@@ -160,6 +160,52 @@ function bindMultiSelect() {
   });
 }
 
+function bindPersonTables() {
+  document.querySelectorAll('.person-table').forEach(table => {
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    const bindRowEvents = row => {
+      row.querySelectorAll('.delete-person').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!confirm('确认删除该相关人员吗？')) return;
+          row.remove();
+        });
+      });
+    };
+
+    tbody.querySelectorAll('tr').forEach(bindRowEvents);
+
+    const addBtn = table.parentElement.querySelector('.add-person-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        const now = new Date().toISOString().slice(0, 10);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input placeholder="人员姓名" /></td>
+          <td>
+            <select>
+              <option>法人</option>
+              <option>负责人</option>
+              <option>财务联系人</option>
+              <option>运营联系人</option>
+            </select>
+          </td>
+          <td><input placeholder="+852-xxxx-xxxx" /></td>
+          <td><input placeholder="name@company.com" /></td>
+          <td><select><option>身份证</option><option>护照</option><option>商业登记证</option></select></td>
+          <td><input placeholder="证件号码" /></td>
+          <td><input type="radio" name="${table.id}-default" /></td>
+          <td>${now}</td>
+          <td class="ops"><button class="btn link">编辑</button><button class="btn link delete-person">删除</button></td>
+        `;
+        tbody.appendChild(tr);
+        bindRowEvents(tr);
+      });
+    }
+  });
+}
+
 function confirmToggle(name, action) {
   alert(`是否${action}该企业：${name}`);
 }
@@ -171,5 +217,6 @@ function resubmit(id) {
 window.addEventListener('DOMContentLoaded', () => {
   applyBrandPaletteFromLogo();
   bindMultiSelect();
+  bindPersonTables();
   if (document.querySelector('.sticky-nav')) bindStickyNav();
 });
