@@ -21,7 +21,13 @@ a { color: var(--primary); text-decoration: none; }
   display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:1000;
 }
 .logo-area { display:flex; align-items:center; gap:12px; font-size:20px; font-weight:700; }
-.logo { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#1677ff,#40a9ff); color:#fff; display:grid; place-items:center; }
+.logo {
+  width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--primary),#40a9ff);
+  color:#fff; display:grid; place-items:center; overflow:hidden; position:relative;
+}
+.logo::after {
+  content:""; position:absolute; inset:0; background:url("../logo.jpg") center/cover no-repeat;
+}
 .top-controls { display:flex; align-items:center; gap:12px; }
 .top-controls select, .top-controls button {
   border:1px solid var(--border); background:#fff; border-radius:8px; height:36px; padding:0 10px;
