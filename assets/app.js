@@ -12,10 +12,27 @@ function rgbToHex(r, g, b) {
 }
 
 function mixWithWhite(r, g, b, ratio = 0.85) {
-  const nr = Math.round(r + (255 - r) * ratio);
-  const ng = Math.round(g + (255 - g) * ratio);
-  const nb = Math.round(b + (255 - b) * ratio);
-  return [nr, ng, nb];
+  return [
+    Math.round(r + (255 - r) * ratio),
+    Math.round(g + (255 - g) * ratio),
+    Math.round(b + (255 - b) * ratio)
+  ];
+}
+
+function mixWithBlack(r, g, b, ratio = 0.2) {
+  return [
+    Math.round(r * (1 - ratio)),
+    Math.round(g * (1 - ratio)),
+    Math.round(b * (1 - ratio))
+  ];
+}
+
+function rotateRgb(r, g, b, dr, dg, db) {
+  return [
+    Math.max(0, Math.min(255, r + dr)),
+    Math.max(0, Math.min(255, g + dg)),
+    Math.max(0, Math.min(255, b + db))
+  ];
 }
 
 function applyBrandPaletteFromLogo() {
@@ -37,17 +54,15 @@ function applyBrandPaletteFromLogo() {
     for (let i = 0; i < data.length; i += 4) {
       const a = data[i + 3];
       if (a < 200) continue;
-
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
 
-      // 过滤近白与近黑，优先提取 logo 主色
       if ((r > 240 && g > 240 && b > 240) || (r < 20 && g < 20 && b < 20)) continue;
 
-      const qr = Math.round(r / 20) * 20;
-      const qg = Math.round(g / 20) * 20;
-      const qb = Math.round(b / 20) * 20;
+      const qr = Math.round(r / 18) * 18;
+      const qg = Math.round(g / 18) * 18;
+      const qb = Math.round(b / 18) * 18;
       const key = `${qr},${qg},${qb}`;
       buckets.set(key, (buckets.get(key) || 0) + 1);
     }
@@ -55,13 +70,30 @@ function applyBrandPaletteFromLogo() {
     if (!buckets.size) return;
     const [top] = [...buckets.entries()].sort((a, b) => b[1] - a[1]);
     const [pr, pg, pb] = top[0].split(',').map(Number);
-    const [sr, sg, sb] = mixWithWhite(pr, pg, pb, 0.88);
-    const [br, bg, bb] = mixWithWhite(pr, pg, pb, 0.95);
+
+    const [pdr, pdg, pdb] = mixWithBlack(pr, pg, pb, 0.2);
+    const [psr, psg, psb] = mixWithWhite(pr, pg, pb, 0.84);
+    const [pgr, pgg, pgb] = mixWithWhite(pr, pg, pb, 0.92);
+    const [bgr, bgg, bgb] = mixWithWhite(pr, pg, pb, 0.95);
+
+    // 从 logo 主色衍生不同语义色，确保全站不再使用默认蓝色语义
+    const [sr, sg, sb] = rotateRgb(pr, pg, pb, -28, 12, -22);
+    const [wr, wg, wb] = rotateRgb(pr, pg, pb, 18, -6, -28);
+    const [dr, dg, db] = rotateRgb(pr, pg, pb, 20, -26, -20);
 
     const root = document.documentElement;
     root.style.setProperty('--primary', rgbToHex(pr, pg, pb));
-    root.style.setProperty('--primary-soft', rgbToHex(sr, sg, sb));
-    root.style.setProperty('--bg', rgbToHex(br, bg, bb));
+    root.style.setProperty('--primary-dark', rgbToHex(pdr, pdg, pdb));
+    root.style.setProperty('--primary-soft', rgbToHex(psr, psg, psb));
+    root.style.setProperty('--primary-ghost', rgbToHex(pgr, pgg, pgb));
+    root.style.setProperty('--bg', rgbToHex(bgr, bgg, bgb));
+
+    root.style.setProperty('--success', rgbToHex(sr, sg, sb));
+    root.style.setProperty('--success-soft', rgbToHex(...mixWithWhite(sr, sg, sb, 0.86)));
+    root.style.setProperty('--warning', rgbToHex(wr, wg, wb));
+    root.style.setProperty('--warning-soft', rgbToHex(...mixWithWhite(wr, wg, wb, 0.86)));
+    root.style.setProperty('--danger', rgbToHex(dr, dg, db));
+    root.style.setProperty('--danger-soft', rgbToHex(...mixWithWhite(dr, dg, db, 0.86)));
   };
 }
 
@@ -88,6 +120,46 @@ function bindStickyNav() {
   onScroll();
 }
 
+function bindMultiSelect() {
+  document.querySelectorAll('.ant-select[data-multiple="true"]').forEach(select => {
+    const valuesEl = select.querySelector('.ant-select-values');
+    const options = Array.from(select.querySelectorAll('.ant-option input[type="checkbox"]'));
+
+    const render = () => {
+      const selected = options.filter(o => o.checked).map(o => o.value);
+      if (!selected.length) {
+        valuesEl.innerHTML = '<span class="ant-select-placeholder">请选择服务通道</span>';
+      } else {
+        valuesEl.innerHTML = selected
+          .map(v => `<span class="ant-tag">${v}<span class="x" data-val="${v}">×</span></span>`)
+          .join('');
+
+        valuesEl.querySelectorAll('.x').forEach(x => {
+          x.addEventListener('click', e => {
+            e.stopPropagation();
+            const target = options.find(o => o.value === x.dataset.val);
+            if (target) target.checked = false;
+            render();
+          });
+        });
+      }
+    };
+
+    select.addEventListener('click', e => {
+      if (e.target.closest('.ant-select-dropdown')) return;
+      select.classList.toggle('open');
+    });
+
+    options.forEach(o => o.addEventListener('change', render));
+
+    document.addEventListener('click', e => {
+      if (!select.contains(e.target)) select.classList.remove('open');
+    });
+
+    render();
+  });
+}
+
 function confirmToggle(name, action) {
   alert(`是否${action}该企业：${name}`);
 }
@@ -98,5 +170,6 @@ function resubmit(id) {
 
 window.addEventListener('DOMContentLoaded', () => {
   applyBrandPaletteFromLogo();
+  bindMultiSelect();
   if (document.querySelector('.sticky-nav')) bindStickyNav();
 });

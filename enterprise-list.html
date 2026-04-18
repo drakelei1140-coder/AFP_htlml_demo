@@ -31,7 +31,18 @@
           <div class="field"><label>地区</label><select><option>香港</option><option>新加坡</option></select></div>
           <div class="field"><label>企业启用状态</label><select><option>全部</option><option>启用</option><option>停用</option></select></div>
           <div class="field"><label>企业审核状态</label><select><option>全部</option><option>待审核</option><option>待风控审核</option><option>待第三方审核</option><option>审核通过</option><option>审核不通过</option></select></div>
-          <div class="field"><label>服务通道</label><select multiple><option>Adyen-AFP</option><option>Adyen-payfac</option><option>其他（预留）</option></select></div>
+          <div class="field">
+            <label>服务通道</label>
+            <div class="ant-select" data-multiple="true">
+              <div class="ant-select-values"></div>
+              <span class="ant-select-arrow">▼</span>
+              <div class="ant-select-dropdown">
+                <label class="ant-option"><input type="checkbox" value="Adyen-AFP" />Adyen-AFP</label>
+                <label class="ant-option"><input type="checkbox" value="Adyen-payfac" />Adyen-payfac</label>
+                <label class="ant-option"><input type="checkbox" value="其他（预留）" />其他（预留）</label>
+              </div>
+            </div>
+          </div>
           <div class="field"><label>创建时间</label><input placeholder="2026-01-01 ~ 2026-03-01" /></div>
 
           <div class="field filter-extra hidden"><label>上單來源</label><select multiple><option>CRM</option><option>DMO</option><option>SaaS</option></select></div>
