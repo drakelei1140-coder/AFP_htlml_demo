@@ -18,6 +18,16 @@
     .merchant-edit .rate-note { margin:8px 0 0; color:var(--muted); }
     .merchant-edit .inline-copy { margin-left:8px; }
     .merchant-edit .switch-wrap { display:flex; align-items:center; justify-content:center; }
+    .merchant-edit .combo-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .merchant-edit .modal-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none;
+      align-items: center; justify-content: center; z-index: 1200;
+    }
+    .merchant-edit .modal { width: min(920px, calc(100vw - 40px)); background: var(--panel); border-radius: 10px; border: 1px solid var(--border); }
+    .merchant-edit .modal-hd, .merchant-edit .modal-ft { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .merchant-edit .modal-ft { border-bottom: none; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .merchant-edit .modal-bd { padding: 12px 16px; max-height: 60vh; overflow: auto; }
+    .merchant-edit .inline-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   </style>
 </head>
 <body class="merchant-edit">
@@ -108,12 +118,43 @@
   <button class="btn primary" type="submit" form="merchantEditForm" id="submitBtn">提交修改</button>
 </section>
 
+<div class="modal-mask" id="editChannelServiceModal">
+  <div class="modal">
+    <div class="modal-hd"><strong>选择渠道及服务</strong></div>
+    <div class="modal-bd">
+      <div class="inline-2">
+        <div>
+          <div class="hint">先选渠道（可多选）</div>
+          <select id="editChannelSelect" multiple size="6" style="width:100%;min-height:180px;">
+            <option value="Adyen">Adyen</option>
+            <option value="CyberSource">CyberSource</option>
+            <option value="Nuvei">Nuvei</option>
+          </select>
+        </div>
+        <div>
+          <div class="hint">再选服务（可多选）</div>
+          <select id="editServiceSelect" multiple size="6" style="width:100%;min-height:180px;"></select>
+        </div>
+      </div>
+      <div class="btns" style="justify-content:flex-start; margin:8px 0;">
+        <button class="btn" type="button" id="editAddChannelServiceComboBtn">添加组合</button>
+      </div>
+      <div class="hint">已选渠道+服务组合</div>
+      <div id="editModalChannelServiceTags" class="combo-tags"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn" type="button" data-edit-close="editChannelServiceModal">取消</button>
+      <button class="btn primary" type="button" id="editConfirmChannelServiceBtn">确认</button>
+    </div>
+  </div>
+</div>
+
 <script src="assets/app.js"></script>
 <script>
   const EMPTY='-';
-  const copyFields = new Set(['MID','CID','SID','渠道编码','服务编码','FPS賬號','銀行號碼','銀行編號','結算身份證號']);
+  const copyFields = new Set(['MID','CID','SID','渠道及服务（通道）','FPS賬號','銀行號碼','銀行編號','結算身份證號']);
   const overview = {
-    MID:'MID-2026-88801', CID:'CID-2026-0004', SID:'SID-3001', 渠道编码:'CHN-ADYEN-HK-01', 服务编码:'SRV-CARD-CNP-01',
+    MID:'MID-2026-88801', CID:'CID-2026-0004', SID:'SID-3001', '渠道及服务（通道）':'Adyen + Online Card；CyberSource + Token Billing',
     进件通道:'Adyen-payfac', 商户审核状态:'总经理审核', 当前审核人:'-', 上單來源:'CRM', 创建人:'Olivia', 创建时间:'2026-04-11 09:11', 更新时间:'2026-04-19 10:25'
   };
 
@@ -139,10 +180,55 @@
     container.insertAdjacentHTML('beforeend', `<div class="field"><label class="${cls}">${name}</label>${input}${copy}</div>`);
   }
 
-  const order=['MID','CID','SID','渠道编码','服务编码','进件通道','商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间'];
+  const order=['MID','CID','SID','渠道及服务（通道）','进件通道','商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间'];
   order.forEach(k => kv(document.getElementById('overviewFields'), k, overview[k], k==='商户审核状态'));
+  const channelServiceMap = {
+    Adyen: ['Online Card', 'POS Card', 'Wallet'],
+    CyberSource: ['Online Card', 'Token Billing'],
+    Nuvei: ['Online Card', 'APM']
+  };
+  let selectedEditChannelServiceCombos = [
+    { channel: 'Adyen', service: 'Online Card' },
+    { channel: 'CyberSource', service: 'Token Billing' }
+  ];
+  let draftEditChannelServiceCombos = [];
 
-  ['MID','CID','SID','渠道编码','服务编码'].forEach(k => field(document.getElementById('keyFields'), k, overview[k]));
+  function renderEditChannelServiceTags(containerId, list, removable = false){
+    const node = document.getElementById(containerId);
+    node.innerHTML = list.map((item, idx) => `
+      <span class="ant-tag">${item.channel} + ${item.service}${removable ? `<span class="x" data-edit-remove-index="${idx}">×</span>` : ''}</span>
+    `).join('');
+    if (removable) {
+      node.querySelectorAll('[data-edit-remove-index]').forEach(btn => {
+        btn.addEventListener('click', ()=>{
+          draftEditChannelServiceCombos.splice(Number(btn.dataset.editRemoveIndex), 1);
+          renderEditChannelServiceTags('editModalChannelServiceTags', draftEditChannelServiceCombos, true);
+        });
+      });
+    }
+  }
+
+  function renderKeyFields(){
+    const keyRoot = document.getElementById('keyFields');
+    keyRoot.innerHTML = '';
+    ['MID','CID','SID'].forEach(k => field(keyRoot, k, overview[k]));
+    keyRoot.insertAdjacentHTML('beforeend', `
+      <div class="field">
+        <label class="required">渠道及服务（通道）</label>
+        <div class="btns" style="justify-content:flex-start;">
+          <button class="btn" type="button" id="editChooseChannelServiceBtn">选择渠道及服务</button>
+        </div>
+        <div id="editSelectedChannelServiceTags" class="combo-tags"></div>
+      </div>
+    `);
+    renderEditChannelServiceTags('editSelectedChannelServiceTags', selectedEditChannelServiceCombos, false);
+    document.getElementById('editChooseChannelServiceBtn').addEventListener('click', ()=>{
+      draftEditChannelServiceCombos = selectedEditChannelServiceCombos.map(x => ({ ...x }));
+      renderEditChannelServiceTags('editModalChannelServiceTags', draftEditChannelServiceCombos, true);
+      document.getElementById('editChannelServiceModal').style.display = 'flex';
+    });
+  }
+  renderKeyFields();
 
   const flow = {
     商户审核状态:'总经理审核', 当前审核人:'-', 上單來源:'CRM', 创建人:'Olivia', 创建时间:'2026-04-11 09:11', 更新时间:'2026-04-19 10:25',
@@ -190,9 +276,50 @@
   const special = {'是否存在在途特殊费率申请':'是','特殊费率申请单号':'SRA-2026-0419-009','特殊费率申请状态':'处理中','特殊费率申请结果':'审批中','特殊费率申请完成时间':'-'};
   Object.entries(special).forEach(([k,v])=>field(document.getElementById('specialFields'),k,v));
 
+  const editChannelSelect = document.getElementById('editChannelSelect');
+  const editServiceSelect = document.getElementById('editServiceSelect');
+  function refreshEditServiceOptions(){
+    const channels = Array.from(editChannelSelect.selectedOptions).map(o=>o.value);
+    const services = [...new Set(channels.flatMap(c => channelServiceMap[c] || []))];
+    editServiceSelect.innerHTML = services.map(s => `<option value="${s}">${s}</option>`).join('');
+  }
+  editChannelSelect.addEventListener('change', refreshEditServiceOptions);
+  refreshEditServiceOptions();
+
+  document.getElementById('editAddChannelServiceComboBtn').addEventListener('click', ()=>{
+    const channels = Array.from(editChannelSelect.selectedOptions).map(o=>o.value);
+    const services = Array.from(editServiceSelect.selectedOptions).map(o=>o.value);
+    if (!channels.length || !services.length) {
+      alert('请先选择渠道，再选择服务。');
+      return;
+    }
+    channels.forEach(channel=>{
+      services.forEach(service=>{
+        if (!draftEditChannelServiceCombos.some(x => x.channel===channel && x.service===service)) {
+          draftEditChannelServiceCombos.push({ channel, service });
+        }
+      });
+    });
+    renderEditChannelServiceTags('editModalChannelServiceTags', draftEditChannelServiceCombos, true);
+  });
+
+  document.getElementById('editConfirmChannelServiceBtn').addEventListener('click', ()=>{
+    selectedEditChannelServiceCombos = draftEditChannelServiceCombos.map(x => ({ ...x }));
+    renderEditChannelServiceTags('editSelectedChannelServiceTags', selectedEditChannelServiceCombos, false);
+    overview['渠道及服务（通道）'] = selectedEditChannelServiceCombos.map(x => `${x.channel} + ${x.service}`).join('；') || '-';
+    document.getElementById('editChannelServiceModal').style.display = 'none';
+  });
+  document.querySelectorAll('[data-edit-close]').forEach(btn => {
+    btn.addEventListener('click', ()=>{ document.getElementById(btn.dataset.editClose).style.display = 'none'; });
+  });
+
   document.getElementById('cancelBtn').addEventListener('click', ()=>history.back());
   document.getElementById('merchantEditForm').addEventListener('submit', (e)=>{
     e.preventDefault();
+    if (!selectedEditChannelServiceCombos.length) {
+      alert('渠道及服务（通道）至少选择一个组合。');
+      return;
+    }
     if (rates.length !== 12 || document.querySelectorAll('#rateBody tr').length !== 12) {
       alert('产品费率 12 行结构不允许缺行、不允许多行。');
       return;
