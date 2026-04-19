@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商户编辑</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .merchant-edit .sticky-nav { top: 72px; z-index: 20; }
+    .merchant-edit .nav-tag { background:#eef3ff; color:#1f3a68; border-color:#cfdbf6; }
+    .merchant-edit .nav-tag.active { background:#e0ecff; color:#123a78; border-color:#9bb7ea; }
+    .merchant-edit .overview-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .merchant-edit .sub-card { border:1px solid var(--border); border-radius:8px; padding:12px; margin-top:12px; }
+    .merchant-edit .mini-title { margin:0 0 10px; font-size:14px; font-weight:600; }
+    .merchant-edit .readonly { background:#fafafa; color:#5f6368; }
+    .merchant-edit .required::after { content:' *'; color:#d4380d; }
+    .merchant-edit .hint { color:var(--muted); font-size:12px; margin-top:6px; }
+    .merchant-edit .rate-note { margin:8px 0 0; color:var(--muted); }
+    .merchant-edit .inline-copy { margin-left:8px; }
+    .merchant-edit .switch-wrap { display:flex; align-items:center; justify-content:center; }
+  </style>
+</head>
+<body class="merchant-edit">
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="merchant-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a class="active" href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+    <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+  </aside>
+
+  <main class="main with-bottom-space">
+    <form id="merchantEditForm">
+      <section id="sec-overview" class="card section-anchor">
+        <h3 class="section-title">页面顶部概览区</h3>
+        <div class="kv overview-grid" id="overviewFields"></div>
+      </section>
+
+      <section class="sticky-nav card">
+        <button type="button" class="nav-tag" data-target="sec-overview">商户概览</button>
+        <button type="button" class="nav-tag" data-target="sec-key">主键与关联</button>
+        <button type="button" class="nav-tag" data-target="sec-flow">审核流转信息</button>
+        <button type="button" class="nav-tag" data-target="sec-enterprise">企业信息摘要</button>
+        <button type="button" class="nav-tag" data-target="sec-shop">商铺信息摘要</button>
+        <button type="button" class="nav-tag" data-target="sec-bank">结算与银行信息</button>
+        <button type="button" class="nav-tag" data-target="sec-rate">产品费率</button>
+        <button type="button" class="nav-tag" data-target="sec-special">特殊费率申请信息</button>
+      </section>
+
+      <section id="sec-key" class="card section-anchor">
+        <h3 class="section-title">主键与关联信息区</h3>
+        <div class="form-grid" id="keyFields"></div>
+      </section>
+
+      <section id="sec-flow" class="card section-anchor">
+        <h3 class="section-title">审核流转信息区</h3>
+        <div class="form-grid" id="flowFields"></div>
+        <p class="hint">本区只展示审核流转信息，不在编辑页做审核动作按钮；编辑页提交后走资料修改待审核流程，不改变当前审核主流程状态。</p>
+      </section>
+
+      <section id="sec-enterprise" class="card section-anchor">
+        <h3 class="section-title">企业信息摘要区</h3>
+        <div class="sub-card"><h4 class="mini-title">基础识别与状态摘要</h4><div class="form-grid" id="enterpriseBase"></div></div>
+        <div class="sub-card"><h4 class="mini-title">企业审核关键字段摘要</h4><div class="form-grid" id="enterpriseKey"></div></div>
+        <div class="sub-card"><h4 class="mini-title">企业风险与业务信息摘要</h4><div class="form-grid" id="enterpriseRisk"></div></div>
+        <div class="btns" style="justify-content:flex-start;"><a class="btn" target="_blank" href="enterprise-detail-approved-enabled.html">查看详情</a></div>
+      </section>
+
+      <section id="sec-shop" class="card section-anchor">
+        <h3 class="section-title">商铺信息摘要区</h3>
+        <div class="sub-card"><h4 class="mini-title">基础识别与状态摘要</h4><div class="form-grid" id="shopBase"></div></div>
+        <div class="sub-card"><h4 class="mini-title">商铺审核关键字段摘要</h4><div class="form-grid" id="shopKey"></div></div>
+        <div class="sub-card"><h4 class="mini-title">商铺风险与业务信息摘要</h4><div class="form-grid" id="shopRisk"></div></div>
+        <div class="btns" style="justify-content:flex-start;"><a class="btn" target="_blank" href="shop-detail-pending.html">查看详情</a></div>
+      </section>
+
+      <section id="sec-bank" class="card section-anchor">
+        <h3 class="section-title">结算与银行信息区</h3>
+        <div class="sub-card"><h4 class="mini-title">结算配置</h4><div class="form-grid" id="settlementFields"></div></div>
+        <div class="sub-card"><h4 class="mini-title">银行账户信息</h4><div class="form-grid" id="bankFields"></div></div>
+        <div class="sub-card"><h4 class="mini-title">结算文件</h4><div class="form-grid" id="fileFields"></div></div>
+      </section>
+
+      <section id="sec-rate" class="card section-anchor">
+        <h3 class="section-title">产品费率区</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>支付产品</th><th>类型</th><th>交易费率（百分比）</th><th>固定收费-百分比</th><th>固定收费-绝对值</th><th>开关</th><th>费率来源</th></tr></thead>
+            <tbody id="rateBody"></tbody>
+          </table>
+        </div>
+        <p class="rate-note">若后续有特殊费率申请覆盖，则在页面中展示当前最终值。编辑页允许修改当前费率配置，但提交后进入资料修改待审核流程。</p>
+      </section>
+
+      <section id="sec-special" class="card section-anchor">
+        <h3 class="section-title">特殊费率申请信息区</h3>
+        <div class="form-grid" id="specialFields"></div>
+      </section>
+    </form>
+  </main>
+</div>
+
+<section class="bottom-actions">
+  <button class="btn" type="button" id="cancelBtn">取消</button>
+  <button class="btn primary" type="submit" form="merchantEditForm" id="submitBtn">提交修改</button>
+</section>
+
+<script src="assets/app.js"></script>
+<script>
+  const EMPTY='-';
+  const copyFields = new Set(['MID','CID','SID','渠道编码','服务编码','FPS賬號','銀行號碼','銀行編號','結算身份證號']);
+  const overview = {
+    MID:'MID-2026-88801', CID:'CID-2026-0004', SID:'SID-3001', 渠道编码:'CHN-ADYEN-HK-01', 服务编码:'SRV-CARD-CNP-01',
+    进件通道:'Adyen-payfac', 商户审核状态:'总经理审核', 当前审核人:'-', 上單來源:'CRM', 创建人:'Olivia', 创建时间:'2026-04-11 09:11', 更新时间:'2026-04-19 10:25'
+  };
+
+  function safe(v){ return v===undefined||v===null||v===''?EMPTY:v; }
+  function copyText(v){ navigator.clipboard?.writeText(v); }
+  function kv(container, name, value, badge){
+    const val = safe(value);
+    const copy = copyFields.has(name) && val!==EMPTY ? `<button type="button" class="btn link inline-copy" onclick="copyText('${String(val).replace(/'/g,"\\'")}')">复制</button>` : '';
+    const html = `<div class="kv-item"><div class="k">${name}</div><div class="v">${badge?`<span class="badge processing">${val}</span>`:val}${copy}</div></div>`;
+    container.insertAdjacentHTML('beforeend', html);
+  }
+  function field(container, name, value, editable=false, required=false, type='text', pattern=''){
+    const val = safe(value);
+    const read = editable ? '' : 'readonly';
+    const ro = editable ? '' : 'readonly';
+    const req = required ? 'required' : '';
+    const cls = required ? 'required' : '';
+    const rule = pattern ? `pattern="${pattern}"` : '';
+    const copy = copyFields.has(name) && val!==EMPTY ? `<button type="button" class="btn link inline-copy" onclick="copyText('${String(val).replace(/'/g,"\\'")}')">复制</button>` : '';
+    const input = type==='file'
+      ? `<input type="file" ${req} />`
+      : `<input type="${type}" value="${val===EMPTY?'':val}" class="${ro}" ${read} ${req} ${rule} />`;
+    container.insertAdjacentHTML('beforeend', `<div class="field"><label class="${cls}">${name}</label>${input}${copy}</div>`);
+  }
+
+  const order=['MID','CID','SID','渠道编码','服务编码','进件通道','商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间'];
+  order.forEach(k => kv(document.getElementById('overviewFields'), k, overview[k], k==='商户审核状态'));
+
+  ['MID','CID','SID','渠道编码','服务编码'].forEach(k => field(document.getElementById('keyFields'), k, overview[k]));
+
+  const flow = {
+    商户审核状态:'总经理审核', 当前审核人:'-', 上單來源:'CRM', 创建人:'Olivia', 创建时间:'2026-04-11 09:11', 更新时间:'2026-04-19 10:25',
+    '当前风险等级（如有）':'中风险', '当前风险评分表状态（如有）':'已完成', 是否存在在途特殊费率申请:'是', 特殊费率申请结果:'审批中', 特殊费率申请完成时间:EMPTY
+  };
+  Object.entries(flow).forEach(([k,v])=>field(document.getElementById('flowFields'),k,v));
+
+  const enterpriseBase = {'企业主显示名称':'Everpeak Digital Commerce','CID':'CID-2026-0004','企业启用状态':'启用','企业审核状态':'已审核通过','進件通道(必須)':'Adyen-payfac','上單來源':'CRM','創建時間':'2026-03-30 11:20','更新時間':'2026-04-18 19:30'};
+  const enterpriseKey = {'公司模式':'直营','公司結構':'有限公司','行業分類 / 業務性質 / 產品服務':'零售 / 服饰','MCC Code':'5651','進階MCC Code':'5651-02','小微商戶':'否','SME 設定':'标准','法律地位':'有限公司','僱員人數':'86','注冊資本':'HKD 5,000,000','企业税务申报分类':'一般纳税人','企业税务业务类型':'本地贸易','平均每月營業額':'HKD 8,900,000','每宗交易平均金額':'HKD 420','每宗交易最大交易額':'HKD 20,000','預計每年交易宗數':'260000','過往拒付比例':'0.3%','過往退款比例':'0.9%','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'7天','是否對公':'是','合約期':'24个月','是否NGO':'否','商戶營業狀態（企業口徑）':'正常营业'};
+  const enterpriseRisk = {'風控類型':'标准风控','風險等級':'中','審核類型':'常规审核','服務類型':'收单服务','合作夥伴推薦人':'Henry Chan','合作夥伴編號':'PARTNER-22','交單備註':'资料齐全','是否高額商戶':'否'};
+  [enterpriseBase,enterpriseKey,enterpriseRisk].forEach((obj,i)=>{const ids=['enterpriseBase','enterpriseKey','enterpriseRisk'][i];Object.entries(obj).forEach(([k,v])=>field(document.getElementById(ids),k,v));});
+
+  const shopBase = {'商铺主显示名称':'Everpeak Central Flagship','SID':'SID-3001','所属企业名称':'Everpeak Digital Commerce','所属企业编号（CID）':'CID-2026-0004','商铺启用状态':'启用','商铺审核状态':'已审核通过','终端设备数量':'8','MID 数量':'1','進件通道(必須)':'Adyen-payfac','上單來源':'CRM','創建時間':'2026-04-01 09:00','更新時間':'2026-04-18 20:00'};
+  const shopKey = {'商铺类型':'线下门店','经营模式':'直营','是否总部':'否','是否默认主门店':'是','行业分类 / 业务性质 / 产品服务':'零售 / 服饰','MCC Code':'5651','進階MCC Code':'5651-02','开店日期':'2021-03-01','商铺营业状态':'营业中','经营年限':'5','小微商戶':'否','SME 設定':'标准','是否NGO':'否','每宗交易平均金額':'HKD 380','每宗交易最大交易額':'HKD 5,000','預計每年交易宗數':'150000','過往拒付比例':'0.6%','過往退款比例':'1.1%','平均每月營業額':'HKD 3,200,000','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'5天','是否對公':'是','合約期':'24个月','小費功能':'开','商戶營業狀態（商铺口徑）':'正常营业'};
+  const shopRisk = {'風控類型':'标准风控','風險等級':'中','審核類型':'常规审核','上單來源':'CRM','服務類型':'收单服务','合作夥伴推薦人':'Henry Chan','合作夥伴編號':'PARTNER-22','交單備註':'资料齐全','是否高額商戶':'否'};
+  [shopBase,shopKey,shopRisk].forEach((obj,i)=>{const ids=['shopBase','shopKey','shopRisk'][i];Object.entries(obj).forEach(([k,v])=>field(document.getElementById(ids),k,v));});
+
+  const settlement = [['結算週期','T+2',true,true],['結算幣種','HKD',true,true],['NP結算週期','T+7',true,true]];
+  settlement.forEach(([k,v,e,r])=>field(document.getElementById('settlementFields'),k,v,e,r));
+  const bank = [
+    ['打款銀行','DBS',true,true],['FPS賬號','fps_8890112',true,true,'text','^[A-Za-z0-9_\-]{4,32}$'],['收款銀行賬戶名稱','Everpeak Digital Commerce Ltd',true,true],
+    ['銀行名稱','DBS Bank',true,true],['銀行號碼','012-889-110',true,true,'text','^[0-9\-]{6,20}$'],['銀行編號','016',true,true,'text','^[0-9]{2,6}$'],
+    ['結算摘要前綴','EVERPEAK',true,false],['卡類型','Credit & Debit',true,false],['結算身份證號','A123456(7)',true,false,'text','^[A-Za-z0-9()\-]{6,20}$'],
+    ['銀行卡歸屬國','中国',true,true],['銀行卡歸屬省','香港',true,true]
+  ];
+  bank.forEach(([k,v,e,r,t,p])=>field(document.getElementById('bankFields'),k,v,e,r,t||'text',p||''));
+  field(document.getElementById('fileFields'),'一份銀行戶口月結單（最近三個月內銀行發出的）','',true,true,'file');
+  field(document.getElementById('fileFields'),'FPS-DBS 申請文件','',true,false,'file');
+
+  const rates = [
+    ['Visa','借记卡-境外'],['Visa','贷记卡-境外'],['Visa','借记卡-境内'],['Visa','贷记卡-境内'],
+    ['Mastercard','借记卡-境外'],['Mastercard','贷记卡-境外'],['Mastercard','借记卡-境内'],['Mastercard','贷记卡-境内'],
+    ['UnionPay','借记卡-境外'],['UnionPay','贷记卡-境外'],['UnionPay','借记卡-境内'],['UnionPay','贷记卡-境内']
+  ];
+  document.getElementById('rateBody').innerHTML = rates.map((r,i)=>`<tr>
+    <td><input class="readonly" readonly value="${r[0]}"/></td>
+    <td><input class="readonly" readonly value="${r[1]}"/></td>
+    <td><input required pattern="^\\d+(\\.\\d{1,4})?%?$" value="${(2+i*0.03).toFixed(2)}%"/></td>
+    <td><input pattern="^\\d+(\\.\\d{1,4})?%?$" value="0.20%"/></td>
+    <td><input pattern="^\\d+(\\.\\d{1,2})?$" value="2.00"/></td>
+    <td class="switch-wrap"><input type="checkbox" ${i!==10?'checked':''}/></td>
+    <td>销售计划模板</td>
+  </tr>`).join('');
+
+  const special = {'是否存在在途特殊费率申请':'是','特殊费率申请单号':'SRA-2026-0419-009','特殊费率申请状态':'处理中','特殊费率申请结果':'审批中','特殊费率申请完成时间':'-'};
+  Object.entries(special).forEach(([k,v])=>field(document.getElementById('specialFields'),k,v));
+
+  document.getElementById('cancelBtn').addEventListener('click', ()=>history.back());
+  document.getElementById('merchantEditForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    if (rates.length !== 12 || document.querySelectorAll('#rateBody tr').length !== 12) {
+      alert('产品费率 12 行结构不允许缺行、不允许多行。');
+      return;
+    }
+    if (!e.target.reportValidity()) {
+      alert('必填未通过时禁止提交。');
+      return;
+    }
+    alert('已提交修改，进入商户资料修改待审核流程（Demo）。');
+    location.href = 'merchant-change-review.html';
+  });
+</script>
+</body>
+</html>
