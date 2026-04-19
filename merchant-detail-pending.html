@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>商户审核详情页</title>
+  <title>商户审核详情页 - 待审核</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <style>
     .detail-page .sticky-nav { top: 72px; }
@@ -153,8 +153,8 @@
 <script>
   const EMPTY = '-';
   const merchantState = {
-    status: '风控核查',
-    startedByCurrentUser: true,
+    status: '待审核',
+    startedByCurrentUser: false,
     currentRole: '风控',
     currentUser: 'Ivy（Risk）',
     isAfpOnly: false,
@@ -202,7 +202,7 @@
   }
 
   function resolveMerchantStatusKey(){
-    if (merchant.status !== '风控核查') return merchant.status;
+    if (merchantState.status !== '风控核查') return merchantState.status;
     return merchantState.startedByCurrentUser ? '风控核查（2）' : '风控核查（1）';
   }
 
