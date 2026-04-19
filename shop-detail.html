@@ -3,79 +3,364 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>商铺详情</title>
+  <title>商户审核详情页</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .detail-page .sticky-nav { top: 72px; }
+    .detail-page .nav-tag { background: #f5f7fb; color: #1f2937; border-color: #d6deeb; }
+    .detail-page .nav-tag.active { background: #e9f2ff; color: #154a8a; border-color: #9bc2f5; }
+    .detail-page .overview-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .detail-page .inline-copy { margin-left: 8px; }
+    .detail-page .muted { color: var(--muted); }
+    .detail-page .warn-bar { background: #fff7e6; border: 1px solid #ffd591; color: #ad6800; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; }
+    .detail-page .sub-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; background: #fff; }
+    .detail-page .mini-title { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+    .detail-page .action-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .detail-page .table-fixed table { min-width: 900px; }
+    .detail-page .readonly-switch { display: inline-flex; align-items: center; gap: 6px; }
+    .detail-page .switch-dot { width: 10px; height: 10px; border-radius: 50%; background: #52c41a; }
+    .detail-page .switch-dot.off { background: #bfbfbf; }
+    .detail-page .drawer-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; z-index: 1200; }
+    .detail-page .drawer { position: fixed; top: 0; right: -520px; width: 520px; max-width: 100%; height: 100%; background: #fff; border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgba(0,0,0,.15); z-index: 1250; transition: right .25s; display: flex; flex-direction: column; }
+    .detail-page .drawer.open { right: 0; }
+    .detail-page .drawer-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .detail-page .drawer-body { padding: 16px; overflow: auto; }
+    .detail-page .drawer-foot { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .detail-page .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1300; display: none; }
+    .detail-page .modal { width: 460px; max-width: calc(100% - 24px); background: #fff; border-radius: 8px; margin: 14vh auto 0; border: 1px solid var(--border); }
+    .detail-page .modal-head,.detail-page .modal-foot { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .detail-page .modal-foot { border-top: 1px solid var(--border); border-bottom: 0; display:flex; justify-content:flex-end; gap:8px; }
+    .detail-page .modal-body { padding: 14px; }
+  </style>
 </head>
-<body>
+<body class="detail-page">
 <header class="shell-top">
-  <div class="logo-area"><div class="logo">K</div><a href="shop-list.html">Kpay CRM</a></div>
-  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div>
+  <div class="logo-area"><div class="logo">K</div><a href="merchant-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia（OPS）</div></div>
 </header>
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a class="active" href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
-    <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
-    <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a class="active" href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li></ul></div>
   </aside>
 
   <main class="main">
-    <section id="overview" class="card section-anchor">
+    <section id="merchant-overview" class="card section-anchor">
       <h3 class="section-title">页面顶部概览区</h3>
-      <div class="kv">
-        <div class="kv-item"><div class="k">商铺主显示名称</div><div class="v">Everpeak Central Flagship</div></div>
-        <div class="kv-item"><div class="k">SID</div><div class="v">SID-3001 <button class="btn link" onclick="copyText('SID-3001')">复制</button></div></div>
-        <div class="kv-item"><div class="k">所属企业名称</div><div class="v">Everpeak Digital Commerce</div></div>
-        <div class="kv-item"><div class="k">所属企业编号（CID）</div><div class="v">CID-2026-0004 <button class="btn link" onclick="copyText('CID-2026-0004')">复制</button></div></div>
-        <div class="kv-item"><div class="k">商铺启用状态</div><div class="v"><span class="badge success">启用</span></div></div>
-        <div class="kv-item"><div class="k">商铺审核状态</div><div class="v"><span class="badge success">审核通过</span></div></div>
-        <div class="kv-item"><div class="k">服务通道</div><div class="v">Adyen-payfac</div></div>
-        <div class="kv-item"><div class="k">上單來源</div><div class="v">CRM</div></div>
-        <div class="kv-item"><div class="k">创建时间</div><div class="v">2026-04-11 09:11</div></div>
-        <div class="kv-item"><div class="k">更新时间</div><div class="v">2026-04-19 10:25</div></div>
-        <div class="kv-item"><div class="k">关联 MID 数量</div><div class="v">3</div></div>
-        <div class="kv-item"><div class="k">终端设备数量</div><div class="v">12</div></div>
-      </div>
-      <div class="btns"><a class="btn" href="shop-edit.html">编辑</a><button class="btn">停用</button></div>
+      <div class="kv overview-grid" id="overviewFields"></div>
+      <h4 class="mini-title" style="margin-top:14px;">页面顶部操作按钮</h4>
+      <div class="action-row" id="merchantActionRow"></div>
     </section>
 
     <section class="sticky-nav card">
-      <button class="nav-tag" data-target="overview">商铺概览</button><button class="nav-tag" data-target="key">商铺主键与关联</button><button class="nav-tag" data-target="name">商铺名称信息</button><button class="nav-tag" data-target="entity">商铺主体与经营信息</button><button class="nav-tag" data-target="base">商铺基础经营数据</button><button class="nav-tag" data-target="contact">商铺联系信息</button><button class="nav-tag" data-target="addr">商铺地址信息</button><button class="nav-tag" data-target="online">商铺线上资料信息</button><button class="nav-tag" data-target="file">商铺文件信息</button><button class="nav-tag" data-target="risk">风控 / 业务信息</button><button class="nav-tag" data-target="person">相关人员</button><button class="nav-tag" data-target="company">关联企业</button><button class="nav-tag" data-target="mid">关联 MID</button><button class="nav-tag" data-target="device">终端设备</button><button class="nav-tag" data-target="timeline">修改记录时间轴</button>
+      <button class="nav-tag" data-target="merchant-overview">商户概览</button>
+      <button class="nav-tag" data-target="key-rel">主键与关联</button>
+      <button class="nav-tag" data-target="flow-info">审核流转信息</button>
+      <button class="nav-tag" data-target="enterprise-review">企业审核信息</button>
+      <button class="nav-tag" data-target="shop-review">商铺审核信息</button>
+      <button class="nav-tag" data-target="settlement-bank">结算与银行信息</button>
+      <button class="nav-tag" data-target="product-rate">产品费率</button>
+      <button class="nav-tag" data-target="special-rate">特殊费率申请信息</button>
+      <button class="nav-tag" data-target="timeline">修改记录时间轴</button>
     </section>
 
-    <section id="key" class="card section-anchor"><h3 class="section-title">商铺主键与关联信息区</h3><div class="form-grid"><div class="field"><label>SID</label><input class="readonly" value="SID-3001" readonly></div><div class="field"><label>所属地区</label><input class="readonly" value="香港" readonly></div><div class="field"><label>服务通道</label><input class="readonly" value="Adyen-payfac" readonly></div><div class="field"><label>默认主联系人人员ID</label><input class="readonly" value="P-10009" readonly></div><div class="field"><label>上级商铺ID（如有）</label><input class="readonly" value="-" readonly></div></div></section>
+    <section id="key-rel" class="card section-anchor">
+      <h3 class="section-title">主键与关联信息区</h3>
+      <div class="form-grid" id="keyRelFields"></div>
+    </section>
 
-    <section id="name" class="card section-anchor"><h3 class="section-title">商铺名称信息区</h3><h4 class="section-title" style="font-size:14px;">4.1 基础名称</h4><div class="form-grid"><div class="field"><label>商铺中文名称</label><input class="readonly" value="远峰中环旗舰店" readonly></div><div class="field"><label>商铺中文简称</label><input class="readonly" value="远峰中环店" readonly></div><div class="field"><label>商铺英文名称</label><input class="readonly" value="Everpeak Central Flagship" readonly></div><div class="field"><label>商铺英文简称</label><input class="readonly" value="Everpeak Central" readonly></div></div><h4 class="section-title" style="font-size:14px;">4.2 其他名称</h4><div class="form-grid"><div class="field"><label>商铺其它名称</label><textarea class="readonly" readonly>Everpeak Main Branch</textarea></div><div class="field"><label>商铺所有名称（中文）</label><textarea class="readonly" readonly>远峰中环旗舰店；远峰中环门市</textarea></div><div class="field"><label>商铺所有名称（英文）</label><textarea class="readonly" readonly>Everpeak Central Flagship; Everpeak Main Branch</textarea></div><div class="field"><label>切换商铺显示名称（中文）</label><input class="readonly" value="远峰旗舰店" readonly></div><div class="field"><label>切换商铺显示名称（英文）</label><input class="readonly" value="Everpeak Flagship" readonly></div></div><h4 class="section-title" style="font-size:14px;">4.3 对外展示名称</h4><div class="form-grid"><div class="field"><label>门头名称</label><input class="readonly" value="Everpeak 中环旗舰店" readonly></div><div class="field"><label>收据显示名称</label><input class="readonly" value="Everpeak Central" readonly></div><div class="field"><label>商店logo</label><input class="readonly" value="everpeak-logo.png" readonly></div></div></section>
+    <section id="flow-info" class="card section-anchor">
+      <h3 class="section-title">审核流转信息区</h3>
+      <div class="form-grid" id="flowFields"></div>
+      <div class="sub-card">
+        <h4 class="mini-title">特殊费率申请相关</h4>
+        <div class="form-grid" id="flowSpecialFields"></div>
+      </div>
+      <p class="desc" style="margin-top:10px;">流转说明（demo）：系统保留“销售主管审核”但自动跳过；仅 AFP 通道自动进入“风控审核完成”；本页面用于审核信息汇总展示。</p>
+    </section>
 
-    <section id="entity" class="card section-anchor"><h3 class="section-title">商铺主体与经营信息区</h3><h4 class="section-title" style="font-size:14px;">5.1 商铺属性</h4><div class="form-grid"><div class="field"><label>商铺类型</label><input class="readonly" value="线下门店" readonly></div><div class="field"><label>经营模式</label><input class="readonly" value="直营" readonly></div><div class="field"><label>是否总部</label><input class="readonly" value="否" readonly></div><div class="field"><label>是否默认主门店</label><input class="readonly" value="是" readonly></div><div class="field"><label>开店日期</label><input class="readonly" value="2021-03-01" readonly></div><div class="field"><label>商铺营业状态</label><input class="readonly" value="营业中" readonly></div><div class="field"><label>商戶營業狀態（商铺口徑）</label><input class="readonly" value="正常营业" readonly></div><div class="field"><label>经营年限</label><input class="readonly" value="5" readonly></div></div><h4 class="section-title" style="font-size:14px;">5.2 行业与经营分类</h4><div class="form-grid"><div class="field"><label>行业分类 / 业务性质 / 产品服务</label><input class="readonly" value="零售/服饰/配件" readonly></div><div class="field"><label>MCC Code</label><input class="readonly" value="5651" readonly></div><div class="field"><label>進階MCC Code</label><input class="readonly" value="5651-02" readonly></div><div class="field"><label>小微商戶</label><input class="readonly" value="否" readonly></div><div class="field"><label>SME 設定</label><input class="readonly" value="标准" readonly></div><div class="field"><label>是否NGO</label><input class="readonly" value="否" readonly></div><div class="field"><label>公司層級（门店口径如有）</label><input class="readonly" value="L2" readonly></div><div class="field"><label>特殊業務屬性標籤</label><input class="readonly" value="跨境电商, 高客单" readonly></div></div><h4 class="section-title" style="font-size:14px;">5.3 补充经营属性</h4><div class="form-grid"><div class="field"><label>special MCC 附件</label><input class="readonly" value="special-mcc.pdf" readonly></div><div class="field"><label>经营说明</label><textarea class="readonly" readonly>主营服饰与生活用品，线上线下混合经营。</textarea></div><div class="field"><label>AFP Store业务说明</label><textarea class="readonly" readonly>通过AFP创建Store用于对接渠道侧收单。</textarea></div><div class="field"><label>聯絡語言</label><input class="readonly" value="中文 / English" readonly></div></div></section>
+    <section id="enterprise-review" class="card section-anchor">
+      <h3 class="section-title">企业审核信息区</h3>
+      <div class="warn-bar" id="enterpriseBlockTip">企业尚未完成风控审核，商户审核暂不可完成</div>
+      <div class="form-grid" id="enterpriseSummary"></div>
+      <div class="sub-card"><h4 class="mini-title">企业审核关键字段摘要</h4><div class="form-grid" id="enterpriseKeyFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">企业风险与业务信息摘要</h4><div class="form-grid" id="enterpriseRiskFields"></div></div>
+      <div class="btns" style="justify-content:flex-start;"><a class="btn" href="enterprise-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="enterpriseAuditBtn">审核</button></div>
+    </section>
 
-    <section id="base" class="card section-anchor"><h3 class="section-title">商铺基础经营数据区</h3><h4 class="section-title" style="font-size:14px;">6.1 交易与经营指标</h4><div class="form-grid"><div class="field"><label>每宗交易平均金額</label><input class="readonly" value="HKD 380" readonly></div><div class="field"><label>每宗交易最大交易額</label><input class="readonly" value="HKD 5,000" readonly></div><div class="field"><label>預計每年交易宗數</label><input class="readonly" value="150,000" readonly></div><div class="field"><label>過往拒付比例</label><input class="readonly" value="0.6%" readonly></div><div class="field"><label>拒付平均處理日數</label><input class="readonly" value="13" readonly></div><div class="field"><label>過往退款比例</label><input class="readonly" value="1.1%" readonly></div><div class="field"><label>退款平均處理日數</label><input class="readonly" value="6" readonly></div><div class="field"><label>平均每月營業額</label><input class="readonly" value="HKD 3,200,000" readonly></div><div class="field"><label>經營方式</label><input class="readonly" value="线上+线下" readonly></div><div class="field"><label>提前收款日數</label><input class="readonly" value="2" readonly></div><div class="field"><label>貨物 / 服務最短送達時間</label><input class="readonly" value="1天" readonly></div><div class="field"><label>貨物 / 服務最長送達時間</label><input class="readonly" value="5天" readonly></div></div><h4 class="section-title" style="font-size:14px;">6.2 合约与业务属性</h4><div class="form-grid"><div class="field"><label>進件通道(必須)</label><input class="readonly" value="Adyen-payfac" readonly></div><div class="field"><label>T1特選商戶</label><input class="readonly" value="否" readonly></div><div class="field"><label>是否對公</label><input class="readonly" value="是" readonly></div><div class="field"><label>小費功能</label><input class="readonly" value="开" readonly></div><div class="field"><label>合約期</label><input class="readonly" value="24个月" readonly></div><div class="field"><label>是否首次申請卡機商戶（包括KPay及其他卡機）</label><input class="readonly" value="否" readonly></div><div class="field"><label>申請過的卡機品牌（多選）</label><input class="readonly" value="KPay, Verifone" readonly></div><div class="field"><label>在上述卡機中，商戶預計使用KPay的業務占比</label><input class="readonly" value="65%" readonly></div><div class="field"><label>重複簽約原因</label><textarea class="readonly" readonly>业务扩展新增门店。</textarea></div></div><h4 class="section-title" style="font-size:14px;">6.3 租赁与场地</h4><div class="form-grid"><div class="field"><label>租金</label><input class="readonly" value="HKD 120,000 / 月" readonly></div><div class="field"><label>租約年期</label><input class="readonly" value="36个月" readonly></div></div></section>
+    <section id="shop-review" class="card section-anchor">
+      <h3 class="section-title">商铺审核信息区</h3>
+      <div class="warn-bar" id="shopBlockTip">商铺尚未完成风控审核，商户审核暂不可完成</div>
+      <div class="form-grid" id="shopSummary"></div>
+      <div class="sub-card"><h4 class="mini-title">商铺审核关键字段摘要</h4><div class="form-grid" id="shopKeyFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">商铺风险与业务信息摘要</h4><div class="form-grid" id="shopRiskFields"></div></div>
+      <div class="btns" style="justify-content:flex-start;"><a class="btn" href="shop-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="shopAuditBtn">审核</button></div>
+    </section>
 
-    <section id="contact" class="card section-anchor"><h3 class="section-title">商铺联系信息区</h3><div class="form-grid"><div class="field"><label>商铺电话</label><input class="readonly" value="+852-2111-1000" readonly></div><div class="field"><label>AFP Store联系电话</label><input class="readonly" value="+852-2111-1999" readonly></div><div class="field"><label>手提电话</label><input class="readonly" value="+852-6123-0987" readonly></div><div class="field"><label>管理员电邮</label><input class="readonly" value="ops.central@everpeak.hk" readonly></div><div class="field"><label>运营电邮</label><input class="readonly" value="ops@everpeak.hk" readonly></div><div class="field"><label>接收营销资讯</label><input class="readonly" value="是" readonly></div><div class="field"><label>微信ID</label><input class="readonly" value="everpeak_ops" readonly></div><div class="field"><label>商铺电话类型</label><input class="readonly" value="座机+手机" readonly></div><div class="field"><label>对外联系窗口名称</label><input class="readonly" value="Everpeak 客服中心" readonly></div></div></section>
+    <section id="merchant-block" class="card section-anchor">
+      <h3 class="section-title">商户审核阻塞提示区</h3>
+      <div class="warn-bar" id="merchantBlockMessage"></div>
+      <p class="desc">存在阻塞时：涉及“完成当前商户审核阶段”的按钮会禁用；企业和商铺区域中的【审核】按钮仍可使用。</p>
+    </section>
 
-    <section id="addr" class="card section-anchor"><h3 class="section-title">商铺地址信息区</h3><h4 class="section-title" style="font-size:14px;">8.1 门店地址</h4><div class="form-grid"><div class="field"><label>门店地址（原始全文）</label><textarea class="readonly" readonly>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>门店地址-街道</label><input class="readonly" value="皇后大道中" readonly></div><div class="field"><label>门店地址-补充地址</label><input class="readonly" value="99号19楼A室" readonly></div><div class="field"><label>门店地址-城市</label><input class="readonly" value="香港" readonly></div><div class="field"><label>门店地址-州 / 省</label><input class="readonly" value="香港岛" readonly></div><div class="field"><label>门店地址-邮编</label><input class="readonly" value="999077" readonly></div><div class="field"><label>门店地址-国家</label><input class="readonly" value="中国香港" readonly></div><div class="field"><label>门店地址-地址行1</label><input class="readonly" value="19/F, 99 Queen's Road Central" readonly></div><div class="field"><label>门店地址-地址行2</label><input class="readonly" value="Room A" readonly></div><div class="field"><label>门店地址-地址行3</label><input class="readonly" value="Central" readonly></div><div class="field"><label>英文门店地址</label><textarea class="readonly" readonly>Room A, 19/F, 99 Queen's Road Central, Hong Kong</textarea></div></div><h4 class="section-title" style="font-size:14px;">8.2 主要营业地址</h4><div class="form-grid"><div class="field"><label>主要營業地址(中文)</label><textarea class="readonly" readonly>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>主要營業地址(英文)</label><textarea class="readonly" readonly>Room A, 19/F, 99 Queen's Road Central, Hong Kong</textarea></div><div class="field"><label>营业地址（原始全文）</label><textarea class="readonly" readonly>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>营业地址-街道</label><input class="readonly" value="皇后大道中" readonly></div><div class="field"><label>营业地址-补充地址</label><input class="readonly" value="99号19楼A室" readonly></div><div class="field"><label>营业地址-城市</label><input class="readonly" value="香港" readonly></div><div class="field"><label>营业地址-州 / 省</label><input class="readonly" value="香港岛" readonly></div><div class="field"><label>营业地址-邮编</label><input class="readonly" value="999077" readonly></div><div class="field"><label>营业地址-国家</label><input class="readonly" value="中国香港" readonly></div></div><h4 class="section-title" style="font-size:14px;">8.3 其他地址补充</h4><div class="form-grid"><div class="field"><label>營業鋪位</label><input class="readonly" value="铺位A1" readonly></div><div class="field"><label>郵政編碼</label><input class="readonly" value="999077" readonly></div><div class="field"><label>營業國家</label><input class="readonly" value="中国香港" readonly></div><div class="field"><label>營業地區</label><input class="readonly" value="中环" readonly></div><div class="field"><label>收机地址</label><textarea class="readonly" readonly>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>邮寄地址</label><textarea class="readonly" readonly>香港邮政信箱0088</textarea></div></div></section>
+    <section id="settlement-bank" class="card section-anchor">
+      <h3 class="section-title">结算与银行信息区</h3>
+      <div class="sub-card"><h4 class="mini-title">结算配置</h4><div class="form-grid" id="settlementFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">银行账户信息</h4><div class="form-grid" id="bankFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">结算文件</h4><div class="form-grid" id="bankFileFields"></div></div>
+    </section>
 
-    <section id="online" class="card section-anchor"><h3 class="section-title">商铺线上资料信息区</h3><h4 class="section-title" style="font-size:14px;">9.1 官网 / App / H5</h4><div class="form-grid"><div class="field"><label>Website(Desktop)</label><input class="readonly" value="https://everpeak.com" readonly></div><div class="field"><label>Website(Mobile)</label><input class="readonly" value="https://m.everpeak.com" readonly></div><div class="field"><label>APP(Andrioid)</label><input class="readonly" value="https://play.google.com/everpeak" readonly></div><div class="field"><label>APP(IOS)</label><input class="readonly" value="https://apps.apple.com/everpeak" readonly></div><div class="field"><label>H5經營網址</label><input class="readonly" value="https://h5.everpeak.com/store3001" readonly></div><div class="field"><label>官网 / App Store URL</label><input class="readonly" value="https://everpeak.com/app" readonly></div></div><h4 class="section-title" style="font-size:14px;">9.2 社交与平台</h4><div class="form-grid"><div class="field"><label>Facebook</label><input class="readonly" value="https://facebook.com/everpeak" readonly></div><div class="field"><label>Instagram</label><input class="readonly" value="https://instagram.com/everpeak" readonly></div><div class="field"><label>Openrice</label><input class="readonly" value="-" readonly></div></div><h4 class="section-title" style="font-size:14px;">9.3 线上政策与目录</h4><div class="form-grid"><div class="field"><label>私隱政策</label><input class="readonly" value="privacy-policy.pdf" readonly></div><div class="field"><label>產品目錄</label><input class="readonly" value="catalog-2026.pdf" readonly></div><div class="field"><label>送貨政策</label><input class="readonly" value="delivery-policy.pdf" readonly></div><div class="field"><label>退貨政策</label><input class="readonly" value="return-policy.pdf" readonly></div><div class="field"><label>退貨政策截圖</label><input class="readonly" value="return-policy-shot.png" readonly></div></div></section>
+    <section id="product-rate" class="card section-anchor table-fixed">
+      <h3 class="section-title">产品费率区</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>支付产品</th><th>类型</th><th>交易费率（百分比）</th><th>固定收费-百分比</th><th>固定收费-绝对值</th><th>开关</th><th>费率来源</th></tr></thead>
+          <tbody id="rateTableBody"></tbody>
+        </table>
+      </div>
+    </section>
 
-    <section id="file" class="card section-anchor"><h3 class="section-title">商铺文件信息区</h3><div class="form-grid"><div class="field"><label>门头照片</label><input class="readonly" value="storefront.jpg" readonly></div><div class="field"><label>店面相片</label><input class="readonly" value="shop-front.jpg" readonly></div><div class="field"><label>店内环境照片</label><input class="readonly" value="indoor.jpg" readonly></div><div class="field"><label>營業環境照片三張</label><input class="readonly" value="env-1.jpg, env-2.jpg, env-3.jpg" readonly></div><div class="field"><label>收银台照片</label><input class="readonly" value="cashier.jpg" readonly></div><div class="field"><label>存倉相片</label><input class="readonly" value="warehouse.jpg" readonly></div><div class="field"><label>营业场所证明</label><input class="readonly" value="business-premise-proof.pdf" readonly></div><div class="field"><label>租赁合同 / 场地证明</label><input class="readonly" value="lease-contract.pdf" readonly></div><div class="field"><label>租約證明</label><input class="readonly" value="lease-proof.pdf" readonly></div><div class="field"><label>地址证明文件</label><input class="readonly" value="address-proof.pdf" readonly></div><div class="field"><label>菜单 / 商品清单 / 服务清单</label><input class="readonly" value="product-list.pdf" readonly></div><div class="field"><label>財務報表審計</label><input class="readonly" value="audit-report.pdf" readonly></div><div class="field"><label>NP其他文檔</label><input class="readonly" value="np-other.zip" readonly></div><div class="field"><label>閉路電視錄影</label><input class="readonly" value="cctv.mp4" readonly></div><div class="field"><label>入货单</label><input class="readonly" value="goods-invoice.pdf" readonly></div><div class="field"><label>最高交易金额的客户单据</label><input class="readonly" value="max-transaction-receipt.pdf" readonly></div><div class="field"><label>營業牌照</label><input class="readonly" value="license.pdf" readonly></div><div class="field"><label>其他补充文件</label><input class="readonly" value="supplementary.pdf" readonly></div></div></section>
+    <section id="special-rate" class="card section-anchor">
+      <h3 class="section-title">特殊费率申请信息区</h3>
+      <div class="form-grid" id="specialRateFields"></div>
+    </section>
 
-    <section id="risk" class="card section-anchor"><h3 class="section-title">风控 / 业务信息区</h3><div class="form-grid"><div class="field"><label>風控類型</label><input class="readonly" value="标准风控" readonly></div><div class="field"><label>風險等級</label><input class="readonly" value="中" readonly></div><div class="field"><label>風險評估報告</label><input class="readonly" value="risk-report.pdf" readonly></div><div class="field"><label>審核類型</label><input class="readonly" value="人工复核" readonly></div><div class="field"><label>上單來源</label><input class="readonly" value="CRM" readonly></div><div class="field"><label>服務類型</label><input class="readonly" value="门店收单" readonly></div><div class="field"><label>合作夥伴推薦人</label><input class="readonly" value="Alice Wong" readonly></div><div class="field"><label>合作夥伴編號</label><input class="readonly" value="PARTNER-9001" readonly></div><div class="field"><label>交單備註</label><textarea class="readonly" readonly>资料齐全，风险可控。</textarea></div><div class="field"><label>是否高額商戶</label><input class="readonly" value="否" readonly></div></div></section>
-
-    <section id="person" class="card section-anchor"><h3 class="section-title">相关人员区</h3><div class="table-wrap"><table style="min-width:1000px;"><thead><tr><th>人员姓名</th><th>人员角色</th><th>手机号码</th><th>电邮地址</th><th>证件类型</th><th>证件号码</th><th>是否默认主联系人</th><th>操作</th></tr></thead><tbody><tr><td>陈一鸣</td><td>负责人</td><td>+852-6666-8899</td><td>owner@everpeak.hk</td><td>身份证</td><td>A1234567</td><td>是</td><td><a href="person-detail.html?id=P-10009">查看详情</a></td></tr><tr><td>林嘉敏</td><td>财务联系人</td><td>+852-6555-2211</td><td>finance@everpeak.hk</td><td>身份证</td><td>B9876543</td><td>否</td><td><a href="person-detail.html?id=P-10035">查看详情</a></td></tr></tbody></table></div></section>
-
-    <section id="company" class="card section-anchor"><h3 class="section-title">关联企业区</h3><div class="table-wrap"><table style="min-width:900px;"><thead><tr><th>企业名称</th><th>企业编号</th><th>地区</th><th>启用状态</th><th>审核状态</th><th>操作</th></tr></thead><tbody><tr><td>Everpeak Digital Commerce</td><td>CID-2026-0004</td><td>香港</td><td><span class="badge success">启用</span></td><td><span class="badge success">审核通过</span></td><td><a href="enterprise-detail-approved-enabled.html">查看详情</a></td></tr></tbody></table></div></section>
-
-    <section id="mid" class="card section-anchor"><h3 class="section-title">关联 MID 区域</h3><div class="table-wrap"><table style="min-width:1000px;"><thead><tr><th>MID 编号</th><th>第三方渠道 MID</th><th>服务通道</th><th>当前状态</th><th>更新时间</th><th>操作</th></tr></thead><tbody><tr><td>MID-88901</td><td>ADYEN-3349001</td><td>Adyen-payfac</td><td>Active</td><td>2026-04-18</td><td><a href="mid-detail.html?id=MID-88901">查看详情</a></td></tr><tr><td>MID-88902</td><td>ADYEN-3349002</td><td>Adyen-payfac</td><td>Active</td><td>2026-04-18</td><td><a href="mid-detail.html?id=MID-88902">查看详情</a></td></tr></tbody></table></div></section>
-
-    <section id="device" class="card section-anchor"><h3 class="section-title">终端设备区域</h3><h4 class="section-title" style="font-size:14px;">15.1 设备摘要字段</h4><div class="table-wrap"><table style="min-width:900px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>数量</th><th>绑定状态</th><th>更新时间</th></tr></thead><tbody><tr><td>KP-T1</td><td>POS终端</td><td>8</td><td>已绑定</td><td>2026-04-18</td></tr><tr><td>KP-SCAN</td><td>扫码枪</td><td>4</td><td>已绑定</td><td>2026-04-18</td></tr></tbody></table></div><h4 class="section-title" style="font-size:14px;">15.2 SID 原设备字段</h4><div class="form-grid"><div class="field"><label>Tap to pay</label><input class="readonly" value="支持" readonly></div><div class="field"><label>終端數量</label><input class="readonly" value="8" readonly></div><div class="field"><label>終端（自助場景專用）數量</label><input class="readonly" value="2" readonly></div><div class="field"><label>配置设备方式——购买/租赁</label><input class="readonly" value="租赁" readonly></div><div class="field"><label>配件數量</label><input class="readonly" value="4" readonly></div><div class="field"><label>每部終端機開戶費 HK$ 2,000</label><input class="readonly" value="HK$ 16,000" readonly></div><div class="field"><label>配件申請表</label><input class="readonly" value="accessory-form.pdf" readonly></div><div class="field"><label>自動打印收據(卡類)</label><input class="readonly" value="开" readonly></div><div class="field"><label>自動打印收據(非卡類)</label><input class="readonly" value="关" readonly></div></div></section>
-
-    <section id="timeline" class="card section-anchor"><h3 class="section-title">修改记录时间轴区</h3><div class="timeline"><div class="item"><strong>2026-04-19 10:25</strong>｜Olivia｜资料修改记录｜更新线上资料与门店照片。</div><div class="item"><strong>2026-04-18 15:30</strong>｜Risk Team｜审核通过记录｜审核意见：风险可控，准入通过。</div><div class="item"><strong>2026-04-16 11:05</strong>｜OPS｜通知补件记录｜补件内容：补充租約證明。</div><div class="item"><strong>2026-04-15 09:40</strong>｜OPS｜审核驳回记录｜审核意见：地址证明文件不清晰。</div><div class="item"><strong>2026-04-11 09:11</strong>｜Olivia｜创建记录｜新建商铺资料。</div><div class="item"><strong>2026-04-20 08:00</strong>｜Device Ops｜终端设备相关摘要变更记录｜新增2台KP-T1终端。</div><div class="item"><strong>2026-04-21 14:30</strong>｜OPS｜启用 / 停用记录｜由停用改为启用。</div></div></section>
+    <section id="timeline" class="card section-anchor">
+      <h3 class="section-title">修改记录时间轴区</h3>
+      <div class="timeline" id="timelineItems"></div>
+    </section>
   </main>
+</div>
+
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="auditDrawer">
+  <div class="drawer-head"><strong id="drawerTitle">企业审核</strong><button class="btn" id="closeDrawerBtn">关闭</button></div>
+  <div class="drawer-body"><div class="form-grid" id="drawerFields"></div></div>
+  <div class="drawer-foot" id="drawerActionRow"></div>
+</aside>
+
+<div class="modal-mask" id="transferModalMask">
+  <div class="modal">
+    <div class="modal-head"><strong>轉交審核</strong></div>
+    <div class="modal-body">
+      <div class="field"><label>选择其他人</label><select id="transferUser"><option>Olivia（OPS）</option><option>Aaron（OPS）</option><option>Ivy（Risk）</option><option>Ethan（Risk）</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn" id="cancelTransfer">取消</button><button class="btn primary" id="confirmTransfer">确认转交</button></div>
+  </div>
 </div>
 
 <script src="assets/app.js"></script>
 <script>
-function copyText(v){navigator.clipboard?.writeText(v);}
+  const EMPTY = '-';
+  const merchantState = {
+    status: '风控核查',
+    startedByCurrentUser: true,
+    currentRole: '风控',
+    currentUser: 'Ivy（Risk）',
+    isAfpOnly: false,
+    enterpriseRiskDone: false,
+    shopRiskDone: false
+  };
+
+  const merchant = {
+    MID: 'MID-2026-88801', CID: 'CID-2026-0004', SID: 'SID-3001', 渠道编码: 'CHN-ADYEN-HK-01', 服务编码: 'SRV-CARD-CNP-01',
+    进件通道: 'Adyen-payfac, Stripe', 商户审核状态: merchantState.status, 当前审核人: merchantState.currentUser,
+    上單來源: 'CRM', 创建人: 'Olivia（OPS）', 创建时间: '2026-04-11 09:11', 更新时间: '2026-04-19 10:25',
+    当前风险等级: '中风险', 当前风险评分表状态: '待补充', 是否存在在途特殊费率申请: '是', 特殊费率申请结果: '审批中', 特殊费率申请完成时间: EMPTY
+  };
+
+  const statusButtonMap = {
+    '待审核': ['开始核查'],
+    '基础资料审核': ['取消簽約','從已有商戶複製資料','轉交審核','遞交審核'],
+    '风控核查（1）': ['开始核查'],
+    '风控核查（2）': ['通知BD（OS补件）','取消签约','风险评分风控核查','退回审核','转交审核','递交风控','基础资料评定'],
+    '风控初级审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '风控中级审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '总经理审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '风控审核完成': []
+  };
+
+  const idFields = new Set(['MID','CID','SID','渠道编码','服务编码','FPS賬號','銀行號碼','銀行編號','結算身份證號']);
+  const fmt = v => (v === null || v === undefined || v === '' ? EMPTY : v);
+
+  function copyText(v){ navigator.clipboard?.writeText(v); }
+  function fieldHTML(k,v){
+    const val = fmt(v);
+    const copyBtn = idFields.has(k) && val !== EMPTY ? `<button class="btn link inline-copy" onclick="copyText('${String(val).replace(/'/g, "\\'")}')">复制</button>` : '';
+    return `<div class="field"><label>${k}</label><input class="readonly" readonly value="${val}">${copyBtn}</div>`;
+  }
+  function kvHTML(k,v,badge){
+    let val = fmt(v);
+    if (badge) val = `<span class="badge processing">${val}</span>`;
+    const copyBtn = idFields.has(k) && val !== EMPTY ? `<button class="btn link inline-copy" onclick="copyText('${String(v).replace(/'/g, "\\'")}')">复制</button>` : '';
+    return `<div class="kv-item"><div class="k">${k}</div><div class="v">${val}${copyBtn}</div></div>`;
+  }
+
+  function buildOverview(){
+    const overviewOrder = ['MID','CID','SID','渠道编码','服务编码','进件通道','商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间'];
+    document.getElementById('overviewFields').innerHTML = overviewOrder.map(k=>kvHTML(k,merchant[k],k==='商户审核状态')).join('');
+  }
+
+  function resolveMerchantStatusKey(){
+    if (merchant.status !== '风控核查') return merchant.status;
+    return merchantState.startedByCurrentUser ? '风控核查（2）' : '风控核查（1）';
+  }
+
+  function needBlock(){ return !merchantState.isAfpOnly && (!merchantState.enterpriseRiskDone || !merchantState.shopRiskDone); }
+
+  function buildActionButtons(){
+    const statusKey = resolveMerchantStatusKey();
+    const names = statusButtonMap[statusKey] || [];
+    const row = document.getElementById('merchantActionRow');
+    row.innerHTML = '';
+    if (!names.length) { row.innerHTML = '<span class="muted">当前状态无详情页操作按钮</span>'; return; }
+    names.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = name === '审核通过' ? 'btn primary' : 'btn';
+      btn.textContent = name;
+      const blockCompleteBtn = ['审核通过','递交风控','遞交審核'].includes(name) && needBlock();
+      if (blockCompleteBtn) {
+        btn.disabled = true;
+        btn.title = '企业或商铺未完成风控审核，暂不可完成商户审核';
+      }
+      btn.onclick = () => onMerchantAction(name);
+      row.appendChild(btn);
+    });
+  }
+
+  function onMerchantAction(name){
+    if (name === '开始核查') {
+      merchantState.startedByCurrentUser = true;
+      merchant.当前审核人 = merchantState.currentUser;
+      merchant.更新时间 = new Date().toISOString().slice(0,16).replace('T',' ');
+      buildOverview(); buildActionButtons();
+      return alert('已进入正式处理状态，并记录当前处理人。');
+    }
+    if (name === '轉交審核' || name === '转交审核') return openTransferModal();
+    if (name === '從已有商戶複製資料') return alert('已执行从已有商户复制资料（mock）。');
+    return alert(`已触发【${name}】（mock）。`);
+  }
+
+  function buildForms(){
+    document.getElementById('keyRelFields').innerHTML = ['MID','CID','SID','渠道编码','服务编码'].map(k=>fieldHTML(k,merchant[k])).join('');
+    document.getElementById('flowFields').innerHTML = ['商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间','当前风险等级','当前风险评分表状态'].map(k=>fieldHTML(k,merchant[k])).join('');
+    document.getElementById('flowSpecialFields').innerHTML = ['是否存在在途特殊费率申请','特殊费率申请结果','特殊费率申请完成时间'].map(k=>fieldHTML(k,merchant[k])).join('');
+  }
+
+  const enterpriseSummaryData = {
+    '企业主显示名称':'Everpeak Digital Commerce', 'CID':'CID-2026-0004', '企业启用状态':'启用', '企业审核状态':'风控审核中', '進件通道(必須)':'Adyen-payfac',
+    '上單來源':'CRM','創建時間':'2026-04-10 16:20','更新時間':'2026-04-19 09:35'
+  };
+  const enterpriseKeyData = {
+    '公司模式':'有限公司','公司結構':'母子公司','行業分類 / 業務性質 / 產品服務':'零售/服饰/配件','MCC Code':'5651','進階MCC Code':'5651-02','小微商戶':'否','SME 設定':'标准','法律地位':'法人企业','僱員人數':'220','注冊資本':'HKD 20,000,000','企业税务申报分类':'一般纳税','企业税务业务类型':'本地+跨境','平均每月營業額':'HKD 31,000,000','每宗交易平均金額':'HKD 450','每宗交易最大交易額':'HKD 12,000','預計每年交易宗數':'1,200,000','過往拒付比例':'0.7%','過往退款比例':'1.3%','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'10天','是否對公':'是','合約期':'24个月','是否NGO':'否','商戶營業狀態（企業口徑）':'正常营业'
+  };
+  const enterpriseRiskData = { '風控類型':'标准风控','風險等級':'中风险','審核類型':'新签约','服務類型':'线下+线上','合作夥伴推薦人':'Blue Harbor Platform','合作夥伴編號':'PARTNER-7788','交單備註':'重点跟进跨境交易比例','是否高額商戶':'是' };
+
+  const shopSummaryData = {
+    '商铺主显示名称':'Everpeak Central Flagship', 'SID':'SID-3001', '所属企业名称':'Everpeak Digital Commerce','所属企业编号（CID）':'CID-2026-0004','商铺启用状态':'启用','商铺审核状态':'风控审核中','终端设备数量':'12','MID 数量':'3','進件通道(必須)':'Adyen-payfac','上單來源':'CRM','創建時間':'2026-04-11 09:11','更新時間':'2026-04-19 10:25'
+  };
+  const shopKeyData = {
+    '商铺类型':'线下门店','经营模式':'直营','是否总部':'否','是否默认主门店':'是','行业分类 / 业务性质 / 产品服务':'零售/服饰/配件','MCC Code':'5651','進階MCC Code':'5651-02','开店日期':'2021-03-01','商铺营业状态':'营业中','经营年限':'5','小微商戶':'否','SME 設定':'标准','是否NGO':'否','每宗交易平均金額':'HKD 380','每宗交易最大交易額':'HKD 5,000','預計每年交易宗數':'150,000','過往拒付比例':'0.6%','過往退款比例':'1.1%','平均每月營業額':'HKD 3,200,000','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'5天','是否對公':'是','合約期':'24个月','小費功能':'开','商戶營業狀態（商铺口徑）':'正常营业'
+  };
+  const shopRiskData = { '風控類型':'标准风控','風險等級':'中风险','審核類型':'新签约','上單來源':'CRM','服務類型':'线下门店','合作夥伴推薦人':'Blue Harbor Platform','合作夥伴編號':'PARTNER-7788','交單備註':'节假日交易峰值波动较大','是否高額商戶':'否' };
+
+  function fillMap(id, map){ document.getElementById(id).innerHTML = Object.entries(map).map(([k,v])=>fieldHTML(k,v)).join(''); }
+
+  function buildMerchantBlock(){
+    let text = '无阻塞，可继续商户审核流程';
+    if (!merchantState.isAfpOnly) {
+      if (!merchantState.enterpriseRiskDone && !merchantState.shopRiskDone) text = '当前企业与商铺均未完成风控审核，暂不可完成商户审核';
+      else if (!merchantState.enterpriseRiskDone) text = '当前企业未完成风控审核，暂不可完成商户审核';
+      else if (!merchantState.shopRiskDone) text = '当前商铺未完成风控审核，暂不可完成商户审核';
+    }
+    document.getElementById('merchantBlockMessage').textContent = text;
+  }
+
+  function buildSettlement(){
+    fillMap('settlementFields', {
+      '結算週期':'T+1','結算幣種':'HKD','NP結算週期':'T+2','打款銀行':'DBS Bank Hong Kong','結算摘要前綴':'EVPKPAY','卡類型':'Credit + Debit'
+    });
+    fillMap('bankFields', {
+      'FPS賬號':'FPS-99881234','收款銀行賬戶名稱':'Everpeak Digital Commerce Limited','銀行名稱':'DBS Bank','銀行號碼':'016','銀行編號':'123-456','結算身份證號':'BR-77889900','銀行卡歸屬國':'中国香港','銀行卡歸屬省':'香港'
+    });
+    document.getElementById('bankFileFields').innerHTML = [
+      ['一份銀行戶口月結單（最近三個月內銀行發出的）','bank-statement-2026-03.pdf'],
+      ['FPS-DBS 申請文件','fps-dbs-apply.pdf']
+    ].map(([k,v]) => `<div class="field"><label>${k}</label><div><span>${v}</span> <a class="btn link" href="#">查看</a> <a class="btn link" href="#">下载</a></div></div>`).join('');
+  }
+
+  function buildRateTable(){
+    const rows = [
+      ['Visa','借记卡-境外'],['Visa','贷记卡-境外'],['Visa','借记卡-境内'],['Visa','贷记卡-境内'],
+      ['Mastercard','借记卡-境外'],['Mastercard','贷记卡-境外'],['Mastercard','借记卡-境内'],['Mastercard','贷记卡-境内'],
+      ['UnionPay','借记卡-境外'],['UnionPay','贷记卡-境外'],['UnionPay','借记卡-境内'],['UnionPay','贷记卡-境内']
+    ];
+    document.getElementById('rateTableBody').innerHTML = rows.map((r,idx)=>{
+      const tr = (1.65 + idx * 0.03).toFixed(2) + '%';
+      const fp = (0.35 + (idx%4)*0.05).toFixed(2) + '%';
+      const fa = 'HKD ' + (1.2 + (idx%3)*0.4).toFixed(2);
+      const on = idx % 5 !== 0;
+      return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${tr}</td><td>${fp}</td><td>${fa}</td><td><span class="readonly-switch"><span class="switch-dot ${on?'':'off'}"></span>${on?'开启':'关闭'}</span></td><td>${idx%2===0?'销售计划模板（已覆盖）':'销售计划模板'}</td></tr>`;
+    }).join('');
+  }
+
+  function buildSpecialRate(){
+    fillMap('specialRateFields', {
+      '是否存在在途特殊费率申请':'是','特殊费率申请单号':'SR-20260419-9001','特殊费率申请状态':'审批中','特殊费率申请结果':'待定','特殊费率申请完成时间':EMPTY
+    });
+  }
+
+  function buildTimeline(){
+    const items = [
+      ['2026-04-19 10:25','Olivia（OPS）','资料修改记录','更新结算摘要前缀、补充门店营业说明。'],
+      ['2026-04-19 09:46','Ivy（Risk）','风险评分记录','审核意见：需补充近三月拒付原因拆分。'],
+      ['2026-04-18 16:05','Ivy（Risk）','通知补件记录','补件内容：请上传新版銀行戶口月結單。'],
+      ['2026-04-18 15:10','Aaron（Risk）','转交审核记录','从 Aaron（Risk） 转交至 Ivy（Risk）。'],
+      ['2026-04-17 14:21','Olivia（OPS）','审核通过 / 驳回记录','审核意见：基础资料完整，提交风控核查。'],
+      ['2026-04-17 09:00','System','特殊费率申请结果回写记录','特殊费率申请进入审批中，等待结果回写。'],
+      ['2026-04-11 09:11','Olivia（OPS）','创建记录','创建商户审核记录。']
+    ];
+    const html = items.map(i => `<div class="item"><strong>${i[0]}</strong>｜${i[1]}｜${i[2]}｜${i[3]}</div>`).join('');
+    document.getElementById('timelineItems').innerHTML = html || '<div class="muted">暂无记录</div>';
+  }
+
+  function openDrawer(title, fields, actions){
+    document.getElementById('drawerTitle').textContent = title;
+    document.getElementById('drawerFields').innerHTML = Object.entries(fields).map(([k,v])=>fieldHTML(k,v)).join('');
+    document.getElementById('drawerActionRow').innerHTML = actions.map(a => `<button class="btn ${a==='审核通过'?'primary':''}" onclick="alert('已执行【${a}】（mock），并刷新状态展示。')">${a}</button>`).join('');
+    document.getElementById('drawerMask').style.display = 'block';
+    document.getElementById('auditDrawer').classList.add('open');
+  }
+  function closeDrawer(){ document.getElementById('drawerMask').style.display = 'none'; document.getElementById('auditDrawer').classList.remove('open'); }
+  function openTransferModal(){ document.getElementById('transferModalMask').style.display = 'block'; }
+  function closeTransferModal(){ document.getElementById('transferModalMask').style.display = 'none'; }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    applyBrandPaletteFromLogo();
+    bindStickyNav();
+    buildOverview();
+    buildActionButtons();
+    buildForms();
+    fillMap('enterpriseSummary', enterpriseSummaryData);
+    fillMap('enterpriseKeyFields', enterpriseKeyData);
+    fillMap('enterpriseRiskFields', enterpriseRiskData);
+    fillMap('shopSummary', shopSummaryData);
+    fillMap('shopKeyFields', shopKeyData);
+    fillMap('shopRiskFields', shopRiskData);
+    buildMerchantBlock();
+    buildSettlement();
+    buildRateTable();
+    buildSpecialRate();
+    buildTimeline();
+
+    document.getElementById('enterpriseAuditBtn').onclick = () => openDrawer('企业审核', enterpriseSummaryData, ['退回审核','审核通过']);
+    document.getElementById('shopAuditBtn').onclick = () => openDrawer('商铺审核', shopSummaryData, ['退回审核','审核通过']);
+    document.getElementById('drawerMask').onclick = closeDrawer;
+    document.getElementById('closeDrawerBtn').onclick = closeDrawer;
+    document.getElementById('cancelTransfer').onclick = closeTransferModal;
+    document.getElementById('confirmTransfer').onclick = () => { alert('已转交给：' + document.getElementById('transferUser').value); closeTransferModal(); };
+    document.getElementById('transferModalMask').addEventListener('click', e => { if (e.target === e.currentTarget) closeTransferModal(); });
+  });
 </script>
 </body>
 </html>
