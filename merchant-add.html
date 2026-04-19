@@ -65,7 +65,6 @@
       <section class="sticky-nav card">
         <button class="nav-tag" data-target="overview">商户概览</button>
         <button class="nav-tag" data-target="primary">主键与关联</button>
-        <button class="nav-tag" data-target="audit">审核流转信息</button>
         <button class="nav-tag" data-target="enterprise">企业新增 / 选择</button>
         <button class="nav-tag" data-target="shop">商铺新增 / 选择</button>
         <button class="nav-tag" data-target="settle">结算与银行信息</button>
@@ -79,25 +78,13 @@
           <div class="field"><label>MID</label><div class="muted-box">系统保存后生成</div></div>
           <div class="field"><label>CID</label><input id="cid" readonly placeholder="请选择企业后自动回显" /></div>
           <div class="field"><label>SID</label><input id="sid" readonly placeholder="请选择商铺后自动回显" /></div>
-          <div class="field"><label class="required">渠道编码</label><input id="channelCode" required /></div>
-          <div class="field"><label class="required">服务编码</label><input id="serviceCode" required /></div>
-        </div>
-      </section>
-
-      <section id="audit" class="card section-anchor">
-        <h3 class="section-title">审核流转信息区</h3>
-        <div class="form-grid">
-          <div class="field"><label>商户审核状态</label><input id="auditStatus" value="待审核" readonly /></div>
-          <div class="field"><label>当前审核人</label><input readonly placeholder="" /></div>
-          <div class="field"><label>上單來源</label><input id="sourceAudit" value="CRM" /></div>
-          <div class="field"><label>创建人</label><input value="Olivia" readonly /></div>
-          <div class="field"><label>创建时间</label><input id="createTime" readonly placeholder="保存后生成" /></div>
-          <div class="field"><label>更新时间</label><input id="updateTime" readonly placeholder="保存后生成" /></div>
-          <div class="field"><label>当前风险等级（如有）</label><input readonly placeholder="" /></div>
-          <div class="field"><label>当前风险评分表状态（如有）</label><input readonly placeholder="" /></div>
-          <div class="field"><label>是否存在在途特殊费率申请</label><select id="inFlightAudit"><option>否</option><option>是</option></select></div>
-          <div class="field"><label>特殊费率申请结果</label><input readonly placeholder="" /></div>
-          <div class="field"><label>特殊费率申请完成时间</label><input readonly placeholder="" /></div>
+          <div class="field">
+            <label class="required">渠道及服务（通道）</label>
+            <div class="btns-inline">
+              <button class="btn" type="button" id="chooseChannelServiceBtn">选择渠道及服务</button>
+            </div>
+            <div id="selectedChannelServiceTags" class="btns-inline" style="margin-top:8px;"></div>
+          </div>
         </div>
       </section>
 
@@ -270,6 +257,37 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="channelServiceModal">
+    <div class="modal">
+      <div class="modal-hd"><strong>选择渠道及服务</strong></div>
+      <div class="modal-bd">
+        <div class="inline-2">
+          <div>
+            <div class="hint">先选渠道（可多选）</div>
+            <select id="channelSelect" multiple size="6" style="width:100%;min-height:180px;">
+              <option value="Adyen">Adyen</option>
+              <option value="CyberSource">CyberSource</option>
+              <option value="Nuvei">Nuvei</option>
+            </select>
+          </div>
+          <div>
+            <div class="hint">再选服务（可多选）</div>
+            <select id="serviceSelect" multiple size="6" style="width:100%;min-height:180px;"></select>
+          </div>
+        </div>
+        <div class="btns-inline" style="margin:8px 0;">
+          <button class="btn" type="button" id="addChannelServiceComboBtn">添加组合</button>
+        </div>
+        <div class="hint">已选渠道+服务组合</div>
+        <div id="modalChannelServiceTags" class="btns-inline" style="margin-top:8px;"></div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn" type="button" data-close="channelServiceModal">取消</button>
+        <button class="btn primary" type="button" id="confirmChannelServiceBtn">确认</button>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/app.js"></script>
   <script>
     const enterpriseList = [
@@ -298,6 +316,13 @@
 
     let selectedEnterprise = null;
     let selectedShop = null;
+    let selectedChannelServiceCombos = [];
+    let draftChannelServiceCombos = [];
+    const channelServiceMap = {
+      Adyen: ['Online Card', 'POS Card', 'Wallet'],
+      CyberSource: ['Online Card', 'Token Billing'],
+      Nuvei: ['Online Card', 'APM']
+    };
 
     const enterpriseSummaryKeys = [
       '企业主显示名称','CID','企业启用状态','企业审核状态','進件通道(必須)','上單來源','創建時間','更新時間',
@@ -317,6 +342,21 @@
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function renderChannelServiceTags(containerId, list, removable = false) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = list.map((item, idx) => `
+        <span class="ant-tag">${item.channel} + ${item.service}${removable ? `<span class="x" data-remove-index="${idx}">×</span>` : ''}</span>
+      `).join('');
+      if (removable) {
+        el.querySelectorAll('[data-remove-index]').forEach(node => {
+          node.addEventListener('click', () => {
+            draftChannelServiceCombos.splice(Number(node.dataset.removeIndex), 1);
+            renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+          });
+        });
+      }
+    }
 
     function renderSummary(data, keys, container, idAlias = {}) {
       container.innerHTML = keys.map(k => {
@@ -483,6 +523,7 @@
       const rateCount = document.querySelectorAll('#rateRows tr').length;
       if (rateCount !== 12) errors.push('产品费率必须固定 12 行');
 
+      if (!selectedChannelServiceCombos.length) errors.push('渠道及服务（通道）至少选择一个组合');
       if (!selectedEnterprise) errors.push('必须先选择企业');
       if (!selectedShop) errors.push('必须先选择商铺');
 
@@ -531,11 +572,6 @@
           return;
         }
 
-        const now = new Date();
-        const fmt = now.toISOString().slice(0, 19).replace('T', ' ');
-        document.getElementById('createTime').value = fmt;
-        document.getElementById('updateTime').value = fmt;
-        document.getElementById('auditStatus').value = '待审核';
         alert('保存成功：已创建正式商户数据，进入待审核状态（MID由系统生成）');
       });
 
@@ -543,11 +579,45 @@
         btn.addEventListener('click', () => closeModal(btn.dataset.close));
       });
 
-      document.getElementById('inFlightSpecial').addEventListener('change', (e) => {
-        document.getElementById('inFlightAudit').value = e.target.value;
+      const channelSelect = document.getElementById('channelSelect');
+      const serviceSelect = document.getElementById('serviceSelect');
+
+      function refreshServiceOptions() {
+        const selectedChannels = Array.from(channelSelect.selectedOptions).map(o => o.value);
+        const services = [...new Set(selectedChannels.flatMap(c => channelServiceMap[c] || []))];
+        serviceSelect.innerHTML = services.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+
+      channelSelect.addEventListener('change', refreshServiceOptions);
+      refreshServiceOptions();
+
+      document.getElementById('chooseChannelServiceBtn').addEventListener('click', () => {
+        draftChannelServiceCombos = selectedChannelServiceCombos.map(x => ({ ...x }));
+        renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+        openModal('channelServiceModal');
       });
-      document.getElementById('inFlightAudit').addEventListener('change', (e) => {
-        document.getElementById('inFlightSpecial').value = e.target.value;
+
+      document.getElementById('addChannelServiceComboBtn').addEventListener('click', () => {
+        const channels = Array.from(channelSelect.selectedOptions).map(o => o.value);
+        const services = Array.from(serviceSelect.selectedOptions).map(o => o.value);
+        if (!channels.length || !services.length) {
+          alert('请先选择渠道，再选择服务。');
+          return;
+        }
+        channels.forEach(channel => {
+          services.forEach(service => {
+            if (!draftChannelServiceCombos.some(x => x.channel === channel && x.service === service)) {
+              draftChannelServiceCombos.push({ channel, service });
+            }
+          });
+        });
+        renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+      });
+
+      document.getElementById('confirmChannelServiceBtn').addEventListener('click', () => {
+        selectedChannelServiceCombos = draftChannelServiceCombos.map(x => ({ ...x }));
+        renderChannelServiceTags('selectedChannelServiceTags', selectedChannelServiceCombos, false);
+        closeModal('channelServiceModal');
       });
     });
   </script>
