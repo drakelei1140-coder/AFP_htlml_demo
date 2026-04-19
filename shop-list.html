@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商铺管理-列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="shell-top">
+    <div class="logo-area"><div class="logo">K</div><a href="shop-list.html">Kpay CRM</a></div>
+    <div class="top-controls">
+      <select><option>地区：香港</option><option>地区：新加坡</option></select>
+      <select><option>语言：简体中文</option><option>English</option></select>
+      <button title="设置">⚙️</button>
+      <button title="通知">🔔</button>
+      <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a class="active" href="shop-list.html">商铺管理</a></li><li><a href="merchant-review.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
+
+    <main class="main">
+      <section class="card">
+        <h3 class="section-title">筛选区</h3>
+        <div class="grid-3">
+          <div class="field"><label>商铺名称关键词</label><input placeholder="商铺名称/简称/英文名" /></div>
+          <div class="field"><label>地区</label><select><option>香港</option><option>新加坡</option><option>澳门</option></select></div>
+          <div class="field"><label>商铺启用状态</label><select><option>全部</option><option>启用</option><option>停用</option></select></div>
+          <div class="field"><label>商铺审核状态</label><select><option>全部</option><option>待审核</option><option>待风控审核</option><option>待第三方审核</option><option>审核通过</option><option>审核不通过</option></select></div>
+          <div class="field"><label>服务通道</label><div class="ant-select" data-multiple="true"><div class="ant-select-values"></div><span class="ant-select-arrow">▼</span><div class="ant-select-dropdown"><label class="ant-option"><input type="checkbox" value="Adyen-AFP" />Adyen-AFP</label><label class="ant-option"><input type="checkbox" value="Adyen-payfac" />Adyen-payfac</label><label class="ant-option"><input type="checkbox" value="Stripe" />Stripe</label></div></div></div>
+          <div class="field"><label>创建时间</label><input placeholder="2026-01-01 ~ 2026-03-01" /></div>
+
+          <div class="field filter-extra hidden"><label>商铺编号</label><input placeholder="SHOP-" /></div>
+          <div class="field filter-extra hidden"><label>所属企业名称</label><input placeholder="输入所属企业名称" /></div>
+          <div class="field filter-extra hidden"><label>所属企业编号（CID）</label><input placeholder="CID-" /></div>
+          <div class="field filter-extra hidden"><label>上單來源</label><div class="ant-select" data-multiple="true"><div class="ant-select-values"></div><span class="ant-select-arrow">▼</span><div class="ant-select-dropdown"><label class="ant-option"><input type="checkbox" value="CRM" />CRM</label><label class="ant-option"><input type="checkbox" value="SaaS" />SaaS</label><label class="ant-option"><input type="checkbox" value="External-API" />External-API</label></div></div></div>
+          <div class="field filter-extra hidden"><label>商铺类型</label><select><option>全部</option><option>线下门店</option><option>线上商铺</option><option>混合</option></select></div>
+          <div class="field filter-extra hidden"><label>经营模式</label><select><option>全部</option><option>直营</option><option>加盟</option><option>联营</option></select></div>
+          <div class="field filter-extra hidden"><label>MCC Code</label><input placeholder="5651" /></div>
+          <div class="field filter-extra hidden"><label>商铺电话</label><input placeholder="+852-xxxx-xxxx" /></div>
+          <div class="field filter-extra hidden"><label>管理员电邮</label><input placeholder="manager@shop.com" /></div>
+        </div>
+        <div class="btns"><button class="btn primary">查询</button><button class="btn">重置</button><button id="toggleFilterBtn" data-expanded="0" class="btn" onclick="toggleFilters()">展开</button></div>
+      </section>
+
+      <section class="card toolbar">
+        <h3 class="section-title" style="margin:0;">功能区</h3>
+        <div class="btns" style="margin:0;"><button class="btn">导出</button><button class="btn">导入</button><a class="btn primary" href="shop-add.html">新增</a></div>
+      </section>
+
+      <section class="card">
+        <h3 class="section-title">列表区</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>商铺名称</th><th>商铺编号</th><th>所属企业名称</th><th>所属企业编号（CID）</th><th>地区</th><th>商铺启用状态</th><th>商铺审核状态</th><th>服务通道</th><th>商铺类型</th><th>经营模式</th><th>MCC Code</th><th>商铺电话</th><th>管理员电邮</th><th>上單來源</th><th>创建人</th><th>创建时间</th><th>更新时间</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Everpeak Central Flagship</td><td>SHOP-3001</td><td>Everpeak Digital Commerce</td><td>CID-2026-0004</td><td>香港</td><td></td><td><span class="badge warning">待审核</span></td><td>Adyen-AFP</td><td>线下门店</td><td>直营</td><td>5651</td><td>+852-2111-1000</td><td>ops.central@everpeak.hk</td><td>CRM</td><td>Olivia（OPS）</td><td>2026-04-11</td><td>2026-04-18</td><td class="ops"><a href="shop-detail-pending.html">查看详情</a></td></tr>
+              <tr><td>Blue Harbor Online Store</td><td>SHOP-3002</td><td>Blue Harbor F&B Group</td><td>CID-2026-0002</td><td>新加坡</td><td></td><td><span class="badge processing">待风控审核</span></td><td>Adyen-payfac</td><td>线上商铺</td><td>联营</td><td>5812</td><td>+65-6000-2211</td><td>risk@blueharbor.sg</td><td>SaaS</td><td>Blue Harbor Platform</td><td>2026-04-10</td><td>2026-04-18</td><td class="ops"><a href="shop-detail-risk.html">查看详情</a></td></tr>
+              <tr><td>Nova AFP Store</td><td>SHOP-3003</td><td>Nova Retail Holdings</td><td>CID-2026-0001</td><td>香港</td><td></td><td><span class="badge processing">待第三方审核</span></td><td>Adyen-AFP</td><td>线上商铺</td><td>直营</td><td>5947</td><td>+852-2333-0101</td><td>api@nova.com</td><td>External-API</td><td>Nova External Platform</td><td>2026-04-09</td><td>2026-04-18</td><td class="ops"><a href="shop-detail-thirdparty.html">查看详情</a></td></tr>
+              <tr><td>Everpeak TST Branch</td><td>SHOP-3004</td><td>Everpeak Digital Commerce</td><td>CID-2026-0004</td><td>香港</td><td><span class="badge success">启用</span></td><td><span class="badge success">审核通过</span></td><td>Adyen-payfac</td><td>线下门店</td><td>直营</td><td>5651</td><td>+852-2999-8800</td><td>manager.tst@everpeak.hk</td><td>CRM</td><td>Ivy（OPS）</td><td>2026-03-20</td><td>2026-04-16</td><td class="ops"><a href="shop-detail-approved-enabled.html">查看详情</a><a href="shop-edit.html">编辑</a><button class="btn link" onclick="confirmToggle('Everpeak TST Branch','停用')">停用</button></td></tr>
+              <tr><td>Everpeak Outlet East</td><td>SHOP-3005</td><td>Everpeak Digital Commerce</td><td>CID-2026-0004</td><td>香港</td><td><span class="badge">停用</span></td><td><span class="badge success">审核通过</span></td><td>Adyen-payfac</td><td>线下门店</td><td>加盟</td><td>5651</td><td>+852-2777-7711</td><td>east@everpeak.hk</td><td>CRM</td><td>Aaron（OPS）</td><td>2026-02-14</td><td>2026-04-15</td><td class="ops"><a href="shop-detail-approved-disabled.html">查看详情</a><a href="shop-edit.html">编辑</a><button class="btn link" onclick="confirmToggle('Everpeak Outlet East','启用')">启用</button></td></tr>
+              <tr><td>Aster Kids Campus Shop</td><td>SHOP-3006</td><td>Aster Kids Education Group</td><td>CID-2026-0006</td><td>澳门</td><td></td><td><span class="badge danger">审核不通过</span></td><td>Adyen-AFP</td><td>线下门店</td><td>直营</td><td>8299</td><td>+853-6222-7788</td><td>admin@asterkids.mo</td><td>SaaS</td><td>Aster SaaS Platform</td><td>2026-04-08</td><td>2026-04-18</td><td class="ops"><a href="shop-detail-rejected.html">查看详情</a><button class="btn link" onclick="resubmit('SHOP-3006')">重新提交审核</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
