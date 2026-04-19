@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商铺编辑</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo"></div><a href="shop-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a class="active" href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+  </aside>
+
+  <main class="main with-bottom-space">
+    <section id="overview" class="card section-anchor">
+      <h3 class="section-title">页面顶部基础信息区</h3>
+      <div class="kv">
+        <div class="kv-item"><div class="k">商铺主显示名称</div><div class="v">Everpeak Central Flagship（只读展示）</div></div>
+        <div class="kv-item"><div class="k">SID</div><div class="v">SID-3001 <button class="btn link" onclick="copyText('SID-3001')">复制</button></div></div>
+        <div class="kv-item"><div class="k">所属企业名称</div><div class="v">Everpeak Digital Commerce</div></div>
+        <div class="kv-item"><div class="k">所属企业编号（CID）</div><div class="v">CID-2026-0004 <button class="btn link" onclick="copyText('CID-2026-0004')">复制</button></div></div>
+        <div class="kv-item"><div class="k">商铺启用状态</div><div class="v"><span class="badge success">启用</span></div></div>
+        <div class="kv-item"><div class="k">商铺审核状态</div><div class="v"><span class="badge processing">已审核通过</span></div></div>
+        <div class="kv-item"><div class="k">服务通道</div><div class="v">Adyen-payfac</div></div>
+        <div class="kv-item"><div class="k">上單來源</div><div class="v">CRM</div></div>
+        <div class="kv-item"><div class="k">创建人</div><div class="v">Olivia</div></div>
+        <div class="kv-item"><div class="k">创建时间</div><div class="v">2026-04-11 09:11</div></div>
+        <div class="kv-item"><div class="k">更新时间</div><div class="v">2026-04-19 10:25</div></div>
+      </div>
+    </section>
+
+    <section class="sticky-nav card">
+      <button class="nav-tag" data-target="overview">商铺概览</button>
+      <button class="nav-tag" data-target="key">商铺主键与关联</button>
+      <button class="nav-tag" data-target="name">商铺名称信息</button>
+      <button class="nav-tag" data-target="entity">商铺主体与经营信息</button>
+      <button class="nav-tag" data-target="base">商铺基础经营数据</button>
+      <button class="nav-tag" data-target="contact">商铺联系信息</button>
+      <button class="nav-tag" data-target="addr">商铺地址信息</button>
+      <button class="nav-tag" data-target="online">商铺线上资料信息</button>
+      <button class="nav-tag" data-target="file">商铺文件信息</button>
+      <button class="nav-tag" data-target="risk">风控 / 业务信息</button>
+      <button class="nav-tag" data-target="person">相关人员</button>
+      <button class="nav-tag" data-target="company">关联企业</button>
+      <button class="nav-tag" data-target="mid">关联 MID</button>
+      <button class="nav-tag" data-target="device">终端设备</button>
+    </section>
+
+    <section id="key" class="card section-anchor"><h3 class="section-title">商铺主键与关联信息区</h3><div class="form-grid">
+      <div class="field"><label>SID</label><input class="readonly" value="SID-3001" readonly></div>
+      <div class="field"><label>所属地区</label><select><option>香港</option><option>澳门</option></select></div>
+      <div class="field"><label>服务通道</label><input class="readonly" value="Adyen-payfac" readonly></div>
+      <div class="field"><label>默认主联系人人员ID</label><input value="P-10009" id="defaultPersonId"></div>
+      <div class="field"><label>上级商铺ID（如有）</label><input placeholder="请输入上级商铺ID" value="SID-2008"></div>
+    </div></section>
+
+    <section id="name" class="card section-anchor"><h3 class="section-title">商铺名称信息区</h3><div class="form-grid">
+      <div class="field"><label>商铺中文名称</label><input value="远峰中环旗舰店"></div><div class="field"><label>商铺中文简称</label><input value="远峰中环店"></div>
+      <div class="field"><label>商铺英文名称</label><input value="Everpeak Central Flagship"></div><div class="field"><label>商铺英文简称</label><input value="Everpeak Central"></div>
+      <div class="field"><label>商铺其它名称</label><textarea>Everpeak Main Branch</textarea></div><div class="field"><label>商铺所有名称（中文）</label><textarea>远峰中环旗舰店；远峰中环门市</textarea></div>
+      <div class="field"><label>商铺所有名称（英文）</label><textarea>Everpeak Central Flagship; Everpeak Main Branch</textarea></div><div class="field"><label>切换商铺显示名称（中文）</label><input value="远峰旗舰店"></div>
+      <div class="field"><label>切换商铺显示名称（英文）</label><input value="Everpeak Flagship"></div><div class="field"><label>门头名称</label><input value="Everpeak 中环旗舰店"></div>
+      <div class="field"><label>收据显示名称</label><input value="Everpeak Central"></div><div class="field"><label>商店logo</label><input type="file"><small><a href="#">查看当前文件</a></small></div>
+    </div></section>
+
+    <section id="entity" class="card section-anchor"><h3 class="section-title">商铺主体与经营信息区</h3><div class="form-grid">
+      <div class="field"><label>商铺类型</label><select><option>线下门店</option></select></div><div class="field"><label>经营模式</label><select><option>直营</option><option>加盟</option></select></div>
+      <div class="field"><label>是否总部</label><select><option>否</option><option>是</option></select></div><div class="field"><label>是否默认主门店</label><select><option>是</option><option>否</option></select></div>
+      <div class="field"><label>行业分类 / 业务性质 / 产品服务</label><input value="零售/服饰/配件"></div><div class="field"><label>MCC Code</label><input value="5651"></div>
+      <div class="field"><label>進階MCC Code</label><input value="5651-02"></div><div class="field"><label>special MCC 附件</label><input type="file"><small><a href="#">查看当前文件</a></small></div>
+      <div class="field"><label>开店日期</label><input type="date" value="2021-03-01"></div><div class="field"><label>商铺营业状态</label><select><option>营业中</option><option>暂停营业</option></select></div>
+      <div class="field"><label>商戶營業狀態（商铺口徑）</label><input value="正常营业"></div><div class="field"><label>经营年限</label><input value="5"></div>
+      <div class="field"><label>小微商戶</label><select><option>否</option><option>是</option></select></div><div class="field"><label>SME 設定</label><select><option>标准</option></select></div>
+      <div class="field"><label>是否NGO</label><select><option>否</option><option>是</option></select></div><div class="field"><label>公司層級（门店口径如有）</label><input value="L2"></div>
+      <div class="field"><label>经营说明</label><textarea>主营服饰与生活用品，线上线下混合经营。</textarea></div><div class="field"><label>特殊業務屬性標籤</label><input value="跨境电商, 高客单"></div>
+      <div class="field"><label>AFP Store业务说明</label><textarea>用于对接渠道侧收单。</textarea></div><div class="field"><label>聯絡語言</label><input value="中文 / English"></div>
+    </div></section>
+
+    <section id="base" class="card section-anchor"><h3 class="section-title">商铺基础经营数据区</h3><div class="form-grid">
+      <div class="field"><label>進件通道(必須)</label><select><option>Adyen-payfac</option></select></div><div class="field"><label>每宗交易平均金額</label><input value="HKD 380"></div>
+      <div class="field"><label>每宗交易最大交易額</label><input value="HKD 5,000"></div><div class="field"><label>預計每年交易宗數</label><input value="150000"></div>
+      <div class="field"><label>過往拒付比例</label><input value="0.6%"></div><div class="field"><label>拒付平均處理日數</label><input value="13"></div>
+      <div class="field"><label>過往退款比例</label><input value="1.1%"></div><div class="field"><label>退款平均處理日數</label><input value="6"></div>
+      <div class="field"><label>平均每月營業額</label><input value="HKD 3,200,000"></div><div class="field"><label>經營方式</label><input value="线上+线下"></div>
+      <div class="field"><label>提前收款日數</label><input value="2"></div><div class="field"><label>貨物 / 服務最短送達時間</label><input value="1天"></div>
+      <div class="field"><label>貨物 / 服務最長送達時間</label><input value="5天"></div><div class="field"><label>T1特選商戶</label><select><option>否</option><option>是</option></select></div>
+      <div class="field"><label>是否對公</label><select><option>是</option><option>否</option></select></div><div class="field"><label>小費功能</label><select><option>开</option><option>关</option></select></div>
+      <div class="field"><label>合約期</label><input value="24个月"></div><div class="field"><label>是否首次申請卡機商戶（包括KPay及其他卡機）</label><select><option>否</option><option>是</option></select></div>
+      <div class="field"><label>申請過的卡機品牌（多選）</label><input value="KPay, Verifone"></div><div class="field"><label>在上述卡機中，商戶預計使用KPay的業務占比</label><input value="65%"></div>
+      <div class="field"><label>重複簽約原因</label><textarea>业务扩展新增门店。</textarea></div><div class="field"><label>租金</label><input value="HKD 120,000 / 月"></div>
+      <div class="field"><label>租約年期</label><input value="36个月"></div>
+    </div></section>
+
+    <section id="contact" class="card section-anchor"><h3 class="section-title">商铺联系信息区</h3><div class="form-grid">
+      <div class="field"><label>商铺电话</label><input value="+852-2111-1000"></div><div class="field"><label>AFP Store联系电话</label><input value="+852-2111-1999"></div>
+      <div class="field"><label>手提电话</label><input value="+852-6123-0987"></div><div class="field"><label>管理员电邮</label><input value="ops.central@everpeak.hk"></div>
+      <div class="field"><label>运营电邮</label><input value="ops@everpeak.hk"></div><div class="field"><label>接收营销资讯</label><select><option>是</option><option>否</option></select></div>
+      <div class="field"><label>微信ID</label><input value="everpeak_ops"></div><div class="field"><label>商铺电话类型</label><input value="座机+手机"></div>
+      <div class="field"><label>对外联系窗口名称</label><input value="Everpeak 客服中心"></div>
+    </div></section>
+
+    <section id="addr" class="card section-anchor"><h3 class="section-title">商铺地址信息区</h3><div class="form-grid">
+      <div class="field"><label>门店地址（原始全文）</label><textarea>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>门店地址-街道</label><input value="皇后大道中"></div>
+      <div class="field"><label>门店地址-补充地址</label><input value="99号19楼A室"></div><div class="field"><label>门店地址-城市</label><input value="香港"></div>
+      <div class="field"><label>门店地址-州 / 省</label><input value="香港岛"></div><div class="field"><label>门店地址-邮编</label><input value="999077"></div>
+      <div class="field"><label>门店地址-国家</label><input value="中国香港"></div><div class="field"><label>门店地址-地址行1</label><input value="19/F, 99 Queen's Road Central"></div>
+      <div class="field"><label>门店地址-地址行2</label><input value="Room A"></div><div class="field"><label>门店地址-地址行3</label><input value="Central"></div>
+      <div class="field"><label>英文门店地址</label><textarea>Room A, 19/F, 99 Queen's Road Central, Hong Kong</textarea></div><div class="field"><label>主要營業地址(中文)</label><textarea>香港中环皇后大道中99号19楼A室</textarea></div>
+      <div class="field"><label>主要營業地址(英文)</label><textarea>Room A, 19/F, 99 Queen's Road Central, Hong Kong</textarea></div><div class="field"><label>营业地址（原始全文）</label><textarea>香港中环皇后大道中99号19楼A室</textarea></div>
+      <div class="field"><label>营业地址-街道</label><input value="皇后大道中"></div><div class="field"><label>营业地址-补充地址</label><input value="99号19楼A室"></div>
+      <div class="field"><label>营业地址-城市</label><input value="香港"></div><div class="field"><label>营业地址-州 / 省</label><input value="香港岛"></div>
+      <div class="field"><label>营业地址-邮编</label><input value="999077"></div><div class="field"><label>营业地址-国家</label><input value="中国香港"></div>
+      <div class="field"><label>營業鋪位</label><input value="铺位A1"></div><div class="field"><label>郵政編碼</label><input value="999077"></div>
+      <div class="field"><label>營業國家</label><input value="中国香港"></div><div class="field"><label>營業地區</label><input value="中环"></div>
+      <div class="field"><label>收机地址</label><textarea>香港中环皇后大道中99号19楼A室</textarea></div><div class="field"><label>邮寄地址</label><textarea>香港邮政信箱0088</textarea></div>
+    </div></section>
+
+    <section id="online" class="card section-anchor"><h3 class="section-title">商铺线上资料信息区</h3><div class="form-grid">
+      <div class="field"><label>Website(Desktop)</label><input value="https://everpeak.com"></div><div class="field"><label>Website(Mobile)</label><input value="https://m.everpeak.com"></div>
+      <div class="field"><label>APP(Andrioid)</label><input value="https://play.google.com/everpeak"></div><div class="field"><label>APP(IOS)</label><input value="https://apps.apple.com/everpeak"></div>
+      <div class="field"><label>Facebook</label><input value="https://facebook.com/everpeak"></div><div class="field"><label>Instagram</label><input value="https://instagram.com/everpeak"></div>
+      <div class="field"><label>Openrice</label><input value="https://www.openrice.com"></div><div class="field"><label>H5經營網址</label><input value="https://h5.everpeak.com/store3001"></div>
+      <div class="field"><label>官网 / App Store URL</label><input value="https://everpeak.com/app"></div><div class="field"><label>私隱政策</label><input type="file"><small><a href="#">查看当前文件</a></small></div>
+      <div class="field"><label>產品目錄</label><input type="file"><small><a href="#">查看当前文件</a></small></div><div class="field"><label>送貨政策</label><input type="file"><small><a href="#">查看当前文件</a></small></div>
+      <div class="field"><label>退貨政策</label><input type="file"><small><a href="#">查看当前文件</a></small></div><div class="field"><label>退貨政策截圖</label><input type="file"><small><a href="#">查看当前文件</a></small></div>
+    </div></section>
+
+    <section id="file" class="card section-anchor"><h3 class="section-title">商铺文件信息区</h3><div class="form-grid">
+      <div class="field"><label>门头照片</label><input type="file"></div><div class="field"><label>店面相片</label><input type="file"></div>
+      <div class="field"><label>店内环境照片</label><input type="file"></div><div class="field"><label>營業環境照片三張</label><input type="file" multiple></div>
+      <div class="field"><label>收银台照片</label><input type="file"></div><div class="field"><label>存倉相片</label><input type="file"></div>
+      <div class="field"><label>营业场所证明</label><input type="file"></div><div class="field"><label>租赁合同 / 场地证明</label><input type="file"></div>
+      <div class="field"><label>租約證明</label><input type="file"></div><div class="field"><label>地址证明文件</label><input type="file"></div>
+      <div class="field"><label>菜单 / 商品清单 / 服务清单</label><input type="file"></div><div class="field"><label>財務報表審計</label><input type="file"></div>
+      <div class="field"><label>NP其他文檔</label><input type="file"></div><div class="field"><label>閉路電視錄影</label><input type="file"></div>
+      <div class="field"><label>入货单</label><input type="file"></div><div class="field"><label>最高交易金额的客户单据</label><input type="file"></div>
+      <div class="field"><label>營業牌照</label><input type="file"></div><div class="field"><label>其他补充文件</label><input type="file"></div>
+    </div></section>
+
+    <section id="risk" class="card section-anchor"><h3 class="section-title">风控 / 业务信息区</h3><div class="form-grid">
+      <div class="field"><label>風控類型</label><select><option>标准风控</option><option>强化尽调</option></select></div><div class="field"><label>風險等級</label><select><option>中</option><option>低</option><option>高</option></select></div>
+      <div class="field"><label>風險評估報告</label><input type="file"><small><a href="#">查看当前文件</a></small></div><div class="field"><label>審核類型</label><select><option>常规审核</option></select></div>
+      <div class="field"><label>上單來源</label><input class="readonly" value="CRM" readonly></div><div class="field"><label>服務類型</label><select><option>收单服务</option></select></div>
+      <div class="field"><label>合作夥伴推薦人</label><input value="Henry Chan"></div><div class="field"><label>合作夥伴編號</label><input value="PARTNER-22"></div>
+      <div class="field"><label>交單備註</label><textarea>材料齐全，可进入更新审批。</textarea></div><div class="field"><label>是否高額商戶</label><select><option>否</option><option>是</option></select></div>
+    </div></section>
+
+    <section id="person" class="card section-anchor"><div class="toolbar"><h3 class="section-title" style="margin:0;">相关人员区域</h3><button class="btn" id="addPersonBtn">新增相关人员</button></div>
+      <div class="table-wrap"><table class="person-table" style="min-width:1100px;"><thead><tr><th>人员姓名</th><th>人员角色</th><th>手机号码</th><th>电邮地址</th><th>证件类型</th><th>证件号码</th><th>是否默认主联系人</th><th>更新时间</th><th>操作</th></tr></thead><tbody id="personRows">
+        <tr><td>陈一鸣</td><td>负责人</td><td>+852-6666-8899</td><td>owner@everpeak.hk</td><td>身份证</td><td>A1234567</td><td><input type="radio" name="defaultPerson" checked></td><td>2026-04-19</td><td class="ops"><button class="btn link edit-person">编辑</button><button class="btn link delete-person">删除</button></td></tr>
+        <tr><td>林嘉敏</td><td>财务联系人</td><td>+852-6555-2211</td><td>finance@everpeak.hk</td><td>身份证</td><td>B9876543</td><td><input type="radio" name="defaultPerson"></td><td>2026-04-18</td><td class="ops"><button class="btn link edit-person">编辑</button><button class="btn link delete-person">删除</button></td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section id="company" class="card section-anchor"><h3 class="section-title">关联企业信息展示区</h3>
+      <div class="table-wrap"><table style="min-width:900px;"><thead><tr><th>企业名称</th><th>企业编号</th><th>地区</th><th>启用状态</th><th>审核状态</th></tr></thead>
+      <tbody><tr><td>Everpeak Digital Commerce</td><td>CID-2026-0004 <button class="btn link" onclick="copyText('CID-2026-0004')">复制</button></td><td>香港</td><td><span class="badge success">启用</span></td><td><span class="badge processing">审核通过</span></td></tr></tbody></table></div>
+    </section>
+
+    <section id="mid" class="card section-anchor"><h3 class="section-title">关联 MID 信息展示区</h3>
+      <div class="table-wrap"><table style="min-width:900px;"><thead><tr><th>MID 编号</th><th>第三方渠道 MID</th><th>服务通道</th><th>当前状态</th><th>更新时间</th></tr></thead>
+      <tbody><tr><td>MID-88901 <button class="btn link" onclick="copyText('MID-88901')">复制</button></td><td>ADYEN-3349001 <button class="btn link" onclick="copyText('ADYEN-3349001')">复制</button></td><td>Adyen-payfac</td><td><span class="badge success">Active</span></td><td>2026-04-18</td></tr></tbody></table></div>
+    </section>
+
+    <section id="device" class="card section-anchor"><h3 class="section-title">终端设备信息展示区</h3>
+      <div class="table-wrap"><table style="min-width:900px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>数量</th><th>绑定状态</th><th>更新时间</th></tr></thead>
+      <tbody><tr><td>KP-T1</td><td>POS终端</td><td>8</td><td><span class="badge success">已绑定</span></td><td>2026-04-18</td></tr></tbody></table></div>
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="field"><label>Tap to pay</label><input class="readonly" value="支持" readonly></div><div class="field"><label>終端數量</label><input class="readonly" value="8" readonly></div>
+        <div class="field"><label>終端（自助場景專用）數量</label><input class="readonly" value="2" readonly></div><div class="field"><label>配件數量</label><input class="readonly" value="4" readonly></div>
+        <div class="field"><label>每部終端機開戶費 HK$ 2,000</label><input class="readonly" value="HK$16,000" readonly></div><div class="field"><label>配件申請表</label><input class="readonly" value="accessory-form.pdf" readonly></div>
+        <div class="field"><label>自動打印收據(卡類)</label><input class="readonly" value="开" readonly></div><div class="field"><label>自動打印收據(非卡類)</label><input class="readonly" value="关" readonly></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<section class="bottom-actions">
+  <a class="btn" href="shop-list.html">取消</a>
+  <a class="btn primary" href="shop-change-review.html" id="submitEditBtn">提交修改</a>
+</section>
+
+<dialog id="personDialog" style="border:1px solid #e6dfd2;border-radius:8px;padding:0;max-width:640px;width:92%;">
+  <form method="dialog" style="padding:16px;">
+    <h3 class="section-title" id="personDialogTitle">新增相关人员</h3>
+    <div class="form-grid">
+      <div class="field"><label>人员姓名</label><input id="personName"></div>
+      <div class="field"><label>人员角色</label><select id="personRole"><option>负责人</option><option>财务联系人</option><option>运营联系人</option></select></div>
+      <div class="field"><label>手机号码</label><input id="personMobile"></div>
+      <div class="field"><label>电邮地址</label><input id="personEmail"></div>
+      <div class="field"><label>证件类型</label><select id="personDocType"><option>身份证</option><option>护照</option></select></div>
+      <div class="field"><label>证件号码</label><input id="personDocNo"></div>
+      <div class="field"><label>是否默认主联系人</label><select id="personIsDefault"><option value="否">否</option><option value="是">是</option></select></div>
+    </div>
+    <div class="btns"><button class="btn" value="cancel">取消</button><button class="btn primary" type="button" id="savePersonBtn">保存</button></div>
+  </form>
+</dialog>
+
+<script src="assets/app.js"></script>
+<script>
+let editRow = null;
+function copyText(v){navigator.clipboard?.writeText(v);}
+
+function openPersonDialog(row){
+  editRow = row || null;
+  document.getElementById('personDialogTitle').textContent = row ? '编辑相关人员' : '新增相关人员';
+  const cells = row ? row.children : [];
+  document.getElementById('personName').value = row ? cells[0].textContent : '';
+  document.getElementById('personRole').value = row ? cells[1].textContent : '负责人';
+  document.getElementById('personMobile').value = row ? cells[2].textContent : '';
+  document.getElementById('personEmail').value = row ? cells[3].textContent : '';
+  document.getElementById('personDocType').value = row ? cells[4].textContent : '身份证';
+  document.getElementById('personDocNo').value = row ? cells[5].textContent : '';
+  document.getElementById('personIsDefault').value = row && row.querySelector('input[type="radio"]').checked ? '是' : '否';
+  document.getElementById('personDialog').showModal();
+}
+
+function bindPersonActions(){
+  document.getElementById('addPersonBtn').addEventListener('click', () => openPersonDialog());
+  document.querySelectorAll('.edit-person').forEach(btn => btn.addEventListener('click', e => openPersonDialog(e.target.closest('tr'))));
+  document.querySelectorAll('.delete-person').forEach(btn => btn.addEventListener('click', e => {
+    if (!confirm('确认删除该相关人员吗？')) return;
+    e.target.closest('tr').remove();
+  }));
+}
+
+function rebindPersonButtons(){
+  document.querySelectorAll('.edit-person').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
+  document.querySelectorAll('.delete-person').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
+  bindPersonActions();
+}
+
+document.getElementById('savePersonBtn').addEventListener('click', () => {
+  const name = document.getElementById('personName').value || '-';
+  const role = document.getElementById('personRole').value;
+  const mobile = document.getElementById('personMobile').value || '-';
+  const email = document.getElementById('personEmail').value || '-';
+  const docType = document.getElementById('personDocType').value;
+  const docNo = document.getElementById('personDocNo').value || '-';
+  const isDefault = document.getElementById('personIsDefault').value === '是';
+  const today = new Date().toISOString().slice(0,10);
+
+  if (!editRow) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${name}</td><td>${role}</td><td>${mobile}</td><td>${email}</td><td>${docType}</td><td>${docNo}</td><td><input type="radio" name="defaultPerson"></td><td>${today}</td><td class="ops"><button class="btn link edit-person">编辑</button><button class="btn link delete-person">删除</button></td>`;
+    document.getElementById('personRows').appendChild(tr);
+    editRow = tr;
+  }
+
+  editRow.children[0].textContent = name;
+  editRow.children[1].textContent = role;
+  editRow.children[2].textContent = mobile;
+  editRow.children[3].textContent = email;
+  editRow.children[4].textContent = docType;
+  editRow.children[5].textContent = docNo;
+  editRow.children[7].textContent = today;
+
+  if (isDefault) {
+    document.querySelectorAll('input[name="defaultPerson"]').forEach(r => r.checked = false);
+    editRow.querySelector('input[name="defaultPerson"]').checked = true;
+    document.getElementById('defaultPersonId').value = 'P-' + Math.floor(Math.random()*90000 + 10000);
+  }
+
+  document.getElementById('personDialog').close();
+  rebindPersonButtons();
+});
+
+document.getElementById('submitEditBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  alert('已提交修改，进入商铺资料修改待审核流程（Demo）。');
+  window.location.href = 'shop-change-review.html';
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  bindPersonActions();
+  bindStickyNav();
+});
+</script>
+</body>
+</html>
