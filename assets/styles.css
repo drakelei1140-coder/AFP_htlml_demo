@@ -147,6 +147,12 @@ input:focus, select:focus, textarea:focus {
   padding: 0 14px;
   cursor: pointer;
   color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: middle;
 }
 .btn:hover { border-color: var(--primary); color: var(--primary-dark); }
 .btn.primary {
@@ -170,6 +176,11 @@ table { width: 100%; border-collapse: collapse; min-width: 1700px; }
 th, td { border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; padding: 10px; font-size: 13px; }
 th { background: var(--panel-2); position: sticky; top: 0; z-index: 1; font-weight: 600; }
 .ops { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+table th:last-child,
+table td:last-child {
+  border-left: 1px solid var(--border);
+  min-width: 140px;
+}
 
 .sticky-nav {
   position: sticky;
