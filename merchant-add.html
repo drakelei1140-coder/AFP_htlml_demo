@@ -1,24 +1,625 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>新增商户</title><link rel="stylesheet" href="assets/styles.css"/></head>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>新增商户</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .section-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .summary-card { border: 1px dashed var(--border); background: var(--panel-2); border-radius: 8px; padding: 12px; margin-top: 12px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .summary-item .k { font-size: 12px; color: var(--muted); }
+    .summary-item .v { font-weight: 600; margin-top: 4px; }
+    .required::before { content: '* '; color: #d4380d; }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .muted-box { border: 1px solid var(--border); border-radius: 6px; min-height: 34px; display: flex; align-items: center; padding: 0 10px; background: #fafafa; color: #666; }
+    .btns-inline { display: flex; gap: 8px; flex-wrap: wrap; }
+    .disabled-mask { opacity: .55; pointer-events: none; }
+    .table-wrap.rate-table table { min-width: 1200px; }
+    .table-input { width: 100%; min-width: 120px; }
+    .anchor-title { font-size: 16px; margin: 0 0 12px; }
+    .modal-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none;
+      align-items: center; justify-content: center; z-index: 1200;
+    }
+    .modal {
+      width: min(960px, calc(100vw - 40px)); background: var(--panel); border-radius: 10px;
+      border: 1px solid var(--border); box-shadow: 0 12px 30px rgba(0,0,0,.12);
+    }
+    .modal-hd, .modal-ft { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .modal-ft { border-bottom: none; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-bd { padding: 12px 16px; max-height: 60vh; overflow: auto; }
+    .inline-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  </style>
+</head>
 <body>
-<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
-<div class="layout"><aside class="sidebar">
-      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a class="active" href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+  <header class="shell-top">
+    <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+    <div class="top-controls">
+      <select><option>地区：香港</option></select>
+      <select><option>语言：简体中文</option></select>
+      <button>⚙️</button><button>🔔</button>
+      <div class="user-pill"><div class="avatar">OP</div>Olivia</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a class="active" href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li></ul></div>
       <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
       <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
     </aside>
-<main class="main with-bottom-space">
-<section id="overview" class="card section-anchor"><h3 class="section-title">页面顶部概览区</h3><p class="desc">页面标题：新增企业</p><p class="desc">页面说明：用于创建新的商户主体资料，保存后进入待审核状态</p><div class="kv"><div class="kv-item"><div class="k">当前操作人</div><div class="v">Olivia</div></div><div class="kv-item"><div class="k">上單來源</div><div class="v">CRM</div></div></div></section>
-<section class="sticky-nav card"><button class="nav-tag" data-target="overview">企业概览</button><button class="nav-tag" data-target="key">企业主键与关联</button><button class="nav-tag" data-target="name">企业名称信息</button><button class="nav-tag" data-target="biz">企业主体与经营信息</button><button class="nav-tag" data-target="base">企业基础经营数据</button><button class="nav-tag" data-target="contact">企业联系信息</button><button class="nav-tag" data-target="addr">企业地址信息</button><button class="nav-tag" data-target="file">企业文件信息</button><button class="nav-tag" data-target="risk">风控 / 业务信息</button><button class="nav-tag" data-target="person">相关人员</button></section>
-<section id="key" class="card section-anchor"><h3 class="section-title">企业主键与关联信息区</h3><div class="form-grid"><div class="field"><label>上級公司ID</label><input placeholder="选择后自动回填"/></div><div class="field"><label>上级公司名称</label><input placeholder="选择后自动回填"/></div><div class="field"><label>关联群组</label><select multiple><option>高风险行业</option><option>跨境电商</option><option>重点商户</option></select></div><div class="field"><label>&nbsp;</label><button class="btn">选择企业</button></div></div></section>
-<section id="name" class="card section-anchor"><h3 class="section-title">企业名称信息区</h3><div class="form-grid"><div class="field"><label>企業中文名稱</label><input/></div><div class="field"><label>企業中文簡稱</label><input/></div><div class="field"><label>企業英文名稱</label><input/></div><div class="field"><label>企業英文簡稱</label><input/></div><div class="field"><label>企業其它名稱</label><textarea></textarea></div><div class="field"><label>企業所有名稱（中文）</label><textarea></textarea></div><div class="field"><label>企業所有名稱（英文）</label><textarea></textarea></div><div class="field"><label>商業登記證名稱</label><input/></div><div class="field"><label>公司登記証名稱(非必須)</label><input/></div></div></section>
-<section id="biz" class="card section-anchor"><h3 class="section-title">企业主体与经营信息区</h3><div class="form-grid"><div class="field"><label>公司模式</label><select><option>直营</option><option>加盟</option><option>连锁</option></select></div><div class="field"><label>是否子公司</label><select><option>是</option><option>否</option></select></div><div class="field"><label>公司結構</label><input/></div><div class="field"><label>行業分類 / 業務性質 / 產品服務</label><input placeholder="三级选择mock"/></div><div class="field"><label>MCC Code</label><input/></div><div class="field"><label>進階MCC Code</label><input/></div><div class="field"><label>special MCC 附件</label><input type="file"/></div><div class="field"><label>小微商戶</label><select><option>是</option><option>否</option></select></div><div class="field"><label>SME 設定</label><input/></div><div class="field"><label>成立日期</label><input type="date"/></div><div class="field"><label>法律地位</label><select><option>有限公司</option></select></div><div class="field"><label>僱員人數</label><input/></div><div class="field"><label>注冊資本</label><input/></div><div class="field"><label>周年申報表 / 法團成立表(非必須)</label><input type="file"/></div><div class="field"><label>企业成立 / 适用法国家</label><input/></div><div class="field"><label>企业治理法律所在国</label><input/></div><div class="field"><label>企业税务申报分类</label><input/></div><div class="field"><label>企业税务业务类型</label><input/></div><div class="field"><label>公司層級</label><input/></div></div></section>
-<section id="base" class="card section-anchor"><h3 class="section-title">企业基础经营数据区</h3><div class="form-grid"><div class="field"><label>進件通道(必須)</label><select multiple><option>Adyen-AFP</option><option>Adyen-payfac</option><option>其他</option></select></div><div class="field"><label>每宗交易平均金額</label><input/></div><div class="field"><label>每宗交易最大交易額</label><input/></div><div class="field"><label>預計每年交易宗數</label><input/></div><div class="field"><label>過往拒付比例</label><input/></div><div class="field"><label>拒付平均處理日數</label><input/></div><div class="field"><label>過往退款比例</label><input/></div><div class="field"><label>退款平均處理日數</label><input/></div><div class="field"><label>平均每月營業額</label><input/></div><div class="field"><label>經營方式</label><input/></div><div class="field"><label>提前收款日數</label><input/></div><div class="field"><label>貨物 / 服務最短送達時間</label><input/></div><div class="field"><label>貨物 / 服務最長送達時間</label><input/></div><div class="field"><label>退貨政策</label><textarea></textarea></div><div class="field"><label>退貨政策截圖</label><input type="file"/></div><div class="field"><label>財務報表審計</label><select><option>是</option><option>否</option></select></div><div class="field"><label>經營年限</label><input/></div><div class="field"><label>職稱 / 職位</label><input/></div><div class="field"><label>T1特選商戶</label><select><option>是</option><option>否</option></select></div><div class="field"><label>歸屬國編號</label><input/></div><div class="field"><label>歸屬省編號</label><input/></div></div></section>
-<section id="contact" class="card section-anchor"><h3 class="section-title">企业联系信息区</h3><div class="form-grid"><div class="field"><label>公司電話</label><input/></div><div class="field"><label>手提電話</label><input/></div><div class="field"><label>管理員電郵</label><input/></div><div class="field"><label>運營電郵</label><input/></div><div class="field"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div><div class="field"><label>微信ID</label><input/></div><div class="field"><label>企业电话类型</label><select><option>固定电话</option><option>手机</option><option>座机+手机</option></select></div></div></section>
-<section id="addr" class="card section-anchor"><h3 class="section-title">企业地址信息区</h3><div class="form-grid"><div class="field"><label>註冊辦事處地址</label><textarea></textarea></div><div class="field"><label>註冊辦事處地址(英文)</label><textarea></textarea></div><div class="field"><label>郵寄地址</label><textarea></textarea></div><div class="field"><label>電郵地址</label><input /></div><div class="field"><label>注册地址（原始全文）</label><textarea></textarea></div><div class="field"><label>注册地址-街道</label><input/></div><div class="field"><label>注册地址-补充地址</label><input/></div><div class="field"><label>注册地址-城市</label><input/></div><div class="field"><label>注册地址-州 / 省</label><input/></div><div class="field"><label>注册地址-邮编</label><input/></div><div class="field"><label>注册地址-国家</label><input/></div><div class="field"><label>主要营业地址（原始全文）</label><textarea></textarea></div><div class="field"><label>主要营业地址-街道</label><input/></div><div class="field"><label>主要营业地址-补充地址</label><input/></div><div class="field"><label>主要营业地址-城市</label><input/></div><div class="field"><label>主要营业地址-州 / 省</label><input/></div><div class="field"><label>主要营业地址-邮编</label><input/></div><div class="field"><label>主要营业地址-国家</label><input/></div></div></section>
-<section id="file" class="card section-anchor"><h3 class="section-title">企业文件信息区</h3><div class="form-grid"><div class="field"><label>商戶篩查報告</label><input type="file"/></div><div class="field"><label>企業架構文件</label><input type="file"/></div><div class="field"><label>財務報表文件</label><input type="file"/></div><div class="field"><label>商業登記證號碼</label><input/></div><div class="field"><label>證書有效期</label><input type="date"/></div><div class="field"><label>商業登記證副本照片</label><input type="file"/></div><div class="field"><label>請提供重複簽約證明附件</label><input type="file"/></div><div class="field"><label>商業登記冊內的資料的電子摘錄（獨資經營者 / 合夥人適用）</label><input type="file"/></div><div class="field"><label>公司註冊證明書(非必須)</label><input type="file"/></div><div class="field"><label>慈善機構資料</label><input type="file"/></div><div class="field"><label>教育資料</label><input type="file"/></div><div class="field"><label>社團 / 協會資料</label><input type="file"/></div><div class="field"><label>業主立案法團資料</label><input type="file"/></div><div class="field"><label>入貨單</label><input type="file"/></div><div class="field"><label>閉路電視錄影</label><input type="file"/></div><div class="field"><label>最高交易金額的客戶單據</label><input type="file"/></div></div></section>
-<section id="risk" class="card section-anchor"><h3 class="section-title">风控 / 业务信息区</h3><div class="form-grid"><div class="field"><label>風控類型</label><select><option>标准风控</option><option>强化风控</option></select></div><div class="field"><label>風險等級</label><select><option>低</option><option>中</option><option>高</option></select></div><div class="field"><label>風險評估報告</label><input type="file"/></div><div class="field"><label>審核類型</label><select><option>标准审核</option><option>人工复核</option></select></div><div class="field"><label>上單來源</label><input value="CRM"/></div><div class="field"><label>服務類型</label><input/></div><div class="field"><label>合作夥伴推薦人</label><input/></div><div class="field"><label>合作夥伴編號</label><input/></div><div class="field"><label>交單備註</label><textarea></textarea></div><div class="field"><label>是否高額商戶</label><select><option>否</option><option>是</option></select></div></div></section>
-<section id="person" class="card section-anchor"><h3 class="section-title">相关人员区域</h3><p class="desc">支持新增、编辑、删除相关人员；仅允许一位默认主联系人。</p><div class="btns" style="justify-content:flex-start;margin:0 0 10px 0;"><button class="btn add-person-btn">新增相关人员</button></div><div class="table-wrap"><table id="add-person-table" class="person-table" style="min-width:1200px"><thead><tr><th>人员姓名</th><th>人员角色</th><th>手机号码</th><th>电邮地址</th><th>证件类型</th><th>证件号码</th><th>是否默认主联系人</th><th>更新时间</th><th>操作</th></tr></thead><tbody><tr><td><input value="张敏" /></td><td><select><option selected>负责人</option><option>财务联系人</option><option>运营联系人</option></select></td><td><input value="+852-6000-8888" /></td><td><input value="owner@newco.hk" /></td><td><select><option selected>身份证</option><option>护照</option></select></td><td><input value="Z1234567" /></td><td><input type="radio" name="add-person-table-default" checked /></td><td>2026-04-18</td><td class="ops"><button class="btn link">编辑</button><button class="btn link delete-person">删除</button></td></tr></tbody></table></div></section>
-</main></div>
-<div class="bottom-actions"><button class="btn">从草稿复制</button><button class="btn">存成草稿</button><button class="btn primary">保存</button><a class="btn" href="enterprise-list.html">取消</a></div>
-<script src="assets/app.js"></script>
-</body></html>
+
+    <main class="main with-bottom-space">
+      <section id="overview" class="card section-anchor">
+        <h3 class="section-title">页面顶部概览区</h3>
+        <p class="desc">页面标题：新增商户</p>
+        <p class="desc">页面说明：用于创建新的商户资料，保存后进入待审核状态</p>
+        <div class="kv">
+          <div class="kv-item"><div class="k">当前操作人</div><div class="v">Olivia</div></div>
+          <div class="kv-item"><div class="k">上單來源</div><div class="v"><input id="sourceTop" value="CRM" /></div></div>
+        </div>
+      </section>
+
+      <section class="sticky-nav card">
+        <button class="nav-tag" data-target="overview">商户概览</button>
+        <button class="nav-tag" data-target="primary">主键与关联</button>
+        <button class="nav-tag" data-target="enterprise">企业新增 / 选择</button>
+        <button class="nav-tag" data-target="shop">商铺新增 / 选择</button>
+        <button class="nav-tag" data-target="settle">结算与银行信息</button>
+        <button class="nav-tag" data-target="rate">产品费率</button>
+        <button class="nav-tag" data-target="special">特殊费率申请信息</button>
+      </section>
+
+      <section id="primary" class="card section-anchor">
+        <h3 class="section-title">主键与关联信息区</h3>
+        <div class="form-grid">
+          <div class="field"><label>MID</label><div class="muted-box">系统保存后生成</div></div>
+          <div class="field"><label>CID</label><input id="cid" readonly placeholder="请选择企业后自动回显" /></div>
+          <div class="field"><label>SID</label><input id="sid" readonly placeholder="请选择商铺后自动回显" /></div>
+          <div class="field">
+            <label class="required">渠道及服务（通道）</label>
+            <div class="btns-inline">
+              <button class="btn" type="button" id="chooseChannelServiceBtn">选择渠道及服务</button>
+            </div>
+            <div id="selectedChannelServiceTags" class="btns-inline" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="enterprise" class="card section-anchor">
+        <div class="section-head">
+          <h3 class="section-title">企业新增 / 选择区</h3>
+          <div class="btns-inline">
+            <button class="btn" id="selectEnterpriseBtn">选择企业</button>
+            <a class="btn" href="enterprise-add.html" target="_blank" rel="noopener">新增企业</a>
+          </div>
+        </div>
+        <p class="hint">必须先完成企业选择，才能继续新增或选择商铺。重新选择企业时会清空当前已选商铺信息。</p>
+        <div id="enterpriseEmpty" class="summary-card">未选择企业，请先点击【选择企业】或【新增企业】。</div>
+        <div id="enterpriseSummary" class="summary-card" style="display:none;">
+          <h4 class="anchor-title">企业已选中后的展示内容</h4>
+          <div class="summary-grid" id="enterpriseSummaryGrid"></div>
+          <div class="btns-inline" style="margin-top:10px;">
+            <a class="btn" id="viewEnterpriseDetail" href="#" target="_blank" rel="noopener">查看详情</a>
+            <button class="btn" id="reSelectEnterpriseBtn">重新选择企业</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="shop" class="card section-anchor">
+        <div class="section-head">
+          <h3 class="section-title">商铺新增 / 选择区</h3>
+          <div class="btns-inline">
+            <button class="btn" id="selectShopBtn">选择商铺</button>
+            <a class="btn" id="addShopBtn" href="shop-add.html" target="_blank" rel="noopener">新增商铺</a>
+          </div>
+        </div>
+        <p class="hint">必须先选择企业，未选择企业前不允许选择商铺，也不允许新增商铺。</p>
+        <div id="shopLockHint" class="summary-card">请先完成企业选择。</div>
+        <div id="shopEmpty" class="summary-card" style="display:none;">企业已选中，尚未选择商铺。</div>
+        <div id="shopSummary" class="summary-card" style="display:none;">
+          <h4 class="anchor-title">商铺已选中后的展示内容</h4>
+          <div class="summary-grid" id="shopSummaryGrid"></div>
+          <div class="btns-inline" style="margin-top:10px;">
+            <a class="btn" id="viewShopDetail" href="#" target="_blank" rel="noopener">查看详情</a>
+            <button class="btn" id="reSelectShopBtn">重新选择商铺</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="settle" class="card section-anchor">
+        <h3 class="section-title">结算与银行信息区</h3>
+        <div class="form-grid">
+          <div class="field"><label class="required">結算週期</label><input required /></div>
+          <div class="field"><label class="required">結算幣種</label><input required /></div>
+          <div class="field"><label class="required">NP結算週期</label><input required /></div>
+          <div class="field"><label class="required">打款銀行</label><input required /></div>
+          <div class="field"><label class="required">FPS賬號</label><input class="account-field" required /></div>
+          <div class="field"><label class="required">收款銀行賬戶名稱</label><input required /></div>
+          <div class="field"><label class="required">銀行名稱</label><input required /></div>
+          <div class="field"><label class="required">銀行號碼</label><input class="code-field" required /></div>
+          <div class="field"><label class="required">銀行編號</label><input class="code-field" required /></div>
+          <div class="field"><label>結算摘要前綴</label><input /></div>
+          <div class="field"><label class="required">卡類型</label><input required /></div>
+          <div class="field"><label>結算身份證號</label><input class="code-field" /></div>
+          <div class="field"><label>銀行卡歸屬國</label><input /></div>
+          <div class="field"><label>銀行卡歸屬省</label><input /></div>
+          <div class="field"><label>一份銀行戶口月結單（最近三個月內銀行發出的）</label><input type="file" /></div>
+          <div class="field"><label>FPS-DBS 申請文件</label><input type="file" /></div>
+        </div>
+      </section>
+
+      <section id="rate" class="card section-anchor">
+        <h3 class="section-title">产品费率区</h3>
+        <p class="hint">固定 12 行结构，不允许增删行；支持默认模板带入及后续特殊费率申请覆盖（本 demo 展示当前录入值）。</p>
+        <div class="table-wrap rate-table">
+          <table>
+            <thead>
+              <tr>
+                <th>支付产品</th>
+                <th>类型</th>
+                <th>交易费率（百分比）</th>
+                <th>固定收费-百分比</th>
+                <th>固定收费-绝对值</th>
+                <th>开关</th>
+              </tr>
+            </thead>
+            <tbody id="rateRows">
+              <tr><td>Visa</td><td>借记卡-境外</td><td><input class="table-input percent-field" placeholder="如 1.20" /></td><td><input class="table-input percent-field" placeholder="如 0.10" /></td><td><input class="table-input number-field" placeholder="如 2.00" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Visa</td><td>贷记卡-境外</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Visa</td><td>借记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Visa</td><td>贷记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Mastercard</td><td>借记卡-境外</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Mastercard</td><td>贷记卡-境外</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Mastercard</td><td>借记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>Mastercard</td><td>贷记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>UnionPay</td><td>借记卡-境外</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>UnionPay</td><td>贷记卡-境外</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>UnionPay</td><td>借记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+              <tr><td>UnionPay</td><td>贷记卡-境内</td><td><input class="table-input percent-field" /></td><td><input class="table-input percent-field" /></td><td><input class="table-input number-field" /></td><td><select><option>开</option><option>关</option></select></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="special" class="card section-anchor">
+        <h3 class="section-title">特殊费率申请信息区</h3>
+        <div class="form-grid">
+          <div class="field"><label>是否存在在途特殊费率申请</label><select id="inFlightSpecial"><option>否</option><option>是</option></select></div>
+          <div class="field"><label>特殊费率申请单号</label><input readonly placeholder="" /></div>
+          <div class="field"><label>特殊费率申请状态</label><input readonly placeholder="" /></div>
+          <div class="field"><label>特殊费率申请结果</label><input readonly placeholder="" /></div>
+          <div class="field"><label>特殊费率申请完成时间</label><input readonly placeholder="" /></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn" id="copyDraftBtn">从草稿复制</button>
+    <button class="btn" id="saveDraftBtn">存成草稿</button>
+    <a class="btn" href="javascript:history.back()">取消</a>
+    <button class="btn primary" id="saveBtn">保存</button>
+  </div>
+
+  <div class="modal-mask" id="enterpriseModal">
+    <div class="modal">
+      <div class="modal-hd"><strong>选择企业</strong></div>
+      <div class="modal-bd">
+        <div class="inline-2">
+          <input id="enterpriseIdFilter" placeholder="按编号搜索" />
+          <input id="enterpriseNameFilter" placeholder="按名称模糊筛选企业" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>企业编号</th><th>企业主显示名称</th><th>企业启用状态</th><th>企业审核状态</th><th>操作</th></tr></thead>
+            <tbody id="enterpriseTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-ft"><button class="btn" data-close="enterpriseModal">关闭</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="shopModal">
+    <div class="modal">
+      <div class="modal-hd"><strong>选择商铺</strong></div>
+      <div class="modal-bd">
+        <div class="inline-2">
+          <input id="shopIdFilter" placeholder="按编号搜索" />
+          <input id="shopNameFilter" placeholder="按名称模糊筛选商铺" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>商铺编号</th><th>商铺主显示名称</th><th>所属企业编号（CID）</th><th>商铺审核状态</th><th>操作</th></tr></thead>
+            <tbody id="shopTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-ft"><button class="btn" data-close="shopModal">关闭</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="draftModal">
+    <div class="modal">
+      <div class="modal-hd"><strong>商户草稿箱</strong></div>
+      <div class="modal-bd">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>草稿编号</th><th>草稿名称</th><th>更新时间</th><th>操作</th></tr></thead>
+            <tbody id="draftTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-ft"><button class="btn" data-close="draftModal">关闭</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="channelServiceModal">
+    <div class="modal">
+      <div class="modal-hd"><strong>选择渠道及服务</strong></div>
+      <div class="modal-bd">
+        <div class="inline-2">
+          <div>
+            <div class="hint">先选渠道（可多选）</div>
+            <select id="channelSelect" multiple size="6" style="width:100%;min-height:180px;">
+              <option value="Adyen">Adyen</option>
+              <option value="CyberSource">CyberSource</option>
+              <option value="Nuvei">Nuvei</option>
+            </select>
+          </div>
+          <div>
+            <div class="hint">再选服务（可多选）</div>
+            <select id="serviceSelect" multiple size="6" style="width:100%;min-height:180px;"></select>
+          </div>
+        </div>
+        <div class="btns-inline" style="margin:8px 0;">
+          <button class="btn" type="button" id="addChannelServiceComboBtn">添加组合</button>
+        </div>
+        <div class="hint">已选渠道+服务组合</div>
+        <div id="modalChannelServiceTags" class="btns-inline" style="margin-top:8px;"></div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn" type="button" data-close="channelServiceModal">取消</button>
+        <button class="btn primary" type="button" id="confirmChannelServiceBtn">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    const enterpriseList = [
+      {
+        cid: 'CID-10001',
+        企业主显示名称: '星航科技有限公司', 企业启用状态: '启用', 企业审核状态: '已审核', '進件通道(必須)': 'Adyen-payfac', 上單來源: 'CRM', 創建時間: '2026-03-01', 更新時間: '2026-04-15',
+        公司模式: '直营', 公司結構: '有限公司', '行業分類 / 業務性質 / 產品服務': '电商 / 跨境 / 软件服务', 'MCC Code': '5734', '進階MCC Code': '573499', 小微商戶: '否', 'SME 設定': 'SME-A', 法律地位: '有限公司', 僱員人數: '120', 注冊資本: '2000万', 企业税务申报分类: '一般纳税人', 企业税务业务类型: '服务业', 平均每月營業額: '5000000', 每宗交易平均金額: '380', 每宗交易最大交易額: '48000', 預計每年交易宗數: '180000', 過往拒付比例: '0.25%', 過往退款比例: '0.8%', 提前收款日數: '2', '貨物 / 服務最短送達時間': '1', '貨物 / 服務最長送達時間': '14', 是否對公: '是', 合約期: '24个月', 是否NGO: '否', '商戶營業狀態（企業口徑）': '营业中', 風控類型: '标准', 風險等級: '中', 審核類型: '标准审核', 服務類型: '综合收单', 合作夥伴推薦人: 'Amy', 合作夥伴編號: 'P-8821', 交單備註: '历史稳定', 是否高額商戶: '否'
+      },
+      {
+        cid: 'CID-10002',
+        企业主显示名称: '海跃教育咨询集团', 企业启用状态: '启用', 企业审核状态: '待复核', '進件通道(必須)': 'Adyen-AFP', 上單來源: 'Partner', 創建時間: '2026-02-20', 更新時間: '2026-04-02',
+        公司模式: '连锁', 公司結構: '合伙企业', '行業分類 / 業務性質 / 產品服務': '教育 / 培训 / 课程', 'MCC Code': '8299', '進階MCC Code': '829900', 小微商戶: '是', 'SME 設定': 'SME-B', 法律地位: '合伙企业', 僱員人數: '38', 注冊資本: '500万', 企业税务申报分类: '小规模', 企业税务业务类型: '教育服务', 平均每月營業額: '1200000', 每宗交易平均金額: '600', 每宗交易最大交易額: '15000', 預計每年交易宗數: '36000', 過往拒付比例: '0.1%', 過往退款比例: '1.2%', 提前收款日數: '3', '貨物 / 服務最短送達時間': '0', '貨物 / 服務最長送達時間': '7', 是否對公: '否', 合約期: '12个月', 是否NGO: '否', '商戶營業狀態（企業口徑）': '营业中', 風控類型: '强化', 風險等級: '中', 審核類型: '人工复核', 服務類型: '教育收单', 合作夥伴推薦人: 'Ken', 合作夥伴編號: 'P-7719', 交單備註: '季节性波动', 是否高額商戶: '否'
+      }
+    ];
+
+    const shopList = [
+      { sid: 'SID-90001', cid: 'CID-10001', 商铺主显示名称: '星航科技中环店', 所属企业名称: '星航科技有限公司', 商铺启用状态: '启用', 商铺审核状态: '已审核', 终端设备数量: '12', 'MID 数量': '6', '進件通道(必須)': 'Adyen-payfac', 上單來源: 'CRM', 創建時間: '2026-03-04', 更新時間: '2026-04-10', 商铺类型: '直营门店', 经营模式: '线上+线下', 是否总部: '否', 是否默认主门店: '是', '行业分类 / 业务性质 / 产品服务': '电商 / SaaS / 软件', 'MCC Code': '5734', '進階MCC Code': '573499', 开店日期: '2025-08-01', 商铺营业状态: '营业中', 经营年限: '1', 小微商戶: '否', 'SME 設定': 'SME-A', 是否NGO: '否', 每宗交易平均金額: '390', 每宗交易最大交易額: '40000', 預計每年交易宗數: '80000', 過往拒付比例: '0.21%', 過往退款比例: '0.52%', 平均每月營業額: '2200000', 提前收款日數: '2', '貨物 / 服務最短送達時間': '1', '貨物 / 服務最長送達時間': '14', 是否對公: '是', 合約期: '24个月', 小費功能: '关', '商戶營業狀態（商铺口徑）': '营业中', 風控類型: '标准', 風險等級: '中', 審核類型: '标准审核', 服務類型: '综合收单', 合作夥伴推薦人: 'Amy', 合作夥伴編號: 'P-8821', 交單備註: '稳定', 是否高額商戶: '否' },
+      { sid: 'SID-90002', cid: 'CID-10001', 商铺主显示名称: '星航科技旺角店', 所属企业名称: '星航科技有限公司', 商铺启用状态: '启用', 商铺审核状态: '待复核', 终端设备数量: '7', 'MID 数量': '4', '進件通道(必須)': 'Adyen-payfac', 上單來源: 'CRM', 創建時間: '2026-01-11', 更新時間: '2026-04-11', 商铺类型: '直营门店', 经营模式: '线下', 是否总部: '否', 是否默认主门店: '否', '行业分类 / 业务性质 / 产品服务': '消费电子', 'MCC Code': '5732', '進階MCC Code': '573299', 开店日期: '2024-11-01', 商铺营业状态: '营业中', 经营年限: '2', 小微商戶: '否', 'SME 設定': 'SME-A', 是否NGO: '否', 每宗交易平均金額: '460', 每宗交易最大交易額: '35000', 預計每年交易宗數: '50000', 過往拒付比例: '0.18%', 過往退款比例: '0.66%', 平均每月營業額: '1900000', 提前收款日數: '2', '貨物 / 服務最短送達時間': '1', '貨物 / 服務最長送達時間': '10', 是否對公: '是', 合約期: '24个月', 小費功能: '开', '商戶營業狀態（商铺口徑）': '营业中', 風控類型: '标准', 風險等級: '低', 審核類型: '标准审核', 服務類型: '综合收单', 合作夥伴推薦人: 'Amy', 合作夥伴編號: 'P-8821', 交單備註: '稳定', 是否高額商戶: '否' },
+      { sid: 'SID-91001', cid: 'CID-10002', 商铺主显示名称: '海跃教育总部', 所属企业名称: '海跃教育咨询集团', 商铺启用状态: '启用', 商铺审核状态: '已审核', 终端设备数量: '3', 'MID 数量': '2', '進件通道(必須)': 'Adyen-AFP', 上單來源: 'Partner', 創建時間: '2026-02-21', 更新時間: '2026-04-03', 商铺类型: '总部', 经营模式: '线上', 是否总部: '是', 是否默认主门店: '是', '行业分类 / 业务性质 / 产品服务': '教育培训', 'MCC Code': '8299', '進階MCC Code': '829900', 开店日期: '2023-03-20', 商铺营业状态: '营业中', 经营年限: '3', 小微商戶: '是', 'SME 設定': 'SME-B', 是否NGO: '否', 每宗交易平均金額: '520', 每宗交易最大交易額: '12000', 預計每年交易宗數: '28000', 過往拒付比例: '0.05%', 過往退款比例: '1.8%', 平均每月營業額: '900000', 提前收款日數: '3', '貨物 / 服務最短送達時間': '0', '貨物 / 服務最長送達時間': '3', 是否對公: '否', 合約期: '12个月', 小費功能: '关', '商戶營業狀態（商铺口徑）': '营业中', 風控類型: '强化', 風險等級: '中', 審核類型: '人工复核', 上單來源: 'Partner', 服務類型: '教育收单', 合作夥伴推薦人: 'Ken', 合作夥伴編號: 'P-7719', 交單備註: '季节性高峰', 是否高額商戶: '否' }
+    ];
+
+    const draftList = [
+      { id: 'DR-20260401', name: '商户草稿A', time: '2026-04-16 10:22:00' },
+      { id: 'DR-20260402', name: '商户草稿B', time: '2026-04-18 20:08:12' }
+    ];
+
+    let selectedEnterprise = null;
+    let selectedShop = null;
+    let selectedChannelServiceCombos = [];
+    let draftChannelServiceCombos = [];
+    const channelServiceMap = {
+      Adyen: ['Online Card', 'POS Card', 'Wallet'],
+      CyberSource: ['Online Card', 'Token Billing'],
+      Nuvei: ['Online Card', 'APM']
+    };
+
+    const enterpriseSummaryKeys = [
+      '企业主显示名称','CID','企业启用状态','企业审核状态','進件通道(必須)','上單來源','創建時間','更新時間',
+      '公司模式','公司結構','行業分類 / 業務性質 / 產品服務','MCC Code','進階MCC Code','小微商戶','SME 設定','法律地位','僱員人數','注冊資本','企业税务申报分类','企业税务业务类型','平均每月營業額','每宗交易平均金額','每宗交易最大交易額','預計每年交易宗數','過往拒付比例','過往退款比例','提前收款日數','貨物 / 服務最短送達時間','貨物 / 服務最長送達時間','是否對公','合約期','是否NGO','商戶營業狀態（企業口徑）',
+      '風控類型','風險等級','審核類型','服務類型','合作夥伴推薦人','合作夥伴編號','交單備註','是否高額商戶'
+    ];
+
+    const shopSummaryKeys = [
+      '商铺主显示名称','SID','所属企业名称','所属企业编号（CID）','商铺启用状态','商铺审核状态','终端设备数量','MID 数量','進件通道(必須)','上單來源','創建時間','更新時間',
+      '商铺类型','经营模式','是否总部','是否默认主门店','行业分类 / 业务性质 / 产品服务','MCC Code','進階MCC Code','开店日期','商铺营业状态','经营年限','小微商戶','SME 設定','是否NGO','每宗交易平均金額','每宗交易最大交易額','預計每年交易宗數','過往拒付比例','過往退款比例','平均每月營業額','提前收款日數','貨物 / 服務最短送達時間','貨物 / 服務最長送達時間','是否對公','合約期','小費功能','商戶營業狀態（商铺口徑）',
+      '風控類型','風險等級','審核類型','上單來源','服務類型','合作夥伴推薦人','合作夥伴編號','交單備註','是否高額商戶'
+    ];
+
+    function escapeHtml(str = '') {
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function renderChannelServiceTags(containerId, list, removable = false) {
+      const el = document.getElementById(containerId);
+      el.innerHTML = list.map((item, idx) => `
+        <span class="ant-tag">${item.channel} + ${item.service}${removable ? `<span class="x" data-remove-index="${idx}">×</span>` : ''}</span>
+      `).join('');
+      if (removable) {
+        el.querySelectorAll('[data-remove-index]').forEach(node => {
+          node.addEventListener('click', () => {
+            draftChannelServiceCombos.splice(Number(node.dataset.removeIndex), 1);
+            renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+          });
+        });
+      }
+    }
+
+    function renderSummary(data, keys, container, idAlias = {}) {
+      container.innerHTML = keys.map(k => {
+        const key = idAlias[k] || k;
+        const val = data[key] ?? '--';
+        return `<div class="summary-item"><div class="k">${escapeHtml(k)}</div><div class="v">${escapeHtml(val)}</div></div>`;
+      }).join('');
+    }
+
+    function updateShopAreaLock() {
+      const selectShopBtn = document.getElementById('selectShopBtn');
+      const addShopBtn = document.getElementById('addShopBtn');
+      const lockHint = document.getElementById('shopLockHint');
+      const shopEmpty = document.getElementById('shopEmpty');
+      const shopSummary = document.getElementById('shopSummary');
+
+      if (!selectedEnterprise) {
+        selectShopBtn.disabled = true;
+        addShopBtn.classList.add('disabled-mask');
+        addShopBtn.removeAttribute('href');
+        lockHint.style.display = 'block';
+        shopEmpty.style.display = 'none';
+        shopSummary.style.display = 'none';
+      } else {
+        selectShopBtn.disabled = false;
+        addShopBtn.classList.remove('disabled-mask');
+        addShopBtn.setAttribute('href', 'shop-add.html');
+        lockHint.style.display = 'none';
+        shopEmpty.style.display = selectedShop ? 'none' : 'block';
+        shopSummary.style.display = selectedShop ? 'block' : 'none';
+      }
+    }
+
+    function clearSelectedShop() {
+      selectedShop = null;
+      document.getElementById('sid').value = '';
+      updateShopAreaLock();
+      document.getElementById('shopSummaryGrid').innerHTML = '';
+      document.getElementById('viewShopDetail').setAttribute('href', '#');
+    }
+
+    function renderEnterpriseTable() {
+      const idFilter = document.getElementById('enterpriseIdFilter').value.trim();
+      const nameFilter = document.getElementById('enterpriseNameFilter').value.trim();
+      const body = document.getElementById('enterpriseTableBody');
+      const rows = enterpriseList
+        .filter(e => (!idFilter || e.cid.includes(idFilter)) && (!nameFilter || e['企业主显示名称'].includes(nameFilter)));
+
+      body.innerHTML = rows.map((e, idx) => `
+        <tr>
+          <td>${e.cid}</td>
+          <td>${e['企业主显示名称']}</td>
+          <td>${e['企业启用状态']}</td>
+          <td>${e['企业审核状态']}</td>
+          <td><button class="btn link" data-enterprise-index="${enterpriseList.findIndex(x => x.cid === e.cid)}">选择</button></td>
+        </tr>
+      `).join('') || '<tr><td colspan="5">暂无匹配数据</td></tr>';
+
+      body.querySelectorAll('button[data-enterprise-index]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = Number(btn.dataset.enterpriseIndex);
+          selectedEnterprise = enterpriseList[i];
+          document.getElementById('cid').value = selectedEnterprise.cid;
+          document.getElementById('enterpriseEmpty').style.display = 'none';
+          document.getElementById('enterpriseSummary').style.display = 'block';
+          renderSummary(
+            { ...selectedEnterprise, 'CID': selectedEnterprise.cid },
+            enterpriseSummaryKeys,
+            document.getElementById('enterpriseSummaryGrid')
+          );
+          document.getElementById('viewEnterpriseDetail').href = `enterprise-detail-rejected.html?cid=${encodeURIComponent(selectedEnterprise.cid)}`;
+          if (selectedShop && selectedShop.cid !== selectedEnterprise.cid) clearSelectedShop();
+          updateShopAreaLock();
+          closeModal('enterpriseModal');
+        });
+      });
+    }
+
+    function renderShopTable() {
+      const idFilter = document.getElementById('shopIdFilter').value.trim();
+      const nameFilter = document.getElementById('shopNameFilter').value.trim();
+      const body = document.getElementById('shopTableBody');
+      const rows = shopList
+        .filter(s => selectedEnterprise && s.cid === selectedEnterprise.cid)
+        .filter(s => (!idFilter || s.sid.includes(idFilter)) && (!nameFilter || s['商铺主显示名称'].includes(nameFilter)));
+
+      body.innerHTML = rows.map((s) => `
+        <tr>
+          <td>${s.sid}</td>
+          <td>${s['商铺主显示名称']}</td>
+          <td>${s.cid}</td>
+          <td>${s['商铺审核状态']}</td>
+          <td><button class="btn link" data-shop-id="${s.sid}">选择</button></td>
+        </tr>
+      `).join('') || '<tr><td colspan="5">暂无匹配数据</td></tr>';
+
+      body.querySelectorAll('button[data-shop-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedShop = shopList.find(s => s.sid === btn.dataset.shopId) || null;
+          if (!selectedShop) return;
+          document.getElementById('sid').value = selectedShop.sid;
+          document.getElementById('shopEmpty').style.display = 'none';
+          document.getElementById('shopSummary').style.display = 'block';
+          renderSummary(
+            { ...selectedShop, 'SID': selectedShop.sid, '所属企业编号（CID）': selectedShop.cid },
+            shopSummaryKeys,
+            document.getElementById('shopSummaryGrid')
+          );
+          document.getElementById('viewShopDetail').href = `shop-detail-risk.html?sid=${encodeURIComponent(selectedShop.sid)}`;
+          closeModal('shopModal');
+        });
+      });
+    }
+
+    function renderDraftTable() {
+      const body = document.getElementById('draftTableBody');
+      body.innerHTML = draftList.map(d => `
+        <tr>
+          <td>${d.id}</td><td>${d.name}</td><td>${d.time}</td>
+          <td>
+            <button class="btn link" data-draft-select="${d.id}">选择</button>
+            <button class="btn link" data-draft-delete="${d.id}">删除</button>
+          </td>
+        </tr>
+      `).join('');
+
+      body.querySelectorAll('[data-draft-select]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          alert(`已从草稿 ${btn.dataset.draftSelect} 覆盖当前表单（demo）`);
+          closeModal('draftModal');
+        });
+      });
+
+      body.querySelectorAll('[data-draft-delete]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          alert(`已删除草稿 ${btn.dataset.draftDelete}（demo）`);
+        });
+      });
+    }
+
+    function validateFormat() {
+      const errors = [];
+
+      const requiredFields = Array.from(document.querySelectorAll('input[required], select[required]'));
+      requiredFields.forEach(f => {
+        if (!String(f.value || '').trim()) {
+          const label = f.closest('.field')?.querySelector('label')?.innerText || '必填字段';
+          errors.push(`${label}不能为空`);
+        }
+      });
+
+      document.querySelectorAll('.number-field').forEach(f => {
+        if (f.value && !/^\d+(\.\d{1,4})?$/.test(f.value)) errors.push('数值字段格式不正确');
+      });
+
+      document.querySelectorAll('.percent-field').forEach(f => {
+        if (f.value && !/^(100(\.0{1,2})?|\d{1,2}(\.\d{1,2})?)$/.test(f.value)) errors.push('百分比字段格式不正确');
+      });
+
+      document.querySelectorAll('.account-field, .code-field').forEach(f => {
+        if (f.value && !/^[A-Za-z0-9\-]{4,30}$/.test(f.value)) errors.push('银行账号、编号类字段格式不正确');
+      });
+
+      const rateCount = document.querySelectorAll('#rateRows tr').length;
+      if (rateCount !== 12) errors.push('产品费率必须固定 12 行');
+
+      if (!selectedChannelServiceCombos.length) errors.push('渠道及服务（通道）至少选择一个组合');
+      if (!selectedEnterprise) errors.push('必须先选择企业');
+      if (!selectedShop) errors.push('必须先选择商铺');
+
+      return errors;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateShopAreaLock();
+
+      document.getElementById('selectEnterpriseBtn').addEventListener('click', () => {
+        renderEnterpriseTable();
+        openModal('enterpriseModal');
+      });
+      document.getElementById('reSelectEnterpriseBtn').addEventListener('click', () => {
+        renderEnterpriseTable();
+        openModal('enterpriseModal');
+      });
+      document.getElementById('enterpriseIdFilter').addEventListener('input', renderEnterpriseTable);
+      document.getElementById('enterpriseNameFilter').addEventListener('input', renderEnterpriseTable);
+
+      document.getElementById('selectShopBtn').addEventListener('click', () => {
+        if (!selectedEnterprise) return alert('请先选择企业');
+        renderShopTable();
+        openModal('shopModal');
+      });
+      document.getElementById('reSelectShopBtn').addEventListener('click', () => {
+        renderShopTable();
+        openModal('shopModal');
+      });
+      document.getElementById('shopIdFilter').addEventListener('input', renderShopTable);
+      document.getElementById('shopNameFilter').addEventListener('input', renderShopTable);
+
+      document.getElementById('copyDraftBtn').addEventListener('click', () => {
+        renderDraftTable();
+        openModal('draftModal');
+      });
+
+      document.getElementById('saveDraftBtn').addEventListener('click', () => {
+        alert('已存成草稿（不校验必填项，不生成正式商户数据）');
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', () => {
+        const errors = validateFormat();
+        if (errors.length) {
+          alert(`保存失败：\n- ${[...new Set(errors)].join('\n- ')}`);
+          return;
+        }
+
+        alert('保存成功：已创建正式商户数据，进入待审核状态（MID由系统生成）');
+      });
+
+      document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.close));
+      });
+
+      const channelSelect = document.getElementById('channelSelect');
+      const serviceSelect = document.getElementById('serviceSelect');
+
+      function refreshServiceOptions() {
+        const selectedChannels = Array.from(channelSelect.selectedOptions).map(o => o.value);
+        const services = [...new Set(selectedChannels.flatMap(c => channelServiceMap[c] || []))];
+        serviceSelect.innerHTML = services.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+
+      channelSelect.addEventListener('change', refreshServiceOptions);
+      refreshServiceOptions();
+
+      document.getElementById('chooseChannelServiceBtn').addEventListener('click', () => {
+        draftChannelServiceCombos = selectedChannelServiceCombos.map(x => ({ ...x }));
+        renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+        openModal('channelServiceModal');
+      });
+
+      document.getElementById('addChannelServiceComboBtn').addEventListener('click', () => {
+        const channels = Array.from(channelSelect.selectedOptions).map(o => o.value);
+        const services = Array.from(serviceSelect.selectedOptions).map(o => o.value);
+        if (!channels.length || !services.length) {
+          alert('请先选择渠道，再选择服务。');
+          return;
+        }
+        channels.forEach(channel => {
+          services.forEach(service => {
+            if (!draftChannelServiceCombos.some(x => x.channel === channel && x.service === service)) {
+              draftChannelServiceCombos.push({ channel, service });
+            }
+          });
+        });
+        renderChannelServiceTags('modalChannelServiceTags', draftChannelServiceCombos, true);
+      });
+
+      document.getElementById('confirmChannelServiceBtn').addEventListener('click', () => {
+        selectedChannelServiceCombos = draftChannelServiceCombos.map(x => ({ ...x }));
+        renderChannelServiceTags('selectedChannelServiceTags', selectedChannelServiceCombos, false);
+        closeModal('channelServiceModal');
+      });
+    });
+  </script>
+</body>
+</html>
