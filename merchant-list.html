@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商户列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .filters-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .filters-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+    .ops-inline { display:flex; flex-wrap:wrap; gap:8px; min-height:34px; align-items:center; }
+    .truncate-3 {
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      line-height:1.4;
+      max-height:4.2em;
+      white-space:normal;
+    }
+    .sticky-right { position:sticky; right:0; background:var(--panel); z-index:2; }
+    .sticky-right-head { position:sticky; right:0; z-index:3; }
+  </style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo"></div><a href="shop-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a class="active" href="merchant-list.html">商户管理</a></li></ul></div>
+  </aside>
+
+  <main class="main">
+    <section class="card">
+      <h3 class="section-title">筛选区</h3>
+      <div class="desc" style="margin-bottom:10px;">风控前置规则：商户进入风控链路前，关联企业与商铺需已进入待风控审核阶段；风控完成后，企业/商铺/商户状态应联动到各自完成态。</div>
+      <div class="filters-grid" id="coreFilters">
+        <div class="field"><label>商户名称关键词</label><input /></div>
+        <div class="field"><label>商户编号</label><input /></div>
+        <div class="field"><label>所属企业编号（CID）</label><input /></div>
+        <div class="field"><label>所属商铺编号（SID）</label><input /></div>
+        <div class="field"><label>商户审核状态</label><select><option value="">全部</option><option>待审核</option><option>基础资料审核</option><option>风控核查（1）</option><option>风控核查（2）</option><option>风控初级审核</option><option>风控中级审核</option><option>总经理审核</option><option>风控审核完成</option></select></div>
+        <div class="field"><label>创建时间</label><input placeholder="2026-01-01 ~ 2026-12-31" /></div>
+      </div>
+
+      <div class="filters-grid hidden" id="moreFilters" style="margin-top:12px;">
+        <div class="field"><label>所属企业名称</label><input /></div>
+        <div class="field"><label>所属商铺名称</label><input /></div>
+        <div class="field"><label>服务通道</label><input /></div>
+        <div class="field"><label>上單來源</label><input /></div>
+        <div class="field"><label>更新时间</label><input placeholder="2026-01-01 ~ 2026-12-31" /></div>
+        <div class="field"><label>创建人</label><input /></div>
+      </div>
+
+      <div class="filters-actions">
+        <div class="btns" style="margin-top:0;">
+          <button class="btn" type="button">查询</button>
+          <button class="btn" type="button">重置</button>
+          <button class="btn" type="button" id="toggleBtn" data-expanded="0">展开</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 class="section-title">功能区</h3>
+      <div class="btns" style="justify-content:flex-start; margin-top:0;">
+        <button class="btn" type="button">导出</button>
+        <a class="btn primary" href="merchant-add.html">新增</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 class="section-title">列表区</h3>
+      <div class="table-wrap">
+        <table style="min-width:1800px;">
+          <thead>
+            <tr>
+              <th style="min-width:220px;">商户名称</th>
+              <th>商户编号</th>
+              <th style="min-width:180px;">所属企业名称</th>
+              <th>所属企业编号（CID）</th>
+              <th style="min-width:180px;">所属商铺名称</th>
+              <th>所属商铺编号（SID）</th>
+              <th>商户审核状态</th>
+              <th>服务通道</th>
+              <th>上單來源</th>
+              <th>创建人</th>
+              <th>创建时间</th>
+              <th>更新时间</th>
+              <th class="sticky-right-head">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td title="Everpeak Merchant Group - Central Flagship POS and Ecommerce Integration"><div class="truncate-3">Everpeak Merchant Group - Central Flagship POS and Ecommerce Integration</div></td>
+              <td>MCH-10001</td><td>Everpeak Digital Commerce</td><td>CID-2026-0004</td><td>Everpeak Central Flagship</td><td>SID-3001</td>
+              <td><span class="badge warning">待审核</span></td><td>Adyen-payfac</td><td>CRM</td><td>Olivia</td><td>2026-04-11</td><td>2026-04-19</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="assign()">分配</button><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Nova Luxury Brand Merchant Core Contract"><div class="truncate-3">Nova Luxury Brand Merchant Core Contract</div></td>
+              <td>MCH-10002</td><td>Nova Retail Group</td><td>CID-2026-0091</td><td>Nova Harbour Shop</td><td>SID-3098</td>
+              <td><span class="badge processing">基础资料审核</span></td><td>Stripe</td><td>Web</td><td>Jason</td><td>2026-04-09</td><td>2026-04-19</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="reassign()">转派</button><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Alpha Dining Merchant"><div class="truncate-3">Alpha Dining Merchant</div></td>
+              <td>MCH-10003</td><td>Alpha Dining Holdings</td><td>CID-2026-0170</td><td>Alpha TST</td><td>SID-3201</td>
+              <td><span class="badge processing">风控核查（1）</span></td><td>Adyen-payfac</td><td>Partner</td><td>Ivy</td><td>2026-04-03</td><td>2026-04-17</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Alpha Dining Merchant - Branch 2"><div class="truncate-3">Alpha Dining Merchant - Branch 2</div></td>
+              <td>MCH-10004</td><td>Alpha Dining Holdings</td><td>CID-2026-0170</td><td>Alpha Mongkok</td><td>SID-3202</td>
+              <td><span class="badge processing">风控核查（2）</span></td><td>Adyen-payfac</td><td>Partner</td><td>Ivy</td><td>2026-04-03</td><td>2026-04-17</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Bright Tech Merchant"><div class="truncate-3">Bright Tech Merchant</div></td>
+              <td>MCH-10005</td><td>Bright Technology</td><td>CID-2026-0212</td><td>Bright Causeway Bay</td><td>SID-3310</td>
+              <td><span class="badge processing">风控初级审核</span></td><td>Stripe</td><td>CRM</td><td>Ken</td><td>2026-03-30</td><td>2026-04-18</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Bright Tech Merchant - New Line"><div class="truncate-3">Bright Tech Merchant - New Line</div></td>
+              <td>MCH-10006</td><td>Bright Technology</td><td>CID-2026-0212</td><td>Bright Kowloon</td><td>SID-3311</td>
+              <td><span class="badge processing">风控中级审核</span></td><td>Stripe</td><td>CRM</td><td>Ken</td><td>2026-03-31</td><td>2026-04-18</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a><a href="#" onclick="return exportOne()">一键导出</a><button class="btn link" onclick="openBranch()">Kpay分店列表</button></div></td>
+            </tr>
+            <tr>
+              <td title="Fusion Global Merchant"><div class="truncate-3">Fusion Global Merchant</div></td>
+              <td>MCH-10007</td><td>Fusion Global Ltd</td><td>CID-2026-0300</td><td>Fusion HQ Shop</td><td>SID-3401</td>
+              <td><span class="badge warning">总经理审核</span></td><td>Adyen-payfac</td><td>API</td><td>Mika</td><td>2026-03-21</td><td>2026-04-18</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a></div></td>
+            </tr>
+            <tr>
+              <td title="Fusion Global Merchant - Final"><div class="truncate-3">Fusion Global Merchant - Final</div></td>
+              <td>MCH-10008</td><td>Fusion Global Ltd</td><td>CID-2026-0300</td><td>Fusion HQ Shop</td><td>SID-3401</td>
+              <td><span class="badge success">风控审核完成</span></td><td>Adyen-payfac</td><td>API</td><td>Mika</td><td>2026-03-12</td><td>2026-04-19</td>
+              <td class="sticky-right"><div class="ops-inline"><a href="merchant-detail.html">查看详情</a></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  document.getElementById('toggleBtn').addEventListener('click', () => {
+    const more = document.getElementById('moreFilters');
+    const expanded = more.classList.contains('hidden');
+    more.classList.toggle('hidden');
+    document.getElementById('toggleBtn').textContent = expanded ? '收起' : '展开';
+  });
+  function exportOne(){ alert('一键导出（Demo）'); return false; }
+  function assign(){ alert('分配（Demo）'); }
+  function reassign(){ alert('转派（Demo）'); }
+  function openBranch(){ alert('Kpay分店列表（Demo）'); }
+</script>
+</body>
+</html>
