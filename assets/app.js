@@ -214,6 +214,67 @@ function resubmit(id) {
   alert(`企业 ${id} 已重新提交审核，状态变更为：待审核（mock）`);
 }
 
+const GLOBAL_SIDEBAR_MENU = [
+  {
+    title: '商户管理',
+    items: [
+      { text: '企业管理', href: 'enterprise-list.html' },
+      { text: '商铺管理', href: 'shop-list.html' },
+      { text: '商户审核', href: 'merchant-list.html' },
+      { text: '群组管理', href: 'group-management.html' },
+      { text: '已签约商户', href: 'signed-merchants.html' },
+      { text: '取消签约商户', href: 'cancelled-merchants.html' },
+      { text: '拒绝签约商户', href: 'rejected-merchants.html' },
+      {
+        text: '资料修改待审核',
+        children: [
+          { text: '企业资料修改待审核', href: 'enterprise-change-review.html' },
+          { text: '商铺资料修改待审核', href: 'shop-change-review.html' },
+          { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
+        ]
+      },
+      { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
+      { text: '商户进件', href: 'merchant-onboarding.html' },
+      { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
+    ]
+  },
+  {
+    title: '合约管理',
+    items: [
+      { text: '已生成的合约', href: 'generated-contracts.html' },
+      { text: '合约字段映射配置', href: 'contract-mapping.html' }
+    ]
+  },
+  {
+    title: '其他模块',
+    items: [
+      { text: 'O/S补件', href: 'os-supplement.html' },
+      { text: '通道管理', href: 'channel-management.html' }
+    ]
+  }
+];
+
+function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const html = GLOBAL_SIDEBAR_MENU.map(group => {
+    const rows = group.items.map(item => {
+      if (item.children) {
+        const children = item.children
+          .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
+          .join('');
+        return `<li><div>${item.text}</div>${children}</li>`;
+      }
+      const isActive = item.href === activeHref;
+      return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
+    }).join('');
+    return `<div class="menu-group"><div class="menu-title">${group.title}</div><ul class="menu-list">${rows}</ul></div>`;
+  }).join('');
+
+  container.innerHTML = html;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   applyBrandPaletteFromLogo();
   bindMultiSelect();

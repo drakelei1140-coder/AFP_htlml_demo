@@ -143,6 +143,16 @@
     }
     .toast.show { display:block; }
     .toast.warning { border-left-color: var(--warning); }
+
+    .field-group-card { border:1px solid var(--border); border-radius:6px; margin-bottom:12px; overflow:hidden; }
+    .field-group-card summary { cursor:pointer; padding:10px 12px; font-weight:600; background:var(--panel-2); }
+    .field-group-inner { padding:10px 12px; }
+    .field-group-table { width:100%; border-collapse:collapse; }
+    .field-group-table th,.field-group-table td { border-bottom:1px solid var(--border); padding:8px; text-align:left; vertical-align:top; }
+    .field-group-table th { background:var(--panel-2); font-weight:600; }
+    .field-group-table input { width:100%; }
+    .readonly-chip { font-size:12px; color:var(--muted); }
+
   </style>
 </head>
 <body>
@@ -259,60 +269,15 @@
 
       <p class="desc" style="margin:0 0 10px;">以下字段来自该通道上一次递交快照，仅用于本次向通道重新进件，不会写回商户主档资料。</p>
 
-      <form class="form-grid" id="resubmitForm">
-        <div class="field">
-          <label>Legal Entity Name</label>
-          <input name="legalEntityName" />
+      <div id="resubmitFieldsContainer"></div>
+      <div class="field" style="margin-top:12px;">
+        <label>KYB 附件上传 / 查看</label>
+        <div class="upload-row">
+          <span id="snapshotFileName">-</span>
+          <button class="btn" type="button" id="mockUploadBtn">模拟上传新文件</button>
         </div>
-        <div class="field">
-          <label>MCC</label>
-          <select name="mcc">
-            <option value="">请选择</option>
-            <option value="5812">5812</option>
-            <option value="5411">5411</option>
-            <option value="5732">5732</option>
-            <option value="7011">7011</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Business Start Date</label>
-          <input name="businessStartDate" type="date" />
-        </div>
-        <div class="field">
-          <label>Settlement Currency</label>
-          <select name="settlementCurrency">
-            <option value="">请选择</option>
-            <option value="HKD">HKD</option>
-            <option value="USD">USD</option>
-            <option value="SGD">SGD</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Store Name</label>
-          <input name="storeName" />
-        </div>
-        <div class="field">
-          <label>Payment Method</label>
-          <select name="paymentMethod">
-            <option value="">请选择</option>
-            <option value="Cards">Cards</option>
-            <option value="AlipayHK">AlipayHK</option>
-            <option value="WeChatPayHK">WeChatPayHK</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>预计月交易额</label>
-          <input name="monthlyVolume" placeholder="例如 800000" />
-        </div>
-        <div class="field">
-          <label>KYB 附件上传 / 查看</label>
-          <div class="upload-row">
-            <span id="snapshotFileName">-</span>
-            <button class="btn" type="button" id="mockUploadBtn">模拟上传新文件</button>
-          </div>
-          <div class="light-hint">演示用途：仅记录到本次通道进件记录快照。</div>
-        </div>
-      </form>
+        <div class="light-hint">演示用途：仅记录到本次通道进件记录快照。</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" type="button" id="cancelResubmitBtn">取消</button>
@@ -339,6 +304,8 @@
       <div class="timeline timeline-wrap" id="historyTimeline"></div>
 
       <h4 class="timeline-title" style="margin-top:14px;">递交摘要</h4>
+      <h4 class="timeline-title" style="margin-top:14px;">字段快照明细（最近一次）</h4>
+      <div id="historyFieldGroups"></div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -401,42 +368,126 @@
 
 <script src="assets/app.js"></script>
 <script>
-  const fullMenu = [
+  const AFP_FIELD_GROUPS = [
     {
-      title: '商户管理',
-      items: [
-        { text: '企业管理', href: 'enterprise-list.html' },
-        { text: '商铺管理', href: 'shop-list.html' },
-        { text: '商户审核', href: 'merchant-list.html' },
-        { text: '群组管理', href: 'group-management.html' },
-        { text: '已签约商户', href: 'signed-merchants.html' },
-        { text: '取消签约商户', href: 'cancelled-merchants.html' },
-        { text: '拒绝签约商户', href: 'rejected-merchants.html' },
-        { text: '资料修改待审核', children: [
-          { text: '企业资料修改待审核', href: 'enterprise-change-review.html' },
-          { text: '商铺资料修改待审核', href: 'shop-change-review.html' },
-          { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
-        ]},
-        { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
-        { text: '商户进件', href: 'merchant-onboarding.html', active: true },
-        { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
+      key: 'companyLegalEntity',
+      title: 'Company Legal Entity',
+      fields: [
+        ['reference', '企业参考号 / 企业外部参考号', 'reference'],
+        ['type', '企业类型', 'type'],
+        ['organizationLegalName', '企业法定名称', 'organization.legalName'],
+        ['organizationDoingBusinessAs', '企业营业名称 / DBA', 'organization.doingBusinessAs'],
+        ['organizationDescription', '企业描述', 'organization.description'],
+        ['organizationPhoneNumber', '企业联系电话', 'organization.phone.number'],
+        ['organizationPhoneCountryCode', '企业电话国家区号', 'organization.phone.phoneCountryCode'],
+        ['organizationPhoneType', '企业电话类型', 'organization.phone.type'],
+        ['organizationEmail', '企业邮箱', 'organization.email'],
+        ['registeredStreet', '注册地址-街道', 'organization.registeredAddress.street'],
+        ['registeredStreet2', '注册地址-补充地址', 'organization.registeredAddress.street2'],
+        ['registeredCity', '注册地址-城市', 'organization.registeredAddress.city'],
+        ['registeredStateOrProvince', '注册地址-州 / 省', 'organization.registeredAddress.stateOrProvince'],
+        ['registeredPostalCode', '注册地址-邮编', 'organization.registeredAddress.postalCode'],
+        ['registeredCountry', '注册地址-国家', 'organization.registeredAddress.country'],
+        ['principalStreet', '主要营业地址-街道', 'organization.principalPlaceOfBusiness.street'],
+        ['principalStreet2', '主要营业地址-补充地址', 'organization.principalPlaceOfBusiness.street2'],
+        ['principalCity', '主要营业地址-城市', 'organization.principalPlaceOfBusiness.city'],
+        ['principalStateOrProvince', '主要营业地址-州 / 省', 'organization.principalPlaceOfBusiness.stateOrProvince'],
+        ['principalPostalCode', '主要营业地址-邮编', 'organization.principalPlaceOfBusiness.postalCode'],
+        ['principalCountry', '主要营业地址-国家', 'organization.principalPlaceOfBusiness.country'],
+        ['dateOfIncorporation', '成立日期', 'organization.dateOfIncorporation'],
+        ['registrationNumber', '企业注册号', 'organization.registrationNumber'],
+        ['countryOfGoverningLaw', '企业治理法律所在国', 'organization.countryOfGoverningLaw'],
+        ['taxCountry', '企业税务国家', 'organization.taxInformation.country'],
+        ['taxNumber', '企业税号', 'organization.taxInformation.number'],
+        ['taxType', '企业税号类型', 'organization.taxInformation.type'],
+        ['vatNumber', 'VAT号', 'organization.vatNumber'],
+        ['vatAbsenceReason', '无VAT原因', 'organization.vatAbsenceReason'],
+        ['marketIdentifier', '上市市场标识', 'organization.stockData.marketIdentifier'],
+        ['stockNumber', '股票代码', 'organization.stockData.stockNumber']
       ]
-    }
+    },
+    {
+      key: 'individualLegalEntity',
+      title: 'Individual Legal Entity',
+      fields: [
+        ['entityAssociationType', '人员角色', 'entityAssociations.type'],
+        ['reference', '人员参考号 / 外部参考号', 'reference'],
+        ['type', '人员类型', 'type'],
+        ['firstName', '名', 'individual.name.firstName'],
+        ['infix', '中间名 / 前缀', 'individual.name.infix'],
+        ['lastName', '姓', 'individual.name.lastName'],
+        ['nationality', '国籍', 'individual.nationality'],
+        ['dateOfBirth', '出生日期', 'individual.birthData.dateOfBirth'],
+        ['email', '邮箱', 'individual.email'],
+        ['phoneNumber', '联系电话', 'individual.phone.number'],
+        ['phoneType', '电话类型', 'individual.phone.type'],
+        ['residentialStreet', '居住地址-街道', 'individual.residentialAddress.street'],
+        ['residentialStreet2', '居住地址-补充地址', 'individual.residentialAddress.street2'],
+        ['residentialCity', '居住地址-城市', 'individual.residentialAddress.city'],
+        ['residentialStateOrProvince', '居住地址-州 / 省', 'individual.residentialAddress.stateOrProvince'],
+        ['residentialPostalCode', '居住地址-邮编', 'individual.residentialAddress.postalCode'],
+        ['residentialCountry', '居住地址-国家', 'individual.residentialAddress.country'],
+        ['identificationType', '证件类型', 'individual.identificationData.type'],
+        ['identificationNumber', '证件号码', 'individual.identificationData.number'],
+        ['identificationExpiryDate', '证件到期日', 'individual.identificationData.expiryDate'],
+        ['identificationIssuerState', '签发州 / 省（如适用）', 'individual.identificationData.issuerState'],
+        ['taxCountry', '税务国家', 'individual.taxInformation.country'],
+        ['taxNumber', '税号', 'individual.taxInformation.number'],
+        ['taxType', '税号类型', 'individual.taxInformation.type']
+      ]
+    },
+    { key: 'accountHolder', title: 'Account Holder', fields: [
+      ['balancePlatform', 'Balance Platform ID', 'balancePlatform'],
+      ['reference', 'Account Holder 参考号', 'reference'],
+      ['legalEntityId', '关联企业 LE ID', 'legalEntityId'],
+      ['capabilities', '所申请能力集合', 'capabilities'],
+      ['verificationStatus', 'capability-verificationStatus', 'capabilities.*.verificationStatus', true],
+      ['allowed', 'capability-allowed', 'capabilities.*.allowed', true],
+      ['enabled', 'capability-enabled', 'capabilities.*.enabled', true]
+    ]},
+    { key: 'balanceAccount', title: 'Balance Account', fields: [
+      ['accountHolderId', '关联 Account Holder ID', 'accountHolderId'],
+      ['reference', 'Balance Account 参考号', 'reference'],
+      ['defaultCurrencyCode', '默认币种 / 结算币种', 'defaultCurrencyCode'],
+      ['balanceAccountId', 'Balance Account ID', '返回字段', true],
+      ['balanceAccountStatus', 'Balance Account 状态', '返回字段', true]
+    ]},
+    { key: 'businessLine', title: 'Business Line', fields: [
+      ['reference', 'Business Line 参考号', 'reference'],
+      ['legalEntityId', '关联企业 LE ID', 'legalEntityId'],
+      ['service', '服务类型', 'service'],
+      ['salesChannels', '销售渠道', 'salesChannels'],
+      ['industryCode', '行业代码 / MCC映射值', 'industryCode'],
+      ['description', '业务线描述 / 名称', 'description']
+    ]},
+    { key: 'store', title: 'Store', fields: [
+      ['merchantId', 'Merchant Account ID', 'merchantId（路径参数）'],
+      ['reference', 'Store参考号 / 门店编码', 'reference'],
+      ['description', 'Store描述 / 门店名称', 'description'],
+      ['phoneNumber', '门店联系电话', 'phoneNumber'],
+      ['shopperStatement', '账单抬头 / Shopper Statement', 'shopperStatement'],
+      ['businessLineIds', '绑定 Business Line IDs', 'businessLineIds'],
+      ['addressStreet', '门店地址-街道', 'address.street'],
+      ['addressStreet2', '门店地址-补充地址', 'address.street2'],
+      ['addressCity', '门店地址-城市', 'address.city'],
+      ['addressStateOrProvince', '门店地址-州 / 省', 'address.stateOrProvince'],
+      ['addressPostalCode', '门店地址-邮编', 'address.postalCode'],
+      ['addressCountry', '门店地址-国家', 'address.country'],
+      ['storeId', 'Store ID', '返回字段', true],
+      ['storeStatus', 'Store状态', '返回字段', true]
+    ]},
+    { key: 'paymentMethod', title: 'Payment Method', fields: [
+      ['paymentMethodType', '支付产品', 'paymentMethod / type'],
+      ['enabledAllowed', '是否开通', 'enabled / allowed'],
+      ['paymentMethodId', '通道支付方式配置ID', 'paymentMethodId'],
+      ['merchantId', 'Merchant Account ID', 'merchantId（路径参数）'],
+      ['storeId', 'Store ID（如适用）', 'storeId'],
+      ['applicableScope', '支付方式适用范围', '扩展配置字段'],
+      ['creationResult', 'Payment Method 创建结果', '返回字段', true],
+      ['availabilityResult', 'Payment Method 可用状态', 'allowed / enabled', true],
+      ['returnMessage', 'Payment Method 返回信息', '返回字段', true]
+    ]}
   ];
-
-  function renderSidebar(menu) {
-    const html = menu.map(group => {
-      const rows = group.items.map(item => {
-        if (item.children) {
-          const children = item.children.map(child => `<a class="lvl3" href="${child.href}">${child.text}</a>`).join('');
-          return `<li><div>${item.text}</div>${children}</li>`;
-        }
-        return `<li><a ${item.active ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
-      }).join('');
-      return `<div class="menu-group"><div class="menu-title">${group.title}</div><ul class="menu-list">${rows}</ul></div>`;
-    }).join('');
-    document.getElementById('appSidebar').innerHTML = html;
-  }
 
   const mockRecords = [
     {
@@ -643,7 +694,89 @@
     }
   ];
 
-  let tableData = JSON.parse(JSON.stringify(mockRecords));
+  function makeEmptySnapshot() {
+    return AFP_FIELD_GROUPS.reduce((acc, group) => {
+      acc[group.key] = group.fields.reduce((fieldAcc, [key]) => {
+        fieldAcc[key] = '';
+        return fieldAcc;
+      }, {});
+      return acc;
+    }, {});
+  }
+
+  function normalizeSnapshot(raw = {}) {
+    if (raw.companyLegalEntity) return raw;
+    const next = makeEmptySnapshot();
+    next.companyLegalEntity.organizationLegalName = raw.legalEntityName || '';
+    next.businessLine.industryCode = raw.mcc || '';
+    next.companyLegalEntity.dateOfIncorporation = raw.businessStartDate || '';
+    next.balanceAccount.defaultCurrencyCode = raw.settlementCurrency || '';
+    next.store.description = raw.storeName || '';
+    next.paymentMethod.paymentMethodType = raw.paymentMethod || '';
+    next.accountHolder.capabilities = raw.monthlyVolume || '';
+    next.kybFileName = raw.kybFileName || '';
+    return next;
+  }
+
+  function renderFieldGroups(containerId, snapshot, mode = 'edit', beforeSnapshot = null) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = AFP_FIELD_GROUPS.map((group, idx) => `
+      <details class="field-group-card" ${idx < 2 ? 'open' : ''}>
+        <summary>${group.title}</summary>
+        <div class="field-group-inner">
+          <div class="table-wrap">
+            <table class="field-group-table">
+              <thead>
+                <tr>
+                  <th>本系统字段名</th>
+                  <th>AFP接口字段名</th>
+                  ${mode === 'edit' ? '<th>当前值</th>' : '<th>修改前值</th><th>修改后值</th>'}
+                </tr>
+              </thead>
+              <tbody>
+                ${group.fields.map(([key, label, afp, readonly]) => {
+                  const afterVal = snapshot?.[group.key]?.[key] || '';
+                  const beforeVal = beforeSnapshot?.[group.key]?.[key] || '';
+                  if (mode !== 'edit') {
+                    return `<tr><td>${label}</td><td>${afp}</td><td>${beforeVal || '-'}</td><td>${afterVal || '-'}</td></tr>`;
+                  }
+                  const disabled = readonly ? 'readonly' : '';
+                  return `<tr><td>${label} ${readonly ? '<span class="readonly-chip">只读</span>' : ''}</td><td>${afp}</td><td><input data-group="${group.key}" data-key="${key}" value="${afterVal}" ${disabled} /></td></tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    `).join('');
+  }
+
+  function collectSnapshotFromInputs() {
+    const snapshot = makeEmptySnapshot();
+    document.querySelectorAll('#resubmitFieldsContainer input[data-group][data-key]').forEach(input => {
+      const g = input.dataset.group;
+      const k = input.dataset.key;
+      snapshot[g][k] = input.value.trim();
+    });
+    return snapshot;
+  }
+
+  function diffSnapshot(beforeSnapshot, afterSnapshot) {
+    const changes = [];
+    AFP_FIELD_GROUPS.forEach(group => {
+      group.fields.forEach(([key, label]) => {
+        const beforeVal = beforeSnapshot?.[group.key]?.[key] || '';
+        const afterVal = afterSnapshot?.[group.key]?.[key] || '';
+        if (beforeVal !== afterVal) changes.push(`${group.title}.${label}: ${beforeVal || '空'} -> ${afterVal || '空'}`);
+      });
+    });
+    return changes.length ? changes.join('；') : '无字段变更';
+  }
+
+  let tableData = JSON.parse(JSON.stringify(mockRecords)).map(item => ({
+    ...item,
+    snapshot: normalizeSnapshot(item.snapshot)
+  }));
   let currentEditRecordId = '';
 
   function showToast(message, type = 'success') {
@@ -716,14 +849,7 @@
     document.getElementById('modalChannel').textContent = record.channel;
     document.getElementById('modalOrderStatus').textContent = record.orderStatus;
 
-    const form = document.getElementById('resubmitForm');
-    form.legalEntityName.value = record.snapshot.legalEntityName || '';
-    form.mcc.value = record.snapshot.mcc || '';
-    form.businessStartDate.value = record.snapshot.businessStartDate || '';
-    form.settlementCurrency.value = record.snapshot.settlementCurrency || '';
-    form.storeName.value = record.snapshot.storeName || '';
-    form.paymentMethod.value = record.snapshot.paymentMethod || '';
-    form.monthlyVolume.value = record.snapshot.monthlyVolume || '';
+    renderFieldGroups('resubmitFieldsContainer', record.snapshot, 'edit');
     document.getElementById('snapshotFileName').textContent = record.snapshot.kybFileName || '-';
 
     openModal('resubmitModalMask');
@@ -763,6 +889,11 @@
       </tr>
     `).join('');
 
+    const latest = record.history[0] || {};
+    const beforeSnapshot = normalizeSnapshot(latest.snapshotBefore || record.snapshot);
+    const afterSnapshot = normalizeSnapshot(latest.snapshotAfter || record.snapshot);
+    renderFieldGroups('historyFieldGroups', afterSnapshot, 'compare', beforeSnapshot);
+
     openModal('historyModalMask');
   }
 
@@ -791,17 +922,9 @@
     const record = getRecord(currentEditRecordId);
     if (!record) return;
 
-    const form = document.getElementById('resubmitForm');
-    const snapshotPayload = {
-      legalEntityName: form.legalEntityName.value.trim(),
-      mcc: form.mcc.value,
-      businessStartDate: form.businessStartDate.value,
-      settlementCurrency: form.settlementCurrency.value,
-      storeName: form.storeName.value.trim(),
-      paymentMethod: form.paymentMethod.value,
-      monthlyVolume: form.monthlyVolume.value.trim(),
-      kybFileName: document.getElementById('snapshotFileName').textContent
-    };
+    const snapshotBefore = JSON.parse(JSON.stringify(record.snapshot || makeEmptySnapshot()));
+    const snapshotPayload = collectSnapshotFromInputs();
+    snapshotPayload.kybFileName = document.getElementById('snapshotFileName').textContent;
 
     // 仅更新通道进件记录快照，不写回商户主档。
     record.snapshot = snapshotPayload;
@@ -810,10 +933,7 @@
     const now = new Date();
     const nowText = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
-    const changedFields = Object.entries(snapshotPayload)
-      .filter(([key, value]) => String(value || '').trim())
-      .map(([key, value]) => `${key}: ${value}`)
-      .join('；') || '无字段变更';
+    const changedFields = diffSnapshot(snapshotBefore, snapshotPayload);
 
     if (record.channel === 'Adyen_AFP') {
       record.orderStatus = '处理中';
@@ -829,6 +949,8 @@
         progressResult: '处理中',
         errorSummary: '-',
         fieldChanges: changedFields,
+        snapshotBefore,
+        snapshotAfter: snapshotPayload,
         opsModifyInfo: `${nowText} / OPS-Olivia`,
         riskReviewInfo: '-',
         finalResult: '处理中',
@@ -854,6 +976,8 @@
         progressResult: '处理中',
         errorSummary: '-',
         fieldChanges: changedFields,
+        snapshotBefore,
+        snapshotAfter: snapshotPayload,
         opsModifyInfo: `${nowText} / OPS-Olivia`,
         riskReviewInfo: `${nowText} / 待分配`,
         finalResult: '处理中',
@@ -956,7 +1080,7 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     applyBrandPaletteFromLogo();
-    renderSidebar(fullMenu);
+    renderGlobalSidebar('appSidebar', 'merchant-onboarding.html');
     renderTable(tableData);
     bindEvents();
   });
