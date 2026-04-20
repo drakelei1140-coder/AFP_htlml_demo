@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>取消签约商户列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .merchant-filters-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .merchant-filters-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+    .merchant-table { min-width:3200px; }
+    .merchant-table th, .merchant-table td { max-width:240px; }
+    .merchant-table .id-col { min-width:200px; }
+    .merchant-table .status-col { min-width:160px; }
+    .merchant-table .code-col { min-width:160px; }
+    .merchant-table .text-col { min-width:180px; }
+    .merchant-table .operator-col { min-width:180px; }
+    .merchant-table .time-col { min-width:190px; }
+    .sticky-right-col { position:sticky; right:0; z-index:2; background:var(--panel); }
+    .sticky-right-head { position:sticky; right:0; z-index:3; }
+    .clip-3 {
+      display:-webkit-box;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:3;
+      overflow:hidden;
+      white-space:normal;
+      line-height:1.45;
+      max-height:4.35em;
+      word-break:break-word;
+    }
+    .id-cell { display:flex; align-items:center; gap:8px; }
+    .copy-btn {
+      border:0;
+      background:transparent;
+      color:var(--primary-dark);
+      cursor:pointer;
+      padding:0;
+      font-size:12px;
+    }
+    .ops-inline { display:flex; flex-wrap:wrap; gap:8px; align-items:center; min-height:34px; }
+    .field-slot.hidden { display:none; }
+  </style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+  <div class="top-controls">
+    <select><option>地区：香港</option><option>地区：新加坡</option></select>
+    <select><option>语言：简体中文</option><option>English</option></select>
+    <button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button>
+    <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="appSidebar"></aside>
+
+  <main class="main">
+    <section class="card">
+      <h3 class="section-title">筛选区</h3>
+      <div class="merchant-filters-grid" id="filterGrid">
+        <div class="field field-slot collapse-visible"><label>MID</label><input placeholder="支持按 MID 精确或模糊搜索" /></div>
+        
+        <div class="field field-slot collapse-visible"><label>SID</label><input placeholder="支持按所属商铺编号搜索" /></div>
+        <div class="field field-slot collapse-visible"><label>渠道编码</label>
+          <select multiple>
+            <option>AFP_HK</option>
+            <option>ADYEN_PAYFAC</option>
+            <option>STRIPE_DIRECT</option>
+            <option>PAYPAL_EC</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-visible"><label>创建时间</label><input placeholder="2026-01-01 ~ 2026-12-31" /></div>
+
+        <div class="field field-slot collapse-extra hidden"><label>服务编码</label>
+          <select multiple>
+            <option>SV_PAYMENT</option>
+            <option>SV_SETTLEMENT</option>
+            <option>SV_RISK</option>
+            <option>SV_REFUND</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-extra hidden"><label>上單來源</label>
+          <select multiple>
+            <option>CRM</option>
+            <option>DMO</option>
+            <option>SaaS</option>
+            <option>其他（预留）</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-extra hidden"><label>使用費率模板</label><input placeholder="输入费率模板名称" /></div>
+        <div class="field field-slot collapse-extra hidden"><label>結算幣種</label>
+          <select>
+            <option value="">全部</option>
+            <option>HKD</option>
+            <option>USD</option>
+            <option>SGD</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-extra hidden"><label>產品開通</label>
+          <select multiple>
+            <option>收单</option>
+            <option>结算</option>
+            <option>分账</option>
+            <option>退款</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-extra hidden"></div>
+      </div>
+
+      <div class="merchant-filters-actions">
+        <div class="btns" style="margin-top:0;">
+          <button class="btn primary" type="button">查询</button>
+          <button class="btn" type="button">重置</button>
+          <button class="btn" id="toggleBtn" type="button" data-expanded="0">展开</button>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <section class="card">
+      <h3 class="section-title">列表区</h3>
+      <div class="table-wrap">
+        <table class="merchant-table">
+          <thead>
+            <tr>
+              <th class="id-col">MID</th>
+              <th class="id-col">CID</th>
+              <th class="text-col">企业名称</th>
+              <th class="id-col">SID</th>
+              <th class="text-col">商铺名称</th>
+              <th class="code-col">渠道编码</th>
+              <th class="code-col">服务编码</th>
+              <th class="text-col">进件通道</th>
+              <th class="status-col">商户审核状态</th>
+              <th class="id-col">当前审核人</th>
+              <th class="text-col">產品開通</th>
+              <th class="text-col">上單來源</th>
+              <th class="text-col">创建人</th>
+              <th class="time-col">创建时间</th>
+              <th class="time-col">更新时间</th>
+              <th class="sticky-right-head operator-col">操作</th>
+            </tr>
+          </thead>
+          <tbody id="merchantTbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  const fullMenu = [
+    {
+      title: '商户管理',
+      items: [
+        { text: '企业管理', href: 'enterprise-list.html' },
+        { text: '商铺管理', href: 'shop-list.html' },
+        { text: '商户审核', href: 'merchant-list.html' },
+        { text: '群组管理', href: 'group-management.html' },
+        { text: '已签约商户', href: 'signed-merchants.html' },
+        { text: '取消签约商户', href: 'cancelled-merchants.html', active: true },
+        { text: '拒绝签约商户', href: 'rejected-merchants.html' },
+        { text: '资料修改待审核', children: [
+          { text: '企业资料修改待审核', href: 'enterprise-change-review.html' },
+          { text: '商铺资料修改待审核', href: 'shop-change-review.html' },
+          { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
+        ]},
+        { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
+        { text: '商户进件', href: 'merchant-onboarding.html' },
+        { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
+      ]
+    },
+    {
+      title: '合约管理',
+      items: [
+        { text: '已生成的合约', href: 'generated-contracts.html' },
+        { text: '合约字段映射配置', href: 'contract-mapping.html' }
+      ]
+    },
+    {
+      title: '其他模块',
+      items: [
+        { text: 'O/S补件', href: 'os-supplement.html' },
+        { text: '通道管理', href: 'channel-management.html' }
+      ]
+    }
+  ];
+
+  function renderSidebar(menu) {
+    const html = menu.map(group => {
+      const rows = group.items.map(item => {
+        if (item.children) {
+          const children = item.children.map(child => `<a class="lvl3" href="${child.href}">${child.text}</a>`).join('');
+          return `<li><div>${item.text}</div>${children}</li>`;
+        }
+        return `<li><a ${item.active ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
+      }).join('');
+      return `<div class="menu-group"><div class="menu-title">${group.title}</div><ul class="menu-list">${rows}</ul></div>`;
+    }).join('');
+    document.getElementById('appSidebar').innerHTML = html;
+  }
+
+  const mockMerchants = [
+    {
+      mid: 'MID-2026-0001', cid: 'CID-2026-0004', enterpriseName: 'Everpeak Digital Commerce', sid: 'SID-3001',
+      shopName: 'Everpeak Central Flagship', channelCodes: ['AFP_HK', 'ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT', 'SV_SETTLEMENT'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '待审核', reviewStage: 'pending', reviewer: '', products: ['收单', '结算'],
+      source: 'CRM', creator: 'Olivia', createdAt: '2026-04-11 10:20:00', updatedAt: '2026-04-19 09:11:00'
+    },
+    {
+      mid: 'MID-2026-0002', cid: 'CID-2026-0091', enterpriseName: 'Nova Retail Group', sid: 'SID-3098',
+      shopName: 'Nova Harbour Shop', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT', 'SV_RISK'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '基础资料审核', reviewStage: 'basic', reviewer: 'OPS-Jason', products: ['收单'],
+      source: 'DMO', creator: 'Mina', createdAt: '2026-04-09 09:21:00', updatedAt: '2026-04-19 11:40:00'
+    },
+    {
+      mid: 'MID-2026-0003', cid: 'CID-2026-0170', enterpriseName: 'Alpha Dining Holdings', sid: 'SID-3201',
+      shopName: 'Alpha TST', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT', 'SV_REFUND'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '风控核查', reviewStage: 'risk_check_1', reviewer: '', products: ['收单', '退款'],
+      source: 'SaaS', creator: 'Ivy', createdAt: '2026-04-03 16:10:00', updatedAt: '2026-04-17 18:05:00'
+    },
+    {
+      mid: 'MID-2026-0004', cid: 'CID-2026-0170', enterpriseName: 'Alpha Dining Holdings', sid: 'SID-3202',
+      shopName: 'Alpha Mongkok', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT', 'SV_REFUND'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '风控核查', reviewStage: 'risk_check_2', reviewer: 'RISK-Ivy', products: ['收单', '退款'],
+      source: 'SaaS', creator: 'Ivy', createdAt: '2026-04-03 18:10:00', updatedAt: '2026-04-17 21:15:00'
+    },
+    {
+      mid: 'MID-2026-0005', cid: 'CID-2026-0212', enterpriseName: 'Bright Technology', sid: 'SID-3310',
+      shopName: 'Bright Causeway Bay', channelCodes: ['STRIPE_DIRECT'], serviceCodes: ['SV_PAYMENT'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '风控初级审核', reviewStage: 'risk_primary', reviewer: 'RISK-Ken', products: ['收单'],
+      source: 'CRM', creator: 'Ken', createdAt: '2026-03-30 09:00:00', updatedAt: '2026-04-18 08:18:00'
+    },
+    {
+      mid: 'MID-2026-0006', cid: 'CID-2026-0212', enterpriseName: 'Bright Technology', sid: 'SID-3311',
+      shopName: 'Bright Kowloon', channelCodes: ['STRIPE_DIRECT'], serviceCodes: ['SV_PAYMENT', 'SV_SETTLEMENT'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '风控中级审核', reviewStage: 'risk_middle', reviewer: 'RISK-Ken', products: ['收单', '结算'],
+      source: 'CRM', creator: 'Ken', createdAt: '2026-03-31 09:12:00', updatedAt: '2026-04-18 10:42:00'
+    },
+    {
+      mid: 'MID-2026-0007', cid: 'CID-2026-0300', enterpriseName: 'Fusion Global Ltd', sid: 'SID-3401',
+      shopName: 'Fusion HQ Shop', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT', 'SV_SETTLEMENT', 'SV_RISK'],
+      entryChannel: '非 AFP（完整审核流）', reviewStatus: '总经理审核', reviewStage: 'gm', reviewer: 'GM-Mika', products: ['收单', '结算', '风控'],
+      source: 'DMO', creator: 'Mika', createdAt: '2026-03-21 17:20:00', updatedAt: '2026-04-18 15:03:00'
+    },
+    {
+      mid: 'MID-2026-0008', cid: 'CID-2026-0400', enterpriseName: 'AFP Fast Merchant', sid: 'SID-4010',
+      shopName: 'AFP Central Shop', channelCodes: ['AFP_HK'], serviceCodes: ['SV_PAYMENT'],
+      entryChannel: '仅 AFP（自动跳过中间阶段）', reviewStatus: '风控审核完成', reviewStage: 'risk_done', reviewer: 'System', products: ['收单'],
+      source: 'CRM', creator: 'Alice', createdAt: '2026-04-12 08:12:00', updatedAt: '2026-04-19 09:30:00'
+    },
+    {
+      mid: 'MID-2026-0009', cid: 'CID-2026-0410', enterpriseName: 'Should Not Show - Signed', sid: 'SID-4011',
+      shopName: 'Signed Shop', channelCodes: ['AFP_HK'], serviceCodes: ['SV_PAYMENT'],
+      entryChannel: '仅 AFP', reviewStatus: '已签约', reviewStage: 'signed', reviewer: 'System', products: ['收单'],
+      source: 'CRM', creator: 'System', createdAt: '2026-04-01 08:00:00', updatedAt: '2026-04-02 08:00:00'
+    },
+    {
+      mid: 'MID-2026-0010', cid: 'CID-2026-0411', enterpriseName: 'Should Not Show - Cancelled', sid: 'SID-4012',
+      shopName: 'Cancelled Shop', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT'],
+      entryChannel: '非 AFP', reviewStatus: '取消签约', reviewStage: 'cancelled', reviewer: 'OPS', products: ['收单'],
+      source: 'CRM', creator: 'System', createdAt: '2026-04-01 08:00:00', updatedAt: '2026-04-02 08:00:00'
+    },
+    {
+      mid: 'MID-2026-0011', cid: 'CID-2026-0412', enterpriseName: 'Should Not Show - Rejected', sid: 'SID-4013',
+      shopName: 'Rejected Shop', channelCodes: ['ADYEN_PAYFAC'], serviceCodes: ['SV_PAYMENT'],
+      entryChannel: '非 AFP', reviewStatus: '拒绝签约', reviewStage: 'rejected', reviewer: 'RISK', products: ['收单'],
+      source: 'CRM', creator: 'System', createdAt: '2026-04-01 08:00:00', updatedAt: '2026-04-02 08:00:00'
+    }
+  ];
+
+  function statusBadge(status) {
+    if (status === '取消签约') return '<span class="badge danger">取消签约</span>';
+    return `<span class="badge processing">${status}</span>`;
+  }
+
+  function opsByStage() {
+    return ['<a href="merchant-detail-cancelled-signing.html">查看详情</a>'];
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('merchantTbody');
+    const data = mockMerchants.filter(row => row.reviewStatus === '取消签约');
+    tbody.innerHTML = data.map(row => `
+      <tr>
+        <td class="id-col"><div class="id-cell"><span>${row.mid}</span><button class="copy-btn" onclick="copyText('${row.mid}')">复制</button></div></td>
+        <td class="id-col"><div class="id-cell"><span>${row.cid}</span><button class="copy-btn" onclick="copyText('${row.cid}')">复制</button></div></td>
+        <td class="text-col" title="${row.enterpriseName}"><div class="clip-3">${row.enterpriseName}</div></td>
+        <td class="id-col"><div class="id-cell"><span>${row.sid}</span><button class="copy-btn" onclick="copyText('${row.sid}')">复制</button></div></td>
+        <td class="text-col" title="${row.shopName}"><div class="clip-3">${row.shopName}</div></td>
+        <td class="code-col" title="${row.channelCodes.join(', ')}"><div class="clip-3">${row.channelCodes.join(', ')}</div></td>
+        <td class="code-col" title="${row.serviceCodes.join(', ')}"><div class="clip-3">${row.serviceCodes.join(', ')}</div></td>
+        <td class="text-col" title="${row.entryChannel}"><div class="clip-3">${row.entryChannel}</div></td>
+        <td class="status-col">${statusBadge(row.reviewStatus)}</td>
+        <td class="id-col">${row.reviewer || '-'}</td>
+        <td class="text-col" title="${row.products.join(', ')}"><div class="clip-3">${row.products.join(', ')}</div></td>
+        <td class="text-col">${row.source}</td>
+        <td class="text-col">${row.creator}</td>
+        <td class="time-col">${row.createdAt}</td>
+        <td class="time-col">${row.updatedAt}</td>
+        <td class="sticky-right-col operator-col"><div class="ops-inline">${opsByStage(row).join('')}</div></td>
+      </tr>
+    `).join('');
+  }
+
+  function bindExpandCollapse() {
+    const btn = document.getElementById('toggleBtn');
+    btn.addEventListener('click', () => {
+      const expanded = btn.dataset.expanded === '1';
+      document.querySelectorAll('.collapse-extra').forEach(el => el.classList.toggle('hidden', !expanded));
+      btn.dataset.expanded = expanded ? '0' : '1';
+      btn.textContent = expanded ? '展开' : '收起';
+    });
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(`已复制：${text}`);
+    } catch (_) {
+      alert(`复制失败，请手动复制：${text}`);
+    }
+  }
+
+
+  window.addEventListener('DOMContentLoaded', () => {
+    renderSidebar(fullMenu);
+    renderTable();
+    bindExpandCollapse();
+  });
+</script>
+</body>
+</html>
