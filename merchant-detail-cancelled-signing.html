@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>取消签约商户详情页</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .detail-page .sticky-nav { top: 72px; }
+    .detail-page .nav-tag { background: #f5f7fb; color: #1f2937; border-color: #d6deeb; }
+    .detail-page .nav-tag.active { background: #e9f2ff; color: #154a8a; border-color: #9bc2f5; }
+    .detail-page .overview-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .detail-page .inline-copy { margin-left: 8px; }
+    .detail-page .muted { color: var(--muted); }
+    .detail-page .warn-bar { background: #fff7e6; border: 1px solid #ffd591; color: #ad6800; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; }
+    .detail-page .sub-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; background: #fff; }
+    .detail-page .mini-title { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+    .detail-page .action-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .detail-page .table-fixed table { min-width: 900px; }
+    .detail-page .readonly-switch { display: inline-flex; align-items: center; gap: 6px; }
+    .detail-page .switch-dot { width: 10px; height: 10px; border-radius: 50%; background: #52c41a; }
+    .detail-page .switch-dot.off { background: #bfbfbf; }
+    .detail-page .drawer-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; z-index: 1200; }
+    .detail-page .drawer { position: fixed; top: 0; right: -520px; width: 520px; max-width: 100%; height: 100%; background: #fff; border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgba(0,0,0,.15); z-index: 1250; transition: right .25s; display: flex; flex-direction: column; }
+    .detail-page .drawer.open { right: 0; }
+    .detail-page .drawer-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .detail-page .drawer-body { padding: 16px; overflow: auto; }
+    .detail-page .drawer-foot { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .detail-page .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1300; display: none; }
+    .detail-page .modal { width: 460px; max-width: calc(100% - 24px); background: #fff; border-radius: 8px; margin: 14vh auto 0; border: 1px solid var(--border); }
+    .detail-page .modal-head,.detail-page .modal-foot { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .detail-page .modal-foot { border-top: 1px solid var(--border); border-bottom: 0; display:flex; justify-content:flex-end; gap:8px; }
+    .detail-page .modal-body { padding: 14px; }
+  </style>
+</head>
+<body class="detail-page">
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="merchant-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia（OPS）</div></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a class="active" href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li></ul></div>
+  </aside>
+
+  <main class="main">
+    <section id="merchant-overview" class="card section-anchor">
+      <h3 class="section-title">页面顶部概览区</h3>
+      <div class="kv overview-grid" id="overviewFields"></div>
+      <h4 class="mini-title" style="margin-top:14px;">页面顶部操作按钮</h4>
+      <div class="warn-bar">当前状态为取消签约，详情页无操作按钮。</div>
+    </section>
+
+    <section class="sticky-nav card">
+      <button class="nav-tag" data-target="merchant-overview">商户概览</button>
+      <button class="nav-tag" data-target="key-rel">主键与关联</button>
+      <button class="nav-tag" data-target="flow-info">审核流转信息</button>
+      <button class="nav-tag" data-target="enterprise-review">企业审核信息</button>
+      <button class="nav-tag" data-target="shop-review">商铺审核信息</button>
+      <button class="nav-tag" data-target="settlement-bank">结算与银行信息</button>
+      <button class="nav-tag" data-target="product-rate">产品费率</button>
+      <button class="nav-tag" data-target="special-rate">特殊费率申请信息</button>
+      <button class="nav-tag" data-target="timeline">修改记录时间轴</button>
+    </section>
+
+    <section id="key-rel" class="card section-anchor">
+      <h3 class="section-title">主键与关联信息区</h3>
+      <div class="form-grid" id="keyRelFields"></div>
+    </section>
+
+    <section id="flow-info" class="card section-anchor">
+      <h3 class="section-title">审核流转信息区</h3>
+      <div class="form-grid" id="flowFields"></div>
+      <div class="sub-card">
+        <h4 class="mini-title">特殊费率申请相关</h4>
+        <div class="form-grid" id="flowSpecialFields"></div>
+      </div>
+      <p class="desc" style="margin-top:10px;">流转说明（demo）：系统保留“销售主管审核”但自动跳过；仅 AFP 通道自动进入“风控审核完成”；本页面用于审核信息汇总展示。</p>
+    </section>
+
+    <section id="enterprise-review" class="card section-anchor">
+      <h3 class="section-title">企业审核信息区</h3>
+      <div class="warn-bar" id="enterpriseBlockTip">企业尚未完成风控审核，商户审核暂不可完成</div>
+      <div class="form-grid" id="enterpriseSummary"></div>
+      <div class="sub-card"><h4 class="mini-title">企业审核关键字段摘要</h4><div class="form-grid" id="enterpriseKeyFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">企业风险与业务信息摘要</h4><div class="form-grid" id="enterpriseRiskFields"></div></div>
+      <p class="desc">取消签约详情为只读展示，无操作按钮。</p>
+    </section>
+
+    <section id="shop-review" class="card section-anchor">
+      <h3 class="section-title">商铺审核信息区</h3>
+      <div class="warn-bar" id="shopBlockTip">商铺尚未完成风控审核，商户审核暂不可完成</div>
+      <div class="form-grid" id="shopSummary"></div>
+      <div class="sub-card"><h4 class="mini-title">商铺审核关键字段摘要</h4><div class="form-grid" id="shopKeyFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">商铺风险与业务信息摘要</h4><div class="form-grid" id="shopRiskFields"></div></div>
+      <p class="desc">取消签约详情为只读展示，无操作按钮。</p>
+    </section>
+
+    <section id="merchant-block" class="card section-anchor">
+      <h3 class="section-title">商户审核阻塞提示区</h3>
+      <div class="warn-bar" id="merchantBlockMessage"></div>
+      <p class="desc">存在阻塞时：涉及“完成当前商户审核阶段”的按钮会禁用；企业和商铺区域中的【审核】按钮仍可使用。</p>
+    </section>
+
+    <section id="settlement-bank" class="card section-anchor">
+      <h3 class="section-title">结算与银行信息区</h3>
+      <div class="sub-card"><h4 class="mini-title">结算配置</h4><div class="form-grid" id="settlementFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">银行账户信息</h4><div class="form-grid" id="bankFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">结算文件</h4><div class="form-grid" id="bankFileFields"></div></div>
+    </section>
+
+    <section id="product-rate" class="card section-anchor table-fixed">
+      <h3 class="section-title">产品费率区</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>支付产品</th><th>类型</th><th>交易费率（百分比）</th><th>固定收费-百分比</th><th>固定收费-绝对值</th><th>开关</th><th>费率来源</th></tr></thead>
+          <tbody id="rateTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="special-rate" class="card section-anchor">
+      <h3 class="section-title">特殊费率申请信息区</h3>
+      <div class="form-grid" id="specialRateFields"></div>
+    </section>
+
+    <section id="timeline" class="card section-anchor">
+      <h3 class="section-title">修改记录时间轴区</h3>
+      <div class="timeline" id="timelineItems"></div>
+    </section>
+  </main>
+</div>
+
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="auditDrawer">
+  <div class="drawer-head"><strong id="drawerTitle">企业审核</strong><button class="btn" id="closeDrawerBtn">关闭</button></div>
+  <div class="drawer-body"><div class="form-grid" id="drawerFields"></div></div>
+  <div class="drawer-foot" id="drawerActionRow"></div>
+</aside>
+
+<div class="modal-mask" id="transferModalMask">
+  <div class="modal">
+    <div class="modal-head"><strong>轉交審核</strong></div>
+    <div class="modal-body">
+      <div class="field"><label>选择其他人</label><select id="transferUser"><option>Olivia（OPS）</option><option>Aaron（OPS）</option><option>Ivy（Risk）</option><option>Ethan（Risk）</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn" id="cancelTransfer">取消</button><button class="btn primary" id="confirmTransfer">确认转交</button></div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  const EMPTY = '-';
+  const merchantState = {
+    status: '取消签约',
+    startedByCurrentUser: true,
+    currentRole: '风控',
+    currentUser: 'Olivia（OPS）',
+    isAfpOnly: false,
+    enterpriseRiskDone: false,
+    shopRiskDone: false
+  };
+
+  const merchant = {
+    MID: 'MID-2026-88801', CID: 'CID-2026-0004', SID: 'SID-3001', 渠道编码: 'CHN-ADYEN-HK-01', 服务编码: 'SRV-CARD-CNP-01',
+    进件通道: 'Adyen-payfac, Stripe', 商户审核状态: merchantState.status, 当前审核人: merchantState.currentUser,
+    上單來源: 'CRM', 创建人: 'Olivia（OPS）', 创建时间: '2026-04-11 09:11', 更新时间: '2026-04-19 10:25',
+    当前风险等级: '中风险', 当前风险评分表状态: '待补充', 是否存在在途特殊费率申请: '是', 特殊费率申请结果: '审批中', 特殊费率申请完成时间: EMPTY
+  };
+
+  const statusButtonMap = {
+    '待审核': ['开始核查'],
+    '基础资料审核': ['取消簽約','從已有商戶複製資料','轉交審核','遞交審核'],
+    '风控核查（1）': ['开始核查'],
+    '风控核查（2）': ['通知BD（OS补件）','取消签约','风险评分风控核查','退回审核','转交审核','递交风控','基础资料评定'],
+    '风控初级审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '风控中级审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '总经理审核': ['通知BD（OS补件）','取消签约','退回审核','转交审核','审核通过','拒绝签约'],
+    '风控审核完成': []
+  };
+
+  const idFields = new Set(['MID','CID','SID','渠道编码','服务编码','FPS賬號','銀行號碼','銀行編號','結算身份證號']);
+  const fmt = v => (v === null || v === undefined || v === '' ? EMPTY : v);
+
+  function copyText(v){ navigator.clipboard?.writeText(v); }
+  function fieldHTML(k,v){
+    const val = fmt(v);
+    const copyBtn = idFields.has(k) && val !== EMPTY ? `<button class="btn link inline-copy" onclick="copyText('${String(val).replace(/'/g, "\\'")}')">复制</button>` : '';
+    return `<div class="field"><label>${k}</label><input class="readonly" readonly value="${val}">${copyBtn}</div>`;
+  }
+  function kvHTML(k,v,badge){
+    let val = fmt(v);
+    if (badge) val = `<span class="badge processing">${val}</span>`;
+    const copyBtn = idFields.has(k) && val !== EMPTY ? `<button class="btn link inline-copy" onclick="copyText('${String(v).replace(/'/g, "\\'")}')">复制</button>` : '';
+    return `<div class="kv-item"><div class="k">${k}</div><div class="v">${val}${copyBtn}</div></div>`;
+  }
+
+  function buildOverview(){
+    const overviewOrder = ['MID','CID','SID','渠道编码','服务编码','进件通道','商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间'];
+    document.getElementById('overviewFields').innerHTML = overviewOrder.map(k=>kvHTML(k,merchant[k],k==='商户审核状态')).join('');
+  }
+
+  function resolveMerchantStatusKey(){
+    if (merchantState.status !== '风控核查') return merchantState.status;
+    return merchantState.startedByCurrentUser ? '风控核查（2）' : '风控核查（1）';
+  }
+
+  function needBlock(){ return !merchantState.isAfpOnly && (!merchantState.enterpriseRiskDone || !merchantState.shopRiskDone); }
+
+  function buildActionButtons(){
+    return;
+    const statusKey = resolveMerchantStatusKey();
+    const names = statusButtonMap[statusKey] || [];
+    const row = document.getElementById('merchantActionRow');
+    row.innerHTML = '';
+    if (!names.length) { row.innerHTML = '<span class="muted">当前状态无详情页操作按钮</span>'; return; }
+    names.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = name === '审核通过' ? 'btn primary' : 'btn';
+      btn.textContent = name;
+      const blockCompleteBtn = ['审核通过','递交风控','遞交審核'].includes(name) && needBlock();
+      if (blockCompleteBtn) {
+        btn.disabled = true;
+        btn.title = '企业或商铺未完成风控审核，暂不可完成商户审核';
+      }
+      btn.onclick = () => onMerchantAction(name);
+      row.appendChild(btn);
+    });
+  }
+
+  function onMerchantAction(name){
+    if (name === '开始核查') {
+      merchantState.startedByCurrentUser = true;
+      merchant.当前审核人 = merchantState.currentUser;
+      merchant.更新时间 = new Date().toISOString().slice(0,16).replace('T',' ');
+      buildOverview();
+      return alert('已进入正式处理状态，并记录当前处理人。');
+    }
+    if (name === '轉交審核' || name === '转交审核') return openTransferModal();
+    if (name === '從已有商戶複製資料') return alert('已执行从已有商户复制资料（mock）。');
+    return alert(`已触发【${name}】（mock）。`);
+  }
+
+  function buildForms(){
+    document.getElementById('keyRelFields').innerHTML = ['MID','CID','SID','渠道编码','服务编码'].map(k=>fieldHTML(k,merchant[k])).join('');
+    document.getElementById('flowFields').innerHTML = ['商户审核状态','当前审核人','上單來源','创建人','创建时间','更新时间','当前风险等级','当前风险评分表状态'].map(k=>fieldHTML(k,merchant[k])).join('');
+    document.getElementById('flowSpecialFields').innerHTML = ['是否存在在途特殊费率申请','特殊费率申请结果','特殊费率申请完成时间'].map(k=>fieldHTML(k,merchant[k])).join('');
+  }
+
+  const enterpriseSummaryData = {
+    '企业主显示名称':'Everpeak Digital Commerce', 'CID':'CID-2026-0004', '企业启用状态':'启用', '企业审核状态':'风控审核中', '進件通道(必須)':'Adyen-payfac',
+    '上單來源':'CRM','創建時間':'2026-04-10 16:20','更新時間':'2026-04-19 09:35'
+  };
+  const enterpriseKeyData = {
+    '公司模式':'有限公司','公司結構':'母子公司','行業分類 / 業務性質 / 產品服務':'零售/服饰/配件','MCC Code':'5651','進階MCC Code':'5651-02','小微商戶':'否','SME 設定':'标准','法律地位':'法人企业','僱員人數':'220','注冊資本':'HKD 20,000,000','企业税务申报分类':'一般纳税','企业税务业务类型':'本地+跨境','平均每月營業額':'HKD 31,000,000','每宗交易平均金額':'HKD 450','每宗交易最大交易額':'HKD 12,000','預計每年交易宗數':'1,200,000','過往拒付比例':'0.7%','過往退款比例':'1.3%','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'10天','是否對公':'是','合約期':'24个月','是否NGO':'否','商戶營業狀態（企業口徑）':'正常营业'
+  };
+  const enterpriseRiskData = { '風控類型':'标准风控','風險等級':'中风险','審核類型':'新签约','服務類型':'线下+线上','合作夥伴推薦人':'Blue Harbor Platform','合作夥伴編號':'PARTNER-7788','交單備註':'重点跟进跨境交易比例','是否高額商戶':'是' };
+
+  const shopSummaryData = {
+    '商铺主显示名称':'Everpeak Central Flagship', 'SID':'SID-3001', '所属企业名称':'Everpeak Digital Commerce','所属企业编号（CID）':'CID-2026-0004','商铺启用状态':'启用','商铺审核状态':'风控审核中','终端设备数量':'12','MID 数量':'3','進件通道(必須)':'Adyen-payfac','上單來源':'CRM','創建時間':'2026-04-11 09:11','更新時間':'2026-04-19 10:25'
+  };
+  const shopKeyData = {
+    '商铺类型':'线下门店','经营模式':'直营','是否总部':'否','是否默认主门店':'是','行业分类 / 业务性质 / 产品服务':'零售/服饰/配件','MCC Code':'5651','進階MCC Code':'5651-02','开店日期':'2021-03-01','商铺营业状态':'营业中','经营年限':'5','小微商戶':'否','SME 設定':'标准','是否NGO':'否','每宗交易平均金額':'HKD 380','每宗交易最大交易額':'HKD 5,000','預計每年交易宗數':'150,000','過往拒付比例':'0.6%','過往退款比例':'1.1%','平均每月營業額':'HKD 3,200,000','提前收款日數':'2','貨物 / 服務最短送達時間':'1天','貨物 / 服務最長送達時間':'5天','是否對公':'是','合約期':'24个月','小費功能':'开','商戶營業狀態（商铺口徑）':'正常营业'
+  };
+  const shopRiskData = { '風控類型':'标准风控','風險等級':'中风险','審核類型':'新签约','上單來源':'CRM','服務類型':'线下门店','合作夥伴推薦人':'Blue Harbor Platform','合作夥伴編號':'PARTNER-7788','交單備註':'节假日交易峰值波动较大','是否高額商戶':'否' };
+
+  function fillMap(id, map){ document.getElementById(id).innerHTML = Object.entries(map).map(([k,v])=>fieldHTML(k,v)).join(''); }
+
+  function buildMerchantBlock(){
+    let text = '无阻塞，可继续商户审核流程';
+    if (!merchantState.isAfpOnly) {
+      if (!merchantState.enterpriseRiskDone && !merchantState.shopRiskDone) text = '当前企业与商铺均未完成风控审核，暂不可完成商户审核';
+      else if (!merchantState.enterpriseRiskDone) text = '当前企业未完成风控审核，暂不可完成商户审核';
+      else if (!merchantState.shopRiskDone) text = '当前商铺未完成风控审核，暂不可完成商户审核';
+    }
+    document.getElementById('merchantBlockMessage').textContent = text;
+  }
+
+  function buildSettlement(){
+    fillMap('settlementFields', {
+      '結算週期':'T+1','結算幣種':'HKD','NP結算週期':'T+2','打款銀行':'DBS Bank Hong Kong','結算摘要前綴':'EVPKPAY','卡類型':'Credit + Debit'
+    });
+    fillMap('bankFields', {
+      'FPS賬號':'FPS-99881234','收款銀行賬戶名稱':'Everpeak Digital Commerce Limited','銀行名稱':'DBS Bank','銀行號碼':'016','銀行編號':'123-456','結算身份證號':'BR-77889900','銀行卡歸屬國':'中国香港','銀行卡歸屬省':'香港'
+    });
+    document.getElementById('bankFileFields').innerHTML = [
+      ['一份銀行戶口月結單（最近三個月內銀行發出的）','bank-statement-2026-03.pdf'],
+      ['FPS-DBS 申請文件','fps-dbs-apply.pdf']
+    ].map(([k,v]) => `<div class="field"><label>${k}</label><div><span>${v}</span> <a class="btn link" href="#">查看</a> <a class="btn link" href="#">下载</a></div></div>`).join('');
+  }
+
+  function buildRateTable(){
+    const rows = [
+      ['Visa','借记卡-境外'],['Visa','贷记卡-境外'],['Visa','借记卡-境内'],['Visa','贷记卡-境内'],
+      ['Mastercard','借记卡-境外'],['Mastercard','贷记卡-境外'],['Mastercard','借记卡-境内'],['Mastercard','贷记卡-境内'],
+      ['UnionPay','借记卡-境外'],['UnionPay','贷记卡-境外'],['UnionPay','借记卡-境内'],['UnionPay','贷记卡-境内']
+    ];
+    document.getElementById('rateTableBody').innerHTML = rows.map((r,idx)=>{
+      const tr = (1.65 + idx * 0.03).toFixed(2) + '%';
+      const fp = (0.35 + (idx%4)*0.05).toFixed(2) + '%';
+      const fa = 'HKD ' + (1.2 + (idx%3)*0.4).toFixed(2);
+      const on = idx % 5 !== 0;
+      return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${tr}</td><td>${fp}</td><td>${fa}</td><td><span class="readonly-switch"><span class="switch-dot ${on?'':'off'}"></span>${on?'开启':'关闭'}</span></td><td>${idx%2===0?'销售计划模板（已覆盖）':'销售计划模板'}</td></tr>`;
+    }).join('');
+  }
+
+  function buildSpecialRate(){
+    fillMap('specialRateFields', {
+      '是否存在在途特殊费率申请':'是','特殊费率申请单号':'SR-20260419-9001','特殊费率申请状态':'审批中','特殊费率申请结果':'待定','特殊费率申请完成时间':EMPTY
+    });
+  }
+
+  function buildTimeline(){
+    const items = [
+      ['2026-04-19 10:25','Olivia（OPS）','资料修改记录','更新结算摘要前缀、补充门店营业说明。'],
+      ['2026-04-19 09:46','Ivy（Risk）','风险评分记录','审核意见：需补充近三月拒付原因拆分。'],
+      ['2026-04-18 16:05','Ivy（Risk）','通知补件记录','补件内容：请上传新版銀行戶口月結單。'],
+      ['2026-04-18 15:10','Aaron（Risk）','转交审核记录','从 Aaron（Risk） 转交至 Ivy（Risk）。'],
+      ['2026-04-17 14:21','Olivia（OPS）','审核通过 / 驳回记录','审核意见：基础资料完整，提交风控核查。'],
+      ['2026-04-17 09:00','System','特殊费率申请结果回写记录','特殊费率申请进入审批中，等待结果回写。'],
+      ['2026-04-11 09:11','Olivia（OPS）','创建记录','创建商户审核记录。']
+    ];
+    const html = items.map(i => `<div class="item"><strong>${i[0]}</strong>｜${i[1]}｜${i[2]}｜${i[3]}</div>`).join('');
+    document.getElementById('timelineItems').innerHTML = html || '<div class="muted">暂无记录</div>';
+  }
+
+  function openDrawer(title, fields, actions){
+    document.getElementById('drawerTitle').textContent = title;
+    document.getElementById('drawerFields').innerHTML = Object.entries(fields).map(([k,v])=>fieldHTML(k,v)).join('');
+    document.getElementById('drawerActionRow').innerHTML = actions.map(a => `<button class="btn ${a==='审核通过'?'primary':''}" onclick="alert('已执行【${a}】（mock），并刷新状态展示。')">${a}</button>`).join('');
+    document.getElementById('drawerMask').style.display = 'block';
+    document.getElementById('auditDrawer').classList.add('open');
+  }
+  function closeDrawer(){ document.getElementById('drawerMask').style.display = 'none'; document.getElementById('auditDrawer').classList.remove('open'); }
+  function openTransferModal(){ document.getElementById('transferModalMask').style.display = 'block'; }
+  function closeTransferModal(){ document.getElementById('transferModalMask').style.display = 'none'; }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    applyBrandPaletteFromLogo();
+    bindStickyNav();
+    buildOverview();
+    buildActionButtons();
+    buildForms();
+    fillMap('enterpriseSummary', enterpriseSummaryData);
+    fillMap('enterpriseKeyFields', enterpriseKeyData);
+    fillMap('enterpriseRiskFields', enterpriseRiskData);
+    fillMap('shopSummary', shopSummaryData);
+    fillMap('shopKeyFields', shopKeyData);
+    fillMap('shopRiskFields', shopRiskData);
+    buildMerchantBlock();
+    buildSettlement();
+    buildRateTable();
+    buildSpecialRate();
+    buildTimeline();
+
+    document.getElementById('enterpriseAuditBtn').onclick = () => openDrawer('企业审核', enterpriseSummaryData, ['退回审核','审核通过']);
+    document.getElementById('shopAuditBtn').onclick = () => openDrawer('商铺审核', shopSummaryData, ['退回审核','审核通过']);
+    document.getElementById('drawerMask').onclick = closeDrawer;
+    document.getElementById('closeDrawerBtn').onclick = closeDrawer;
+    document.getElementById('cancelTransfer').onclick = closeTransferModal;
+    document.getElementById('confirmTransfer').onclick = () => { alert('已转交给：' + document.getElementById('transferUser').value); closeTransferModal(); };
+    document.getElementById('transferModalMask').addEventListener('click', e => { if (e.target === e.currentTarget) closeTransferModal(); });
+  });
+</script>
+</body>
+</html>
