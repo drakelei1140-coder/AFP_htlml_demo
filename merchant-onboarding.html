@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商户进件列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .onboarding-filters-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .onboarding-filters-actions { display:flex; justify-content:flex-end; margin-top:12px; }
+    .field-slot.hidden { display:none; }
+
+    .onboarding-table { min-width: 1750px; }
+    .onboarding-table .merchant-name-col { min-width: 200px; }
+    .onboarding-table .merchant-id-col { min-width: 170px; }
+    .onboarding-table .channel-col { min-width: 150px; }
+    .onboarding-table .channel-merchant-col { min-width: 180px; }
+    .onboarding-table .status-col { min-width: 140px; }
+    .onboarding-table .progress-col { min-width: 140px; }
+    .onboarding-table .order-status-col { min-width: 140px; }
+    .onboarding-table .return-col { min-width: 360px; }
+    .onboarding-table .time-col { min-width: 180px; }
+    .onboarding-table .operator-col { min-width: 180px; }
+
+    .sticky-right-col { position: sticky; right: 0; z-index: 2; background: var(--panel); }
+    .sticky-right-head { position: sticky; right: 0; z-index: 3; }
+
+    .return-info-cell {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+      line-height: 1.45;
+      max-height: 4.35em;
+      white-space: normal;
+      word-break: break-word;
+      color: var(--danger);
+      cursor: pointer;
+    }
+
+    .ops {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1200;
+      padding: 20px;
+    }
+    .modal-mask.show { display:flex; }
+
+    .modal {
+      width: min(1000px, 96vw);
+      max-height: 88vh;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 40px rgba(35,24,9,.18);
+    }
+    .modal.small { width:min(760px, 96vw); }
+
+    .modal-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--border);
+      padding: 14px 16px;
+      position: sticky;
+      top:0;
+      background: var(--panel);
+      z-index: 2;
+    }
+    .modal-title { margin:0; font-size: 16px; }
+
+    .modal-body { padding: 14px 16px; }
+
+    .modal-footer {
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      border-top:1px solid var(--border);
+      padding: 12px 16px;
+      position: sticky;
+      bottom:0;
+      background: var(--panel);
+      z-index: 2;
+    }
+
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+
+    .upload-row {
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--panel-2);
+    }
+
+    .timeline-wrap { margin-top: 14px; }
+    .timeline-title { margin: 0 0 8px; font-size: 14px; }
+
+    .event-title { font-weight: 600; margin-bottom: 2px; }
+    .event-meta { font-size: 12px; color: var(--muted); }
+    .event-desc { font-size: 13px; margin-top: 4px; }
+
+    .light-hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    .click-link {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: var(--primary-dark);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      top: 84px;
+      z-index: 1400;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-left: 4px solid var(--success);
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: var(--shadow-sm);
+      display: none;
+      max-width: 360px;
+    }
+    .toast.show { display:block; }
+    .toast.warning { border-left-color: var(--warning); }
+  </style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+  <div class="top-controls">
+    <select><option>地区：香港</option><option>地区：新加坡</option></select>
+    <select><option>语言：简体中文</option><option>English</option></select>
+    <button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button>
+    <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="appSidebar"></aside>
+
+  <main class="main">
+    <section class="card">
+      <h3 class="section-title">筛选区</h3>
+      <div class="onboarding-filters-grid" id="filterGrid">
+        <div class="field field-slot collapse-visible"><label>商户名称关键词</label><input id="filterMerchantName" placeholder="请输入商户名称关键词" /></div>
+        <div class="field field-slot collapse-visible"><label>商户号</label><input id="filterMid" placeholder="请输入商户号" /></div>
+        <div class="field field-slot collapse-visible"><label>通道</label>
+          <select id="filterChannel" multiple>
+            <option value="Adyen_AFP">Adyen_AFP</option>
+            <option value="Adyen_NonAFP">Adyen_NonAFP</option>
+            <option value="Stripe_Direct">Stripe_Direct</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-visible"><label>通道进件进度</label>
+          <select id="filterProgress" multiple>
+            <option value="待递交">待递交</option>
+            <option value="处理中">处理中</option>
+            <option value="成功">成功</option>
+            <option value="失败">失败</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-visible"><label>进件单状态</label>
+          <select id="filterOrderStatus" multiple>
+            <option value="待递交">待递交</option>
+            <option value="处理中">处理中</option>
+            <option value="进件失败">进件失败</option>
+            <option value="待风控审核">待风控审核</option>
+            <option value="待重新进件">待重新进件</option>
+            <option value="进件成功">进件成功</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-visible"><label>更新时间</label><input id="filterUpdateRange" placeholder="例如：2026-04-01 ~ 2026-04-20" /></div>
+
+        <div class="field field-slot collapse-extra hidden"><label>通道商户号</label><input id="filterChannelMerchantNo" placeholder="请输入通道商户号" /></div>
+        <div class="field field-slot collapse-extra hidden"><label>通道可用状态</label>
+          <select id="filterChannelAvailability">
+            <option value="">全部</option>
+            <option value="可用">可用</option>
+            <option value="未开通">未开通</option>
+            <option value="受限">受限</option>
+          </select>
+        </div>
+        <div class="field field-slot collapse-extra hidden"><label>是否有错误返回</label>
+          <select id="filterHasError">
+            <option value="">全部</option>
+            <option value="是">是</option>
+            <option value="否">否</option>
+          </select>
+        </div>
+      </div>
+      <div class="onboarding-filters-actions">
+        <div class="btns" style="margin-top:0;">
+          <button class="btn primary" id="queryBtn" type="button">查询</button>
+          <button class="btn" id="resetBtn" type="button">重置</button>
+          <button class="btn" id="toggleBtn" type="button" data-expanded="0">展开</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 class="section-title">列表区</h3>
+      <div class="table-wrap">
+        <table class="onboarding-table">
+          <thead>
+            <tr>
+              <th class="merchant-name-col">商户名称</th>
+              <th class="merchant-id-col">商户号</th>
+              <th class="channel-col">通道</th>
+              <th class="channel-merchant-col">通道商户号</th>
+              <th class="status-col">通道可用状态</th>
+              <th class="progress-col">通道进件进度</th>
+              <th class="order-status-col">进件单状态</th>
+              <th class="return-col">通道返回信息</th>
+              <th class="time-col">更新时间</th>
+              <th class="operator-col sticky-right-head">操作</th>
+            </tr>
+          </thead>
+          <tbody id="onboardingTbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-mask" id="resubmitModalMask">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resubmitTitle">
+    <div class="modal-header">
+      <h3 class="modal-title" id="resubmitTitle">修改信息重新进件</h3>
+      <button class="btn" type="button" id="closeResubmitTop">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv" style="margin-bottom:12px;">
+        <div class="kv-item"><div class="k">商户名称</div><div class="v" id="modalMerchantName"></div></div>
+        <div class="kv-item"><div class="k">商户号</div><div class="v" id="modalMerchantId"></div></div>
+        <div class="kv-item"><div class="k">通道</div><div class="v" id="modalChannel"></div></div>
+        <div class="kv-item"><div class="k">当前进件单状态</div><div class="v" id="modalOrderStatus"></div></div>
+      </div>
+
+      <p class="desc" style="margin:0 0 10px;">以下字段来自该通道上一次递交快照，仅用于本次向通道重新进件，不会写回商户主档资料。</p>
+
+      <form class="form-grid" id="resubmitForm">
+        <div class="field">
+          <label>Legal Entity Name</label>
+          <input name="legalEntityName" />
+        </div>
+        <div class="field">
+          <label>MCC</label>
+          <select name="mcc">
+            <option value="">请选择</option>
+            <option value="5812">5812</option>
+            <option value="5411">5411</option>
+            <option value="5732">5732</option>
+            <option value="7011">7011</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Business Start Date</label>
+          <input name="businessStartDate" type="date" />
+        </div>
+        <div class="field">
+          <label>Settlement Currency</label>
+          <select name="settlementCurrency">
+            <option value="">请选择</option>
+            <option value="HKD">HKD</option>
+            <option value="USD">USD</option>
+            <option value="SGD">SGD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Store Name</label>
+          <input name="storeName" />
+        </div>
+        <div class="field">
+          <label>Payment Method</label>
+          <select name="paymentMethod">
+            <option value="">请选择</option>
+            <option value="Cards">Cards</option>
+            <option value="AlipayHK">AlipayHK</option>
+            <option value="WeChatPayHK">WeChatPayHK</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>预计月交易额</label>
+          <input name="monthlyVolume" placeholder="例如 800000" />
+        </div>
+        <div class="field">
+          <label>KYB 附件上传 / 查看</label>
+          <div class="upload-row">
+            <span id="snapshotFileName">-</span>
+            <button class="btn" type="button" id="mockUploadBtn">模拟上传新文件</button>
+          </div>
+          <div class="light-hint">演示用途：仅记录到本次通道进件记录快照。</div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" type="button" id="cancelResubmitBtn">取消</button>
+      <button class="btn primary" type="button" id="confirmResubmitBtn">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="historyModalMask">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="modal-header">
+      <h3 class="modal-title" id="historyTitle">进件历史记录</h3>
+      <button class="btn" type="button" id="closeHistoryTop">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv" style="margin-bottom:12px;">
+        <div class="kv-item"><div class="k">商户名称</div><div class="v" id="historyMerchantName"></div></div>
+        <div class="kv-item"><div class="k">商户号</div><div class="v" id="historyMerchantId"></div></div>
+        <div class="kv-item"><div class="k">通道</div><div class="v" id="historyChannel"></div></div>
+        <div class="kv-item"><div class="k">当前状态</div><div class="v" id="historyOrderStatus"></div></div>
+      </div>
+
+      <h4 class="timeline-title">时间轴</h4>
+      <div class="timeline timeline-wrap" id="historyTimeline"></div>
+
+      <h4 class="timeline-title" style="margin-top:14px;">递交摘要</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>每次递交时间</th>
+              <th>每次递交操作人</th>
+              <th>每次递交前的进件单状态</th>
+              <th>每次递交后的进件单状态</th>
+              <th>每次递交的通道进件进度结果</th>
+              <th>每次递交返回的错误摘要</th>
+              <th>每次修改过的字段内容</th>
+              <th>OPS 修改时间与修改人</th>
+              <th>风控审核时间与审核人（如有）</th>
+              <th>最终成功 / 失败结果</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" type="button" id="closeHistoryBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="returnModalMask">
+  <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="returnTitle">
+    <div class="modal-header">
+      <h3 class="modal-title" id="returnTitle">通道返回信息</h3>
+      <button class="btn" type="button" id="closeReturnTop">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="kv" style="margin-bottom:10px;">
+        <div class="kv-item"><div class="k">商户号</div><div class="v" id="returnMerchantId"></div></div>
+        <div class="kv-item"><div class="k">通道</div><div class="v" id="returnChannel"></div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>接口名称</th>
+              <th>返回状态</th>
+              <th>错误码</th>
+              <th>错误信息</th>
+              <th>返回时间</th>
+            </tr>
+          </thead>
+          <tbody id="returnDetailBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" type="button" id="closeReturnBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/app.js"></script>
+<script>
+  const fullMenu = [
+    {
+      title: '商户管理',
+      items: [
+        { text: '企业管理', href: 'enterprise-list.html' },
+        { text: '商铺管理', href: 'shop-list.html' },
+        { text: '商户审核', href: 'merchant-list.html' },
+        { text: '群组管理', href: 'group-management.html' },
+        { text: '已签约商户', href: 'signed-merchants.html' },
+        { text: '取消签约商户', href: 'cancelled-merchants.html' },
+        { text: '拒绝签约商户', href: 'rejected-merchants.html' },
+        { text: '资料修改待审核', children: [
+          { text: '企业资料修改待审核', href: 'enterprise-change-review.html' },
+          { text: '商铺资料修改待审核', href: 'shop-change-review.html' },
+          { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
+        ]},
+        { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
+        { text: '商户进件', href: 'merchant-onboarding.html', active: true },
+        { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
+      ]
+    }
+  ];
+
+  function renderSidebar(menu) {
+    const html = menu.map(group => {
+      const rows = group.items.map(item => {
+        if (item.children) {
+          const children = item.children.map(child => `<a class="lvl3" href="${child.href}">${child.text}</a>`).join('');
+          return `<li><div>${item.text}</div>${children}</li>`;
+        }
+        return `<li><a ${item.active ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
+      }).join('');
+      return `<div class="menu-group"><div class="menu-title">${group.title}</div><ul class="menu-list">${rows}</ul></div>`;
+    }).join('');
+    document.getElementById('appSidebar').innerHTML = html;
+  }
+
+  const mockRecords = [
+    {
+      id: 'rec-1',
+      merchantName: 'Everpeak Digital Commerce',
+      merchantNo: 'MID-2026-1001',
+      channel: 'Adyen_AFP',
+      channelMerchantNo: '-',
+      channelAvailability: '未开通',
+      channelProgress: '失败',
+      orderStatus: '进件失败',
+      channelReturnSummary: 'LE 接口字段缺失：legalEntity.address.country 不能为空；Store 接口门店营业日期不合法。',
+      updatedAt: '2026-04-20 09:12:00',
+      hasError: true,
+      snapshot: {
+        legalEntityName: 'Everpeak Digital Commerce Limited',
+        mcc: '5812',
+        businessStartDate: '2021-03-12',
+        settlementCurrency: 'HKD',
+        storeName: 'Everpeak Central Flagship',
+        paymentMethod: 'Cards',
+        monthlyVolume: '700000',
+        kybFileName: 'everpeak_kyb_v2.pdf'
+      },
+      returnDetails: [
+        { api: 'LE', status: '失败', code: 'LE_400_102', message: 'country is required', time: '2026-04-20 09:11:33' },
+        { api: 'AH', status: '成功', code: '-', message: '-', time: '2026-04-20 09:11:39' },
+        { api: 'BL', status: '成功', code: '-', message: '-', time: '2026-04-20 09:11:45' },
+        { api: 'Store', status: '失败', code: 'STORE_422_11', message: 'invalid business start date', time: '2026-04-20 09:11:48' },
+        { api: 'Payment Method', status: '未执行', code: '-', message: '前置接口失败', time: '2026-04-20 09:11:48' }
+      ],
+      history: [
+        {
+          submitTime: '2026-04-18 14:32:00',
+          operator: 'OPS-Olivia',
+          beforeStatus: '待递交',
+          afterStatus: '处理中',
+          progressResult: '处理中',
+          errorSummary: '-',
+          fieldChanges: '首次递交',
+          opsModifyInfo: '-',
+          riskReviewInfo: '-',
+          finalResult: '处理中',
+          timeline: { title: '首次发起进件', meta: '2026-04-18 14:32:00 · OPS-Olivia', desc: '提交 LE/AH/BL/Store 接口，请求处理中。' }
+        },
+        {
+          submitTime: '2026-04-20 09:12:00',
+          operator: 'System',
+          beforeStatus: '处理中',
+          afterStatus: '进件失败',
+          progressResult: '失败',
+          errorSummary: 'LE 国家字段缺失；Store 营业日期不合法',
+          fieldChanges: '无',
+          opsModifyInfo: '-',
+          riskReviewInfo: '-',
+          finalResult: '失败',
+          timeline: { title: '通道返回失败', meta: '2026-04-20 09:12:00 · System', desc: 'LE / Store 返回错误，当前可执行【修改信息重新进件】。' }
+        }
+      ]
+    },
+    {
+      id: 'rec-2',
+      merchantName: 'Nova Retail Group',
+      merchantNo: 'MID-2026-1002',
+      channel: 'Adyen_AFP',
+      channelMerchantNo: '-',
+      channelAvailability: '未开通',
+      channelProgress: '处理中',
+      orderStatus: '处理中',
+      channelReturnSummary: '通道处理中，暂未返回最终成功或失败结果。',
+      updatedAt: '2026-04-20 10:05:00',
+      hasError: false,
+      snapshot: {
+        legalEntityName: 'Nova Retail Group',
+        mcc: '5411',
+        businessStartDate: '2020-08-09',
+        settlementCurrency: 'HKD',
+        storeName: 'Nova Harbour Shop',
+        paymentMethod: 'Cards',
+        monthlyVolume: '820000',
+        kybFileName: 'nova_kyb_v3.pdf'
+      },
+      returnDetails: [
+        { api: 'LE', status: '成功', code: '-', message: '-', time: '2026-04-20 10:01:03' },
+        { api: 'AH', status: '成功', code: '-', message: '-', time: '2026-04-20 10:01:07' },
+        { api: 'BL', status: '处理中', code: '-', message: 'Pending review', time: '2026-04-20 10:01:16' },
+        { api: 'Store', status: '处理中', code: '-', message: 'Pending review', time: '2026-04-20 10:01:20' },
+        { api: 'Payment Method', status: '处理中', code: '-', message: 'Pending review', time: '2026-04-20 10:01:29' }
+      ],
+      history: []
+    },
+    {
+      id: 'rec-3',
+      merchantName: 'Fusion Global Ltd',
+      merchantNo: 'MID-2026-1003',
+      channel: 'Adyen_AFP',
+      channelMerchantNo: 'AFP-M-998721',
+      channelAvailability: '可用',
+      channelProgress: '成功',
+      orderStatus: '进件成功',
+      channelReturnSummary: '最近一次执行全部接口成功。',
+      updatedAt: '2026-04-19 16:22:00',
+      hasError: false,
+      snapshot: {
+        legalEntityName: 'Fusion Global Ltd',
+        mcc: '5732',
+        businessStartDate: '2019-01-01',
+        settlementCurrency: 'HKD',
+        storeName: 'Fusion HQ Shop',
+        paymentMethod: 'Cards',
+        monthlyVolume: '1200000',
+        kybFileName: 'fusion_kyb_final.pdf'
+      },
+      returnDetails: [
+        { api: 'LE', status: '成功', code: '-', message: '-', time: '2026-04-19 16:20:11' },
+        { api: 'AH', status: '成功', code: '-', message: '-', time: '2026-04-19 16:20:17' },
+        { api: 'BL', status: '成功', code: '-', message: '-', time: '2026-04-19 16:20:19' },
+        { api: 'Store', status: '成功', code: '-', message: '-', time: '2026-04-19 16:20:29' },
+        { api: 'Payment Method', status: '成功', code: '-', message: '-', time: '2026-04-19 16:20:37' }
+      ],
+      history: []
+    },
+    {
+      id: 'rec-4',
+      merchantName: 'Bright Technology',
+      merchantNo: 'MID-2026-1004',
+      channel: 'Stripe_Direct',
+      channelMerchantNo: '-',
+      channelAvailability: '受限',
+      channelProgress: '失败',
+      orderStatus: '进件失败',
+      channelReturnSummary: 'KYC 证件附件不清晰，法人证件有效期格式错误。',
+      updatedAt: '2026-04-20 09:48:00',
+      hasError: true,
+      snapshot: {
+        legalEntityName: 'Bright Technology Ltd',
+        mcc: '5732',
+        businessStartDate: '2022-05-07',
+        settlementCurrency: 'USD',
+        storeName: 'Bright Kowloon',
+        paymentMethod: 'Cards',
+        monthlyVolume: '360000',
+        kybFileName: 'bright_kyb_retry1.pdf'
+      },
+      returnDetails: [
+        { api: 'Account', status: '失败', code: 'KYC_4002', message: 'document unreadable', time: '2026-04-20 09:47:31' },
+        { api: 'Business Profile', status: '失败', code: 'BIZ_1121', message: 'invalid expiry date format', time: '2026-04-20 09:47:38' }
+      ],
+      history: [
+        {
+          submitTime: '2026-04-16 13:40:00',
+          operator: 'OPS-Ken',
+          beforeStatus: '待递交',
+          afterStatus: '处理中',
+          progressResult: '处理中',
+          errorSummary: '-',
+          fieldChanges: '首次递交',
+          opsModifyInfo: '-',
+          riskReviewInfo: '-',
+          finalResult: '处理中',
+          timeline: { title: '首次递交', meta: '2026-04-16 13:40:00 · OPS-Ken', desc: '提交到 Stripe_Direct，等待处理。' }
+        },
+        {
+          submitTime: '2026-04-20 09:48:00',
+          operator: 'System',
+          beforeStatus: '处理中',
+          afterStatus: '进件失败',
+          progressResult: '失败',
+          errorSummary: '附件不清晰；证件有效期格式错误',
+          fieldChanges: '无',
+          opsModifyInfo: '-',
+          riskReviewInfo: '-',
+          finalResult: '失败',
+          timeline: { title: '通道失败回执', meta: '2026-04-20 09:48:00 · System', desc: '非 AFP 通道失败，OPS 可修改并重新进件。' }
+        }
+      ]
+    },
+    {
+      id: 'rec-5',
+      merchantName: 'Alpha Dining Holdings',
+      merchantNo: 'MID-2026-1005',
+      channel: 'Adyen_NonAFP',
+      channelMerchantNo: '-',
+      channelAvailability: '未开通',
+      channelProgress: '处理中',
+      orderStatus: '待风控审核',
+      channelReturnSummary: 'OPS 已完成修改，待风控审核。',
+      updatedAt: '2026-04-20 08:28:00',
+      hasError: false,
+      snapshot: {
+        legalEntityName: 'Alpha Dining Holdings',
+        mcc: '5812',
+        businessStartDate: '2018-11-20',
+        settlementCurrency: 'HKD',
+        storeName: 'Alpha TST',
+        paymentMethod: 'AlipayHK',
+        monthlyVolume: '490000',
+        kybFileName: 'alpha_kyb_risk_waiting.pdf'
+      },
+      returnDetails: [
+        { api: 'LE', status: '待风控审核', code: '-', message: 'waiting internal risk approval', time: '2026-04-20 08:28:00' }
+      ],
+      history: []
+    }
+  ];
+
+  let tableData = JSON.parse(JSON.stringify(mockRecords));
+  let currentEditRecordId = '';
+
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast show${type === 'warning' ? ' warning' : ''}`;
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function getBadgeClassForAvailability(value) {
+    if (value === '可用') return 'success';
+    if (value === '未开通') return 'warning';
+    return 'danger';
+  }
+
+  function getBadgeClassForProgress(value) {
+    if (value === '成功') return 'success';
+    if (value === '失败') return 'danger';
+    if (value === '待递交') return 'warning';
+    return 'processing';
+  }
+
+  function getBadgeClassForOrderStatus(value) {
+    if (value === '进件成功') return 'success';
+    if (value === '进件失败') return 'danger';
+    if (value === '待递交' || value === '待重新进件' || value === '待风控审核') return 'warning';
+    return 'processing';
+  }
+
+  function renderTable(rows) {
+    const body = document.getElementById('onboardingTbody');
+    body.innerHTML = rows.map(row => `
+      <tr>
+        <td title="${row.merchantName}">${row.merchantName}</td>
+        <td title="${row.merchantNo}">${row.merchantNo}</td>
+        <td title="${row.channel}">${row.channel}</td>
+        <td title="${row.channelMerchantNo}">${row.channelMerchantNo || '-'}</td>
+        <td><span class="badge ${getBadgeClassForAvailability(row.channelAvailability)}">${row.channelAvailability}</span></td>
+        <td><span class="badge ${getBadgeClassForProgress(row.channelProgress)}">${row.channelProgress}</span></td>
+        <td><span class="badge ${getBadgeClassForOrderStatus(row.orderStatus)}">${row.orderStatus}</span></td>
+        <td title="${row.channelReturnSummary}">
+          <button class="click-link return-info-cell" type="button" data-act="return-info" data-id="${row.id}">${row.channelReturnSummary}</button>
+        </td>
+        <td>${row.updatedAt}</td>
+        <td class="sticky-right-col">
+          <div class="ops">
+            ${row.orderStatus === '进件失败' ? `<button class="btn" type="button" data-act="resubmit" data-id="${row.id}">修改信息重新进件</button>` : ''}
+            <button class="btn" type="button" data-act="history" data-id="${row.id}">进件历史记录</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+  function getRecord(id) {
+    return tableData.find(item => item.id === id);
+  }
+
+  function openResubmitModal(id) {
+    const record = getRecord(id);
+    if (!record || record.orderStatus !== '进件失败') return;
+
+    currentEditRecordId = id;
+    document.getElementById('modalMerchantName').textContent = record.merchantName;
+    document.getElementById('modalMerchantId').textContent = record.merchantNo;
+    document.getElementById('modalChannel').textContent = record.channel;
+    document.getElementById('modalOrderStatus').textContent = record.orderStatus;
+
+    const form = document.getElementById('resubmitForm');
+    form.legalEntityName.value = record.snapshot.legalEntityName || '';
+    form.mcc.value = record.snapshot.mcc || '';
+    form.businessStartDate.value = record.snapshot.businessStartDate || '';
+    form.settlementCurrency.value = record.snapshot.settlementCurrency || '';
+    form.storeName.value = record.snapshot.storeName || '';
+    form.paymentMethod.value = record.snapshot.paymentMethod || '';
+    form.monthlyVolume.value = record.snapshot.monthlyVolume || '';
+    document.getElementById('snapshotFileName').textContent = record.snapshot.kybFileName || '-';
+
+    openModal('resubmitModalMask');
+  }
+
+  function openHistoryModal(id) {
+    const record = getRecord(id);
+    if (!record) return;
+
+    document.getElementById('historyMerchantName').textContent = record.merchantName;
+    document.getElementById('historyMerchantId').textContent = record.merchantNo;
+    document.getElementById('historyChannel').textContent = record.channel;
+    document.getElementById('historyOrderStatus').textContent = record.orderStatus;
+
+    const timeline = document.getElementById('historyTimeline');
+    timeline.innerHTML = (record.history.length ? record.history : [{ timeline: { title: '暂无历史', meta: '-', desc: '该记录尚无历史递交或修改事件。' } }])
+      .map(item => {
+        const node = item.timeline || { title: '历史节点', meta: '-', desc: '-' };
+        return `<div class="item"><div class="event-title">${node.title}</div><div class="event-meta">${node.meta}</div><div class="event-desc">${node.desc}</div></div>`;
+      }).join('');
+
+    const historyBody = document.getElementById('historyTableBody');
+    historyBody.innerHTML = (record.history.length ? record.history : [{
+      submitTime: '-', operator: '-', beforeStatus: '-', afterStatus: '-', progressResult: '-', errorSummary: '-', fieldChanges: '-', opsModifyInfo: '-', riskReviewInfo: '-', finalResult: '-'
+    }]).map(item => `
+      <tr>
+        <td>${item.submitTime}</td>
+        <td>${item.operator}</td>
+        <td>${item.beforeStatus}</td>
+        <td>${item.afterStatus}</td>
+        <td>${item.progressResult}</td>
+        <td title="${item.errorSummary}">${item.errorSummary}</td>
+        <td title="${item.fieldChanges}">${item.fieldChanges}</td>
+        <td>${item.opsModifyInfo}</td>
+        <td>${item.riskReviewInfo}</td>
+        <td>${item.finalResult}</td>
+      </tr>
+    `).join('');
+
+    openModal('historyModalMask');
+  }
+
+  function openReturnInfoModal(id) {
+    const record = getRecord(id);
+    if (!record) return;
+
+    document.getElementById('returnMerchantId').textContent = record.merchantNo;
+    document.getElementById('returnChannel').textContent = record.channel;
+
+    const body = document.getElementById('returnDetailBody');
+    body.innerHTML = record.returnDetails.map(detail => `
+      <tr>
+        <td>${detail.api}</td>
+        <td>${detail.status}</td>
+        <td>${detail.code}</td>
+        <td title="${detail.message}">${detail.message}</td>
+        <td>${detail.time}</td>
+      </tr>
+    `).join('');
+
+    openModal('returnModalMask');
+  }
+
+  function confirmResubmit() {
+    const record = getRecord(currentEditRecordId);
+    if (!record) return;
+
+    const form = document.getElementById('resubmitForm');
+    const snapshotPayload = {
+      legalEntityName: form.legalEntityName.value.trim(),
+      mcc: form.mcc.value,
+      businessStartDate: form.businessStartDate.value,
+      settlementCurrency: form.settlementCurrency.value,
+      storeName: form.storeName.value.trim(),
+      paymentMethod: form.paymentMethod.value,
+      monthlyVolume: form.monthlyVolume.value.trim(),
+      kybFileName: document.getElementById('snapshotFileName').textContent
+    };
+
+    // 仅更新通道进件记录快照，不写回商户主档。
+    record.snapshot = snapshotPayload;
+
+    const oldStatus = record.orderStatus;
+    const now = new Date();
+    const nowText = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const changedFields = Object.entries(snapshotPayload)
+      .filter(([key, value]) => String(value || '').trim())
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('；') || '无字段变更';
+
+    if (record.channel === 'Adyen_AFP') {
+      record.orderStatus = '处理中';
+      record.channelProgress = '处理中';
+      record.channelReturnSummary = 'AFP 已重新进件，等待通道处理结果。';
+      record.channelAvailability = '未开通';
+
+      record.history.unshift({
+        submitTime: nowText,
+        operator: 'OPS-Olivia',
+        beforeStatus: oldStatus,
+        afterStatus: '处理中',
+        progressResult: '处理中',
+        errorSummary: '-',
+        fieldChanges: changedFields,
+        opsModifyInfo: `${nowText} / OPS-Olivia`,
+        riskReviewInfo: '-',
+        finalResult: '处理中',
+        timeline: {
+          title: 'OPS 修改后直接重提 AFP',
+          meta: `${nowText} · OPS-Olivia`,
+          desc: '仅 AFP 通道：状态流转为待重新进件后立即重提，当前显示处理中。'
+        }
+      });
+
+      showToast('AFP 场景：已直接进入重新进件流程。');
+    } else {
+      record.orderStatus = '待风控审核';
+      record.channelProgress = '处理中';
+      record.channelReturnSummary = '已提交风控审核，审核通过后进入待重新进件。';
+      record.channelAvailability = '受限';
+
+      record.history.unshift({
+        submitTime: nowText,
+        operator: 'OPS-Olivia',
+        beforeStatus: oldStatus,
+        afterStatus: '待风控审核',
+        progressResult: '处理中',
+        errorSummary: '-',
+        fieldChanges: changedFields,
+        opsModifyInfo: `${nowText} / OPS-Olivia`,
+        riskReviewInfo: `${nowText} / 待分配`,
+        finalResult: '处理中',
+        timeline: {
+          title: 'OPS 修改后提交风控审核',
+          meta: `${nowText} · OPS-Olivia`,
+          desc: '包含非 AFP 通道：先流转到待风控审核，再进入待重新进件。'
+        }
+      });
+
+      showToast('非 AFP 场景：已提交风控审核。', 'warning');
+    }
+
+    record.updatedAt = nowText;
+    renderTable(tableData);
+    closeModal('resubmitModalMask');
+  }
+
+  function applyFilter() {
+    const merchantName = document.getElementById('filterMerchantName').value.trim().toLowerCase();
+    const merchantNo = document.getElementById('filterMid').value.trim().toLowerCase();
+    const channelMerchantNo = document.getElementById('filterChannelMerchantNo').value.trim().toLowerCase();
+    const channelAvailability = document.getElementById('filterChannelAvailability').value;
+    const hasError = document.getElementById('filterHasError').value;
+
+    const selectedChannels = Array.from(document.getElementById('filterChannel').selectedOptions).map(op => op.value);
+    const selectedProgress = Array.from(document.getElementById('filterProgress').selectedOptions).map(op => op.value);
+    const selectedOrderStatus = Array.from(document.getElementById('filterOrderStatus').selectedOptions).map(op => op.value);
+
+    const filtered = tableData.filter(row => {
+      const hitMerchantName = !merchantName || row.merchantName.toLowerCase().includes(merchantName);
+      const hitMerchantNo = !merchantNo || row.merchantNo.toLowerCase().includes(merchantNo);
+      const hitChannel = !selectedChannels.length || selectedChannels.includes(row.channel);
+      const hitChannelMerchantNo = !channelMerchantNo || row.channelMerchantNo.toLowerCase().includes(channelMerchantNo);
+      const hitAvailability = !channelAvailability || row.channelAvailability === channelAvailability;
+      const hitProgress = !selectedProgress.length || selectedProgress.includes(row.channelProgress);
+      const hitOrderStatus = !selectedOrderStatus.length || selectedOrderStatus.includes(row.orderStatus);
+      const hitHasError = !hasError || (hasError === '是' ? row.hasError : !row.hasError);
+      return hitMerchantName && hitMerchantNo && hitChannel && hitChannelMerchantNo && hitAvailability && hitProgress && hitOrderStatus && hitHasError;
+    });
+
+    renderTable(filtered);
+    showToast(`查询完成，共 ${filtered.length} 条（Demo 本地筛选）。`);
+  }
+
+  function resetFilter() {
+    document.querySelectorAll('#filterGrid input').forEach(i => i.value = '');
+    document.querySelectorAll('#filterGrid select').forEach(s => s.selectedIndex = -1);
+    document.getElementById('filterChannelAvailability').value = '';
+    document.getElementById('filterHasError').value = '';
+
+    renderTable(tableData);
+    showToast('筛选条件已重置。');
+  }
+
+  function bindEvents() {
+    document.getElementById('toggleBtn').addEventListener('click', () => {
+      const btn = document.getElementById('toggleBtn');
+      const expanded = btn.dataset.expanded === '1';
+      document.querySelectorAll('.collapse-extra').forEach(el => el.classList.toggle('hidden', expanded));
+      btn.dataset.expanded = expanded ? '0' : '1';
+      btn.textContent = expanded ? '展开' : '收起';
+    });
+
+    document.getElementById('queryBtn').addEventListener('click', applyFilter);
+    document.getElementById('resetBtn').addEventListener('click', resetFilter);
+
+    document.getElementById('onboardingTbody').addEventListener('click', e => {
+      const actionBtn = e.target.closest('[data-act]');
+      if (!actionBtn) return;
+      const id = actionBtn.dataset.id;
+      const act = actionBtn.dataset.act;
+      if (act === 'resubmit') openResubmitModal(id);
+      if (act === 'history') openHistoryModal(id);
+      if (act === 'return-info') openReturnInfoModal(id);
+    });
+
+    document.getElementById('closeResubmitTop').addEventListener('click', () => closeModal('resubmitModalMask'));
+    document.getElementById('cancelResubmitBtn').addEventListener('click', () => closeModal('resubmitModalMask'));
+    document.getElementById('confirmResubmitBtn').addEventListener('click', confirmResubmit);
+
+    document.getElementById('closeHistoryTop').addEventListener('click', () => closeModal('historyModalMask'));
+    document.getElementById('closeHistoryBtn').addEventListener('click', () => closeModal('historyModalMask'));
+
+    document.getElementById('closeReturnTop').addEventListener('click', () => closeModal('returnModalMask'));
+    document.getElementById('closeReturnBtn').addEventListener('click', () => closeModal('returnModalMask'));
+
+    document.getElementById('mockUploadBtn').addEventListener('click', () => {
+      const ts = Date.now();
+      document.getElementById('snapshotFileName').textContent = `kyb_retry_${ts}.pdf`;
+      showToast('已模拟上传附件（仅用于本次通道递交快照）。');
+    });
+
+    document.querySelectorAll('.modal-mask').forEach(mask => {
+      mask.addEventListener('click', e => {
+        if (e.target === mask) mask.classList.remove('show');
+      });
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    applyBrandPaletteFromLogo();
+    renderSidebar(fullMenu);
+    renderTable(tableData);
+    bindEvents();
+  });
+</script>
+</body>
+</html>
