@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AFP 字段映射配置</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .mapping-page { display: grid; gap: 12px; }
+    .ctx-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px; }
+    .ctx-item { background:var(--panel-2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; }
+    .ctx-item .k { font-size:12px; color:var(--muted); }
+    .ctx-item .v { margin-top:4px; font-weight:600; }
+    .switch-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .stats-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .stat-chip { padding:4px 8px; border-radius:999px; background:var(--panel-2); border:1px solid var(--border); font-size:12px; }
+    .split { display:grid; grid-template-columns: 320px minmax(0,1fr); gap:12px; }
+    .interface-list { border:1px solid var(--border); border-radius:8px; overflow:auto; max-height:72vh; }
+    .iface-item { padding:10px; border-bottom:1px solid var(--border); cursor:pointer; }
+    .iface-item.active { background:var(--primary-ghost); }
+    .iface-top { display:flex; justify-content:space-between; gap:8px; }
+    .iface-name { font-weight:600; }
+    .iface-meta { margin-top:6px; font-size:12px; color:var(--muted); line-height:1.5; }
+    .mapping-wrap { border:1px solid var(--border); border-radius:8px; overflow:auto; max-height:72vh; }
+    .group-title { margin: 0; padding:10px 12px; border-bottom:1px solid var(--border); background:var(--panel-2); }
+    .mapping-table { width: 100%; min-width: 1500px; border-collapse:collapse; }
+    .mapping-table th,.mapping-table td { border-bottom:1px solid var(--border); padding:8px; vertical-align:top; text-align:left; }
+    .mapping-table th { position: sticky; top: 0; z-index:1; background:var(--panel-2); }
+    .req-star { color: var(--danger); font-weight:700; }
+    .row-status { font-size:12px; }
+    .row-status.done { color:var(--success); }
+    .row-status.warn { color:var(--warning); }
+    .row-status.danger { color:var(--danger); }
+    .sticky-actions { position: sticky; bottom: 0; z-index: 5; background: var(--panel); border-top:1px solid var(--border); padding: 10px 12px; display:flex; justify-content:flex-end; gap:8px; }
+  </style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+  <div class="top-controls">
+    <select id="globalRegionSelect"><option value="香港">地区：香港</option><option value="新加坡">地区：新加坡</option></select>
+    <select><option>语言：简体中文</option><option>English</option></select>
+    <button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button>
+    <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="appSidebar"></aside>
+
+  <main class="main mapping-page">
+    <section class="card">
+      <h3 class="section-title">页面顶部基础信息区</h3>
+      <div class="ctx-grid" id="baseInfo"></div>
+    </section>
+
+    <section class="card">
+      <h3 class="section-title">筛选 / 切换区</h3>
+      <div class="switch-grid">
+        <div class="field"><label>地区</label><select id="regionSelect"></select></div>
+        <div class="field"><label>通道</label><select id="channelSelect"></select></div>
+        <div class="field"><label>服务</label><select id="serviceSelect"></select></div>
+        <div class="field"><label>接口</label><select id="interfaceSelect"></select></div>
+      </div>
+      <div class="stats-row" id="topStats"></div>
+    </section>
+
+    <section class="card split">
+      <div>
+        <h3 class="section-title">AFP 接口列表区</h3>
+        <div class="interface-list" id="interfaceList"></div>
+      </div>
+      <div>
+        <h3 class="section-title">接口字段映射配置区</h3>
+        <div class="mapping-wrap" id="mappingWrap"></div>
+      </div>
+    </section>
+
+    <div class="sticky-actions">
+      <button class="btn" id="cancelBtn">取消</button>
+      <button class="btn" id="saveDraftBtn">保存草稿</button>
+      <button class="btn primary" id="saveValidateBtn">保存并校验</button>
+    </div>
+  </main>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  const SOURCE_OPTIONS = ['系统字段映射', '固定值', '默认值', '暂不配置'];
+  const RULE_OPTIONS = ['无', '枚举映射', '布尔值转换', '日期格式转换', '多字段拼接', '地址拼接', '国家 / 地区码转换'];
+  const SYSTEM_TABLES = {
+    enterprise: ['legal_name', 'registration_no', 'tax_no', 'country', 'phone', 'email'],
+    shop: ['store_name', 'address_line1', 'address_city', 'address_country', 'shopper_statement'],
+    merchant: ['merchant_account_id', 'mcc', 'service_type', 'sales_channel', 'monthly_volume'],
+    person: ['first_name', 'last_name', 'dob', 'nationality', 'id_number']
+  };
+
+  const META = {
+    香港: {
+      Adyen_AFP: {
+        acquiring: [
+          {
+            code: 'LE',
+            name: 'Company Legal Entity',
+            desc: '创建公司主体 Legal Entity',
+            fields: [
+              { name:'企业法定名称', path:'organization.legalName', desc:'公司法定注册名称', type:'string', required:true },
+              { name:'企业营业名称 / DBA', path:'organization.doingBusinessAs', desc:'对外营业名称', type:'string', required:false },
+              { name:'注册地址-国家', path:'organization.registeredAddress.country', desc:'注册地址国家', type:'string', required:true },
+              { name:'企业税号', path:'organization.taxInformation.number', desc:'税号', type:'string', required:false },
+              { name:'企业联系电话', path:'organization.phone.number', desc:'联系电话', type:'string', required:true }
+            ]
+          },
+          {
+            code: 'Store',
+            name: 'Store',
+            desc: '创建门店信息',
+            fields: [
+              { name:'Store参考号 / 门店编码', path:'reference', desc:'Store 外部参考号', type:'string', required:true },
+              { name:'账单抬头 / Shopper Statement', path:'shopperStatement', desc:'账单展示名称', type:'string', required:true },
+              { name:'门店地址-街道', path:'address.street', desc:'地址街道', type:'string', required:true },
+              { name:'门店地址-城市', path:'address.city', desc:'地址城市', type:'string', required:true },
+              { name:'门店地址-国家', path:'address.country', desc:'地址国家', type:'string', required:true },
+              { name:'绑定 Business Line IDs', path:'businessLineIds', desc:'绑定业务线', type:'array', required:true }
+            ]
+          },
+          {
+            code: 'PM',
+            name: 'Payment Method',
+            desc: '支付产品开通',
+            fields: [
+              { name:'支付产品', path:'paymentMethod.type', desc:'产品类型', type:'enum', required:true },
+              { name:'是否开通', path:'enabled', desc:'开通结果', type:'boolean', required:true },
+              { name:'Store ID（如适用）', path:'storeId', desc:'关联 Store', type:'string', required:false }
+            ]
+          }
+        ]
+      }
+    },
+    新加坡: {
+      Adyen_AFP: {
+        acquiring: [
+          {
+            code: 'AH',
+            name: 'Account Holder',
+            desc: '创建账户持有人并挂能力',
+            fields: [
+              { name:'Balance Platform ID', path:'balancePlatform', desc:'平台 ID', type:'string', required:true },
+              { name:'Account Holder 参考号', path:'reference', desc:'AH 外部参考号', type:'string', required:true },
+              { name:'关联企业 LE ID', path:'legalEntityId', desc:'绑定公司 LE', type:'string', required:true },
+              { name:'所申请能力集合', path:'capabilities', desc:'能力集合', type:'array', required:true }
+            ]
+          },
+          {
+            code: 'BL',
+            name: 'Business Line',
+            desc: '定义支付处理业务线',
+            fields: [
+              { name:'服务类型', path:'service', desc:'通常为 paymentProcessing', type:'string', required:true },
+              { name:'销售渠道', path:'salesChannels', desc:'如 pos', type:'enum', required:true },
+              { name:'行业代码 / MCC映射值', path:'industryCode', desc:'行业代码', type:'string', required:true }
+            ]
+          }
+        ]
+      }
+    }
+  };
+
+  const state = {
+    region: '香港',
+    channel: 'Adyen_AFP',
+    service: 'acquiring',
+    interfaceCode: '',
+    mappings: {}
+  };
+
+  function getInterfaces() {
+    return (((META[state.region] || {})[state.channel] || {})[state.service]) || [];
+  }
+
+  function getCurrentInterface() {
+    return getInterfaces().find(i => i.code === state.interfaceCode) || getInterfaces()[0] || null;
+  }
+
+  function keyFor(path) {
+    return `${state.region}|${state.channel}|${state.service}|${state.interfaceCode}|${path}`;
+  }
+
+  function getMapping(path) {
+    const key = keyFor(path);
+    if (!state.mappings[key]) state.mappings[key] = { sourceType:'', table:'', field:'', fixedOrDefault:'', rule:'无', memo:'' };
+    return state.mappings[key];
+  }
+
+  function getGroupName(path) {
+    if (path.includes('address')) return '地址信息';
+    if (path.includes('phone') || path.includes('email')) return '联系信息';
+    if (path.includes('account') || path.includes('balance') || path.includes('capabilities')) return '账户信息';
+    if (path.includes('file') || path.includes('document')) return '文件信息';
+    if (path.includes('tax') || path.includes('stock') || path.includes('vat')) return '扩展信息';
+    return '基础信息';
+  }
+
+  function isRowComplete(field, map) {
+    if (!map.sourceType) return false;
+    if (map.sourceType === '系统字段映射') return !!(map.table && map.field);
+    if (map.sourceType === '固定值' || map.sourceType === '默认值') return !!map.fixedOrDefault;
+    if (map.sourceType === '暂不配置') return !field.required;
+    return false;
+  }
+
+  function rowStatus(field, map) {
+    if (!map.sourceType) return { text:'未映射', cls:'warn' };
+    if (map.sourceType === '暂不配置' && field.required) return { text:'必填未完成', cls:'danger' };
+    if ((map.sourceType === '固定值' || map.sourceType === '默认值') && !map.fixedOrDefault) return { text:'缺少默认值', cls:'danger' };
+    if (isRowComplete(field, map)) return { text:'已映射', cls:'done' };
+    return { text:'未映射', cls:'warn' };
+  }
+
+  function renderSelectors() {
+    const regionOptions = Object.keys(META).map(v => `<option value="${v}">${v}</option>`).join('');
+    const channelOptions = ['Adyen_AFP'].map(v => `<option value="${v}">${v}</option>`).join('');
+    const serviceOptions = ['acquiring'].map(v => `<option value="${v}">${v}</option>`).join('');
+
+    document.getElementById('regionSelect').innerHTML = regionOptions;
+    document.getElementById('channelSelect').innerHTML = channelOptions;
+    document.getElementById('serviceSelect').innerHTML = serviceOptions;
+
+    document.getElementById('regionSelect').value = state.region;
+    document.getElementById('channelSelect').value = state.channel;
+    document.getElementById('serviceSelect').value = state.service;
+
+    const ifaces = getInterfaces();
+    if (!ifaces.find(i => i.code === state.interfaceCode)) state.interfaceCode = ifaces[0]?.code || '';
+    document.getElementById('interfaceSelect').innerHTML = ifaces.map(i => `<option value="${i.code}">${i.name}（${i.code}）</option>`).join('');
+    document.getElementById('interfaceSelect').value = state.interfaceCode;
+  }
+
+  function renderBaseInfo() {
+    const now = '2026-04-20 15:30:00';
+    const ctx = [
+      ['当前地区', state.region],
+      ['当前通道', state.channel],
+      ['当前服务', state.service],
+      ['当前配置版本（如有）', 'v2026.04.20-demo'],
+      ['最后更新时间', now],
+      ['最后更新人', 'OPS-Olivia']
+    ];
+    document.getElementById('baseInfo').innerHTML = ctx.map(([k,v]) => `<div class="ctx-item"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  }
+
+  function renderInterfaceList() {
+    const list = getInterfaces();
+    document.getElementById('interfaceList').innerHTML = list.map(item => {
+      const requiredCount = item.fields.filter(f => f.required).length;
+      return `<div class="iface-item ${item.code === state.interfaceCode ? 'active' : ''}" data-code="${item.code}">
+        <div class="iface-top"><div class="iface-name">${item.name}</div><span class="badge">${item.code}</span></div>
+        <div class="iface-meta">接口说明：${item.desc}<br/>字段总数：${item.fields.length}；必填字段数：${requiredCount}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderStats() {
+    const list = getInterfaces();
+    const current = getCurrentInterface();
+    const total = current?.fields.length || 0;
+    const required = current?.fields.filter(f => f.required).length || 0;
+    const mapped = current ? current.fields.filter(f => isRowComplete(f, getMapping(f.path))).length : 0;
+    const rate = total ? Math.round((mapped / total) * 100) : 0;
+
+    document.getElementById('topStats').innerHTML = [
+      `当前地区下已识别的 AFP 接口数量：${list.length}`,
+      `当前选中接口的字段总数：${total}`,
+      `当前选中接口的必填字段数：${required}`,
+      `当前选中接口的已映射字段数：${mapped}`,
+      `当前选中接口的完成率：${rate}%`
+    ].map(t => `<span class="stat-chip">${t}</span>`).join('');
+  }
+
+  function renderMappingTable() {
+    const current = getCurrentInterface();
+    if (!current) {
+      document.getElementById('mappingWrap').innerHTML = '<div style="padding:12px;">暂无可配置接口。</div>';
+      return;
+    }
+    const groups = current.fields.reduce((acc, field) => {
+      const key = getGroupName(field.path);
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(field);
+      return acc;
+    }, {});
+
+    const groupHtml = Object.entries(groups).map(([groupName, fields]) => {
+      const rows = fields.map(field => {
+        const map = getMapping(field.path);
+        const status = rowStatus(field, map);
+        const tableOpts = ['<option value="">请选择</option>', ...Object.keys(SYSTEM_TABLES).map(t => `<option value="${t}">${t}</option>`)].join('');
+        const fieldOpts = ['<option value="">请选择</option>', ...(SYSTEM_TABLES[map.table] || []).map(f => `<option value="${f}">${f}</option>`)].join('');
+
+        return `<tr data-path="${field.path}">
+          <td>${field.name}</td>
+          <td><code>${field.path}</code></td>
+          <td>${field.desc}</td>
+          <td>${field.type}</td>
+          <td>${field.required ? '<span class="req-star">* 是</span>' : '否'}</td>
+          <td><select data-col="sourceType">${SOURCE_OPTIONS.map(o => `<option value="${o}" ${map.sourceType===o?'selected':''}>${o}</option>`).join('')}</select><div class="row-status ${status.cls}">${status.text}</div></td>
+          <td><select data-col="table" ${map.sourceType==='系统字段映射'?'':'disabled'}>${tableOpts}</select></td>
+          <td><select data-col="field" ${map.sourceType==='系统字段映射'?'':'disabled'}>${fieldOpts}</select></td>
+          <td><input data-col="fixedOrDefault" value="${map.fixedOrDefault || ''}" ${map.sourceType==='固定值'||map.sourceType==='默认值'?'':'disabled'} placeholder="固定值或默认值" /></td>
+          <td><select data-col="rule">${RULE_OPTIONS.map(o => `<option value="${o}" ${map.rule===o?'selected':''}>${o}</option>`).join('')}</select><button class="btn" type="button" data-act="configRule">配置规则</button></td>
+          <td><input data-col="memo" value="${map.memo || ''}" placeholder="备注" /></td>
+        </tr>`;
+      }).join('');
+      return `<details open><summary class="group-title">${groupName}</summary><table class="mapping-table"><thead><tr>
+        <th>AFP字段名称</th><th>AFP字段路径</th><th>字段说明</th><th>字段类型</th><th>是否必填</th><th>来源方式</th><th>我方系统表</th><th>我方系统字段</th><th>默认值 / 固定值</th><th>转换规则</th><th>备注</th>
+      </tr></thead><tbody>${rows}</tbody></table></details>`;
+    }).join('');
+
+    document.getElementById('mappingWrap').innerHTML = groupHtml;
+    document.querySelectorAll('#mappingWrap tr').forEach(tr => {
+      const path = tr.dataset.path;
+      tr.querySelectorAll('[data-col]').forEach(ctrl => {
+        ctrl.addEventListener('change', () => {
+          const map = getMapping(path);
+          map[ctrl.dataset.col] = ctrl.value;
+          if (ctrl.dataset.col === 'sourceType') {
+            if (map.sourceType !== '系统字段映射') { map.table = ''; map.field = ''; }
+            if (map.sourceType !== '固定值' && map.sourceType !== '默认值') map.fixedOrDefault = '';
+          }
+          if (ctrl.dataset.col === 'table') map.field = '';
+          renderMappingTable();
+          renderStats();
+        });
+      });
+      tr.querySelector('[data-act="configRule"]').addEventListener('click', () => alert(`已预留规则配置入口：${path}`));
+    });
+
+    document.querySelectorAll('#mappingWrap [data-col="table"]').forEach((s, idx) => {
+      const tr = s.closest('tr');
+      const path = tr.dataset.path;
+      s.value = getMapping(path).table;
+    });
+    document.querySelectorAll('#mappingWrap [data-col="field"]').forEach((s) => {
+      const tr = s.closest('tr');
+      const path = tr.dataset.path;
+      s.value = getMapping(path).field;
+    });
+  }
+
+  function validateCurrentInterface() {
+    const current = getCurrentInterface();
+    if (!current) return { ok: true, msg: '' };
+    const failed = [];
+    current.fields.forEach(f => {
+      const m = getMapping(f.path);
+      const noSource = !m.sourceType;
+      const badMap = m.sourceType === '系统字段映射' && (!m.table || !m.field);
+      const badFixed = m.sourceType === '固定值' && !m.fixedOrDefault;
+      const badDefault = m.sourceType === '默认值' && !m.fixedOrDefault;
+      const notConfigReq = m.sourceType === '暂不配置' && f.required;
+      if (f.required && (noSource || badMap || badFixed || badDefault || notConfigReq)) failed.push(f.path);
+    });
+    if (failed.length) return { ok:false, msg:`校验失败，请检查必填字段：${failed.join('、')}` };
+    return { ok:true, msg:'保存成功' };
+  }
+
+  function rerenderAll() {
+    renderSelectors();
+    renderBaseInfo();
+    renderInterfaceList();
+    renderMappingTable();
+    renderStats();
+  }
+
+  function bindEvents() {
+    document.getElementById('globalRegionSelect').addEventListener('change', e => {
+      state.region = e.target.value;
+      document.getElementById('regionSelect').value = state.region;
+      rerenderAll();
+    });
+
+    document.getElementById('regionSelect').addEventListener('change', e => { state.region = e.target.value; rerenderAll(); });
+    document.getElementById('channelSelect').addEventListener('change', e => { state.channel = e.target.value; rerenderAll(); });
+    document.getElementById('serviceSelect').addEventListener('change', e => { state.service = e.target.value; rerenderAll(); });
+    document.getElementById('interfaceSelect').addEventListener('change', e => { state.interfaceCode = e.target.value; rerenderAll(); });
+
+    document.getElementById('interfaceList').addEventListener('click', e => {
+      const node = e.target.closest('.iface-item');
+      if (!node) return;
+      state.interfaceCode = node.dataset.code;
+      rerenderAll();
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => history.back());
+    document.getElementById('saveDraftBtn').addEventListener('click', () => alert('保存草稿成功'));
+    document.getElementById('saveValidateBtn').addEventListener('click', () => {
+      const v = validateCurrentInterface();
+      alert(v.ok ? '保存成功' : '校验失败，请检查必填字段');
+      if (!v.ok) console.warn(v.msg);
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    applyBrandPaletteFromLogo();
+    renderGlobalSidebar('appSidebar', 'afp-mapping.html');
+    rerenderAll();
+    bindEvents();
+  });
+</script>
+</body>
+</html>
