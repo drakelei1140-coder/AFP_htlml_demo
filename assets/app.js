@@ -279,5 +279,378 @@ window.addEventListener('DOMContentLoaded', () => {
   applyBrandPaletteFromLogo();
   bindMultiSelect();
   bindPersonTables();
+  initGroupRelationPickers();
   if (document.querySelector('.sticky-nav')) bindStickyNav();
 });
+
+
+const GROUP_STORE_KEY = 'afp_group_demo_store_v1';
+
+function nowText() {
+  const d = new Date();
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+function seedGroupStore() {
+  return {
+    groups: [
+      { id: 'GRP-HK-340211', name: '跨境电商', region: '香港', objectType: 'enterprise', usageType: 'analytics', status: 'enabled', sortNo: 10, remark: '重点跟踪跨境业务', createdBy: 'Olivia', createdAt: '2026-01-08 09:11:00', updatedBy: 'Olivia', updatedAt: '2026-04-15 10:20:00' },
+      { id: 'GRP-HK-700112', name: '重点商户', region: '香港', objectType: 'enterprise', usageType: 'operations', status: 'disabled', sortNo: 20, remark: '核心高GMV企业', createdBy: 'Aaron', createdAt: '2026-01-12 16:10:00', updatedBy: 'Aaron', updatedAt: '2026-04-20 12:08:00' },
+      { id: 'GRP-HK-210088', name: '线下旗舰店', region: '香港', objectType: 'store', usageType: 'analytics', status: 'enabled', sortNo: 15, remark: '门店经营标杆', createdBy: 'Mina', createdAt: '2026-02-02 12:00:00', updatedBy: 'Mina', updatedAt: '2026-04-14 09:20:00' },
+      { id: 'GRP-HK-990123', name: '夜间营业门店', region: '香港', objectType: 'store', usageType: 'custom', status: 'disabled', sortNo: 30, remark: '营运时段标识', createdBy: 'Mina', createdAt: '2026-02-10 08:00:00', updatedBy: 'Olivia', updatedAt: '2026-04-19 21:30:00' },
+      { id: 'GRP-SG-338001', name: '新加坡重点观察', region: '新加坡', objectType: 'enterprise', usageType: 'operations', status: 'enabled', sortNo: 5, remark: '新市场策略分层', createdBy: 'Jay', createdAt: '2026-03-01 10:10:00', updatedBy: 'Jay', updatedAt: '2026-04-17 15:22:00' }
+    ],
+    enterpriseRelations: [
+      { relationId: 'ER-1', enterpriseId: 'CID-2026-0004', groupId: 'GRP-HK-340211', createdBy: 'Olivia', createdAt: '2026-02-01 10:00:00' },
+      { relationId: 'ER-2', enterpriseId: 'CID-2026-0004', groupId: 'GRP-HK-700112', createdBy: 'Olivia', createdAt: '2026-02-03 12:00:00' }
+    ],
+    storeRelations: [
+      { relationId: 'SR-1', storeId: 'SID-3001', groupId: 'GRP-HK-210088', createdBy: 'Olivia', createdAt: '2026-02-05 11:00:00' },
+      { relationId: 'SR-2', storeId: 'SID-3001', groupId: 'GRP-HK-990123', createdBy: 'Olivia', createdAt: '2026-02-18 09:00:00' }
+    ],
+    timelineLogs: [
+      { logId: 'LOG-1', groupId: 'GRP-HK-340211', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Olivia', operatedAt: '2026-01-08 09:11:00' },
+      { logId: 'LOG-2', groupId: 'GRP-HK-700112', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Aaron', operatedAt: '2026-04-20 12:08:00' },
+      { logId: 'LOG-3', groupId: 'GRP-HK-990123', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Olivia', operatedAt: '2026-04-19 21:30:00' }
+    ]
+  };
+}
+
+function getGroupStore() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(GROUP_STORE_KEY) || 'null');
+    if (parsed && parsed.groups) return parsed;
+  } catch (_) {}
+  const seeded = seedGroupStore();
+  localStorage.setItem(GROUP_STORE_KEY, JSON.stringify(seeded));
+  return seeded;
+}
+
+function saveGroupStore(store) {
+  localStorage.setItem(GROUP_STORE_KEY, JSON.stringify(store));
+}
+
+function usageTypeLabel(v) {
+  return ({ analytics: '统计分析', operations: '运营处理', custom: '其他 / 自定义' })[v] || '-';
+}
+
+function objectTypeLabel(v) {
+  return v === 'enterprise' ? '企业' : '商铺';
+}
+
+function statusBadge(v) {
+  return v === 'enabled' ? '<span class="badge success">启用</span>' : '<span class="badge warning">停用</span>';
+}
+
+function randomGroupId(region) {
+  const code = ({ 香港: 'HK', 澳门: 'MO', 新加坡: 'SG' })[region] || 'OT';
+  return `GRP-${code}-${Math.floor(Math.random() * 900000 + 100000)}`;
+}
+
+function appendTimeline(store, payload) {
+  store.timelineLogs.push({ logId: `LOG-${Date.now()}-${Math.floor(Math.random() * 1000)}`, ...payload });
+}
+
+function initGroupManagementPage() {
+  const page = document.getElementById('groupPage');
+  if (!page) return;
+
+  const refs = {
+    filterRegion: document.getElementById('filterRegion'),
+    filterId: document.getElementById('filterId'),
+    filterName: document.getElementById('filterName'),
+    filterObjectType: document.getElementById('filterObjectType'),
+    filterUsageType: document.getElementById('filterUsageType'),
+    filterStatus: document.getElementById('filterStatus'),
+    tableBody: document.getElementById('groupTableBody'),
+    formDialog: document.getElementById('groupFormDialog'),
+    timelineDialog: document.getElementById('timelineDialog')
+  };
+
+  let editingId = '';
+
+  const renderTable = () => {
+    const store = getGroupStore();
+    const filters = {
+      region: refs.filterRegion.value,
+      id: refs.filterId.value.trim(),
+      name: refs.filterName.value.trim().toLowerCase(),
+      objectType: refs.filterObjectType.value,
+      usageType: refs.filterUsageType.value,
+      status: refs.filterStatus.value
+    };
+
+    const rows = store.groups.filter(g => {
+      if (filters.region && g.region !== filters.region) return false;
+      if (filters.id && !g.id.toLowerCase().includes(filters.id.toLowerCase())) return false;
+      if (filters.name && !g.name.toLowerCase().includes(filters.name)) return false;
+      if (filters.objectType && g.objectType !== filters.objectType) return false;
+      if (filters.usageType && g.usageType !== filters.usageType) return false;
+      if (filters.status && g.status !== filters.status) return false;
+      return true;
+    }).sort((a, b) => a.sortNo - b.sortNo);
+
+    refs.tableBody.innerHTML = rows.map(g => `
+      <tr>
+        <td>${g.id}</td>
+        <td>${g.name}</td>
+        <td>${g.region}</td>
+        <td>${objectTypeLabel(g.objectType)}</td>
+        <td>${usageTypeLabel(g.usageType)}</td>
+        <td>${statusBadge(g.status)}</td>
+        <td>${g.remark || '-'}</td>
+        <td>${g.createdBy}</td>
+        <td>${g.createdAt}</td>
+        <td>${g.updatedBy}</td>
+        <td>${g.updatedAt}</td>
+        <td class="ops">
+          <button class="btn link" data-action="edit" data-id="${g.id}">编辑</button>
+          <button class="btn link" data-action="toggle" data-id="${g.id}">${g.status === 'enabled' ? '停用' : '启用'}</button>
+          <button class="btn link" data-action="delete" data-id="${g.id}">删除</button>
+          <button class="btn link" data-action="timeline" data-id="${g.id}">查看时间轴</button>
+        </td>
+      </tr>`).join('');
+  };
+
+  const openForm = group => {
+    editingId = group?.id || '';
+    document.getElementById('groupDialogTitle').textContent = group ? '编辑群组' : '新增群组';
+    document.getElementById('groupIdInput').value = group?.id || '保存后自动生成';
+    document.getElementById('groupRegion').value = group?.region || '';
+    document.getElementById('groupObjectType').value = group?.objectType || '';
+    document.getElementById('groupName').value = group?.name || '';
+    document.getElementById('groupUsageType').value = group?.usageType || '';
+    document.getElementById('groupSortNo').value = group?.sortNo ?? 100;
+    document.getElementById('groupRemark').value = group?.remark || '';
+    document.getElementById('groupStatus').value = group?.status || 'enabled';
+
+    document.getElementById('groupRegion').disabled = !!group;
+    document.getElementById('groupObjectType').disabled = !!group;
+    toggleModal(refs.formDialog, true);
+  };
+
+  const toggleModal = (el, visible) => {
+    if (!el) return;
+    el.classList.toggle('hidden', !visible);
+  };
+
+  const closeForm = () => toggleModal(refs.formDialog, false);
+
+  const renderTimeline = groupId => {
+    const store = getGroupStore();
+    const group = store.groups.find(g => g.id === groupId);
+    const logs = store.timelineLogs.filter(l => l.groupId === groupId).sort((a, b) => b.operatedAt.localeCompare(a.operatedAt));
+    document.getElementById('timelineTitle').textContent = `群组时间轴 · ${group?.name || groupId}`;
+    document.getElementById('groupTimeline').innerHTML = logs.length ? logs.map(log => `
+      <div class="item">
+        <div class="title">${log.actionType}</div>
+        <div class="meta">${log.operatedAt} · ${log.operator}</div>
+        <div class="summary">${log.fieldName === 'all' ? '创建群组' : `${log.fieldName}: ${log.oldValue || '-'} → ${log.newValue || '-'}`}</div>
+      </div>
+    `).join('') : '<p class="desc">暂无时间轴记录</p>';
+    toggleModal(refs.timelineDialog, true);
+  };
+
+  page.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+    const store = getGroupStore();
+    const group = store.groups.find(g => g.id === id);
+    if (!group) return;
+
+    if (action === 'edit') openForm(group);
+    if (action === 'timeline') renderTimeline(id);
+    if (action === 'toggle') {
+      const next = group.status === 'enabled' ? 'disabled' : 'enabled';
+      const actionText = next === 'enabled' ? '启用' : '停用';
+      if (!confirm(`确认${actionText}群组「${group.name}」吗？`)) return;
+      group.status = next;
+      group.updatedAt = nowText();
+      group.updatedBy = 'Olivia';
+      appendTimeline(store, {
+        groupId: id,
+        actionType: actionText,
+        fieldName: 'status',
+        oldValue: next === 'enabled' ? '停用' : '启用',
+        newValue: next === 'enabled' ? '启用' : '停用',
+        operator: 'Olivia',
+        operatedAt: nowText()
+      });
+      saveGroupStore(store);
+      alert(`群组已${actionText}`);
+      renderTable();
+    }
+    if (action === 'delete') {
+      if (!confirm(`确认删除群组「${group.name}」吗？该操作不可恢复。`)) return;
+      const linked = store.enterpriseRelations.some(r => r.groupId === id) || store.storeRelations.some(r => r.groupId === id);
+      if (linked) {
+        alert('当前群组已存在关联数据，不能删除，请先解除关联或改为停用');
+        return;
+      }
+      store.groups = store.groups.filter(g => g.id !== id);
+      saveGroupStore(store);
+      alert('群组已删除');
+      renderTable();
+    }
+  });
+
+  document.getElementById('queryGroupBtn').addEventListener('click', renderTable);
+  document.getElementById('resetGroupBtn').addEventListener('click', () => {
+    refs.filterRegion.value = '';
+    refs.filterId.value = '';
+    refs.filterName.value = '';
+    refs.filterObjectType.value = '';
+    refs.filterUsageType.value = '';
+    refs.filterStatus.value = '';
+    renderTable();
+  });
+  document.getElementById('addGroupBtn').addEventListener('click', () => openForm());
+  document.getElementById('cancelGroupFormBtn').addEventListener('click', closeForm);
+  refs.formDialog.addEventListener('click', e => { if (e.target === refs.formDialog) closeForm(); });
+  refs.timelineDialog.addEventListener('click', e => { if (e.target === refs.timelineDialog) toggleModal(refs.timelineDialog, false); });
+  document.getElementById('closeTimelineBtn').addEventListener('click', () => toggleModal(refs.timelineDialog, false));
+
+  document.getElementById('saveGroupBtn').addEventListener('click', () => {
+    const region = document.getElementById('groupRegion').value;
+    const objectType = document.getElementById('groupObjectType').value;
+    const name = document.getElementById('groupName').value.trim();
+    const usageType = document.getElementById('groupUsageType').value;
+    const sortNo = Number(document.getElementById('groupSortNo').value || 100);
+    const remark = document.getElementById('groupRemark').value.trim();
+    const status = document.getElementById('groupStatus').value;
+
+    if (!region || !objectType || !name || !usageType) {
+      alert('请完整填写地区、对象类型、群组名称、用途分类等必填字段');
+      return;
+    }
+
+    const store = getGroupStore();
+    const duplicated = store.groups.some(g => g.name.toLowerCase() === name.toLowerCase() && g.id !== editingId);
+    if (duplicated) {
+      alert('群组名称已存在，请修改后重试');
+      return;
+    }
+
+    if (!editingId) {
+      const id = randomGroupId(region);
+      const newGroup = {
+        id,
+        name,
+        region,
+        objectType,
+        usageType,
+        status,
+        sortNo,
+        remark,
+        createdBy: 'Olivia',
+        createdAt: nowText(),
+        updatedBy: 'Olivia',
+        updatedAt: nowText()
+      };
+      store.groups.push(newGroup);
+      appendTimeline(store, { groupId: id, actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Olivia', operatedAt: nowText() });
+      saveGroupStore(store);
+      closeForm();
+      renderTable();
+      alert('新增成功');
+      return;
+    }
+
+    const target = store.groups.find(g => g.id === editingId);
+    if (!target) return;
+
+    const changes = [
+      ['群组名称', target.name, name, '修改群组名称', 'name'],
+      ['用途分类', usageTypeLabel(target.usageType), usageTypeLabel(usageType), '修改用途分类', 'usageType'],
+      ['备注', target.remark || '-', remark || '-', '修改备注', 'remark'],
+      ['状态', target.status === 'enabled' ? '启用' : '停用', status === 'enabled' ? '启用' : '停用', status === 'enabled' ? '启用' : '停用', 'status']
+    ].filter(item => item[1] !== item[2]);
+
+    target.name = name;
+    target.usageType = usageType;
+    target.sortNo = sortNo;
+    target.remark = remark;
+    target.status = status;
+    target.updatedBy = 'Olivia';
+    target.updatedAt = nowText();
+
+    changes.forEach(([label, oldV, newV, actionType, fieldName]) => {
+      appendTimeline(store, { groupId: target.id, actionType, fieldName: label, oldValue: oldV, newValue: newV, operator: 'Olivia', operatedAt: nowText() });
+    });
+
+    saveGroupStore(store);
+    closeForm();
+    renderTable();
+    alert('编辑成功');
+  });
+
+  renderTable();
+}
+
+function initGroupRelationPickers() {
+  const pickers = document.querySelectorAll('.group-picker');
+  if (!pickers.length) return;
+  const store = getGroupStore();
+
+  pickers.forEach((node, index) => {
+    const objectType = node.dataset.objectType;
+    const region = node.dataset.region || '香港';
+    const selected = new Set((node.dataset.selected || '').split(',').filter(Boolean));
+
+    const candidateGroups = store.groups.filter(g => g.region === region && g.objectType === objectType && (g.status === 'enabled' || selected.has(g.id)));
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ant-select openable';
+    wrap.innerHTML = `<div class="ant-select-values"></div><span class="ant-select-arrow">▼</span><div class="ant-select-dropdown"></div>`;
+    node.appendChild(wrap);
+
+    const valuesEl = wrap.querySelector('.ant-select-values');
+    const dropdown = wrap.querySelector('.ant-select-dropdown');
+
+    const updateHidden = () => { hidden.value = [...selected].join(','); };
+
+    function render() {
+      dropdown.innerHTML = candidateGroups.map(g => {
+        const checked = selected.has(g.id) ? 'checked' : '';
+        const disabled = g.status !== 'enabled' && !selected.has(g.id);
+        return `<label class="ant-option ${disabled ? 'disabled' : ''}"><input type="checkbox" value="${g.id}" ${checked} ${disabled ? 'disabled' : ''}>${g.name}${g.status !== 'enabled' ? ' <small>（已停用）</small>' : ''}</label>`;
+      }).join('');
+
+      const selectedGroups = candidateGroups.filter(g => selected.has(g.id));
+      valuesEl.innerHTML = selectedGroups.length ? selectedGroups.map(g => `<span class="ant-tag ${g.status !== 'enabled' ? 'disabled' : ''}">${g.name}${g.status !== 'enabled' ? '（已停用）' : ''}<span class="x" data-id="${g.id}">×</span></span>`).join('') : `<span class="ant-select-placeholder">请选择${objectType === 'enterprise' ? '企业' : '商铺'}群组</span>`;
+
+      valuesEl.querySelectorAll('.x').forEach(x => x.addEventListener('click', e => {
+        e.stopPropagation();
+        selected.delete(x.dataset.id);
+        render();
+      }));
+
+      dropdown.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', () => {
+          if (input.checked) selected.add(input.value);
+          else selected.delete(input.value);
+          render();
+        });
+      });
+
+      updateHidden();
+    }
+
+    wrap.addEventListener('click', e => {
+      if (e.target.closest('.ant-select-dropdown')) return;
+      wrap.classList.toggle('open');
+    });
+    document.addEventListener('click', e => {
+      if (!wrap.contains(e.target)) wrap.classList.remove('open');
+    });
+
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = `groupRelation-${index}`;
+    node.appendChild(hidden);
+
+    render();
+  });
+}
