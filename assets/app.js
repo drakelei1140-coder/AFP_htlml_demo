@@ -310,8 +310,14 @@ function seedGroupStore() {
     ],
     timelineLogs: [
       { logId: 'LOG-1', groupId: 'GRP-HK-340211', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Olivia', operatedAt: '2026-01-08 09:11:00' },
-      { logId: 'LOG-2', groupId: 'GRP-HK-700112', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Aaron', operatedAt: '2026-04-20 12:08:00' },
-      { logId: 'LOG-3', groupId: 'GRP-HK-990123', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Olivia', operatedAt: '2026-04-19 21:30:00' }
+      { logId: 'LOG-1-1', groupId: 'GRP-HK-340211', actionType: '修改备注', fieldName: '备注', oldValue: '跨境业务', newValue: '重点跟踪跨境业务', operator: 'Olivia', operatedAt: '2026-04-15 10:20:00' },
+      { logId: 'LOG-2', groupId: 'GRP-HK-700112', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Aaron', operatedAt: '2026-01-12 16:10:00' },
+      { logId: 'LOG-2-1', groupId: 'GRP-HK-700112', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Aaron', operatedAt: '2026-04-20 12:08:00' },
+      { logId: 'LOG-3', groupId: 'GRP-HK-210088', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Mina', operatedAt: '2026-02-02 12:00:00' },
+      { logId: 'LOG-3-1', groupId: 'GRP-HK-210088', actionType: '修改用途分类', fieldName: '用途分类', oldValue: '运营处理', newValue: '统计分析', operator: 'Mina', operatedAt: '2026-04-14 09:20:00' },
+      { logId: 'LOG-4', groupId: 'GRP-HK-990123', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Mina', operatedAt: '2026-02-10 08:00:00' },
+      { logId: 'LOG-4-1', groupId: 'GRP-HK-990123', actionType: '停用', fieldName: 'status', oldValue: '启用', newValue: '停用', operator: 'Olivia', operatedAt: '2026-04-19 21:30:00' },
+      { logId: 'LOG-5', groupId: 'GRP-SG-338001', actionType: '创建群组', fieldName: 'all', oldValue: '', newValue: '创建群组', operator: 'Jay', operatedAt: '2026-03-01 10:10:00' }
     ]
   };
 }
@@ -319,7 +325,26 @@ function seedGroupStore() {
 function getGroupStore() {
   try {
     const parsed = JSON.parse(localStorage.getItem(GROUP_STORE_KEY) || 'null');
-    if (parsed && parsed.groups) return parsed;
+    if (parsed && parsed.groups) {
+      parsed.timelineLogs = Array.isArray(parsed.timelineLogs) ? parsed.timelineLogs : [];
+      parsed.groups.forEach(group => {
+        const hasLog = parsed.timelineLogs.some(log => log.groupId === group.id);
+        if (!hasLog) {
+          parsed.timelineLogs.push({
+            logId: `LOG-BACKFILL-${group.id}`,
+            groupId: group.id,
+            actionType: '创建群组',
+            fieldName: 'all',
+            oldValue: '',
+            newValue: '创建群组',
+            operator: group.createdBy || 'System',
+            operatedAt: group.createdAt || nowText()
+          });
+        }
+      });
+      localStorage.setItem(GROUP_STORE_KEY, JSON.stringify(parsed));
+      return parsed;
+    }
   } catch (_) {}
   const seeded = seedGroupStore();
   localStorage.setItem(GROUP_STORE_KEY, JSON.stringify(seeded));
@@ -451,7 +476,7 @@ function initGroupManagementPage() {
     toggleModal(refs.timelineDialog, true);
   };
 
-  page.addEventListener('click', e => {
+  refs.tableBody.addEventListener('click', e => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
