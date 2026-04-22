@@ -355,3 +355,7 @@ table td:last-child {
 .modal-card-sm {
   width: min(720px, 94vw);
 }
+
+.modal-mask.hidden {
+  display: none !important;
+}
