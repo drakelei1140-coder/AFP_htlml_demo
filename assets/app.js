@@ -426,10 +426,15 @@ function initGroupManagementPage() {
 
     document.getElementById('groupRegion').disabled = !!group;
     document.getElementById('groupObjectType').disabled = !!group;
-    refs.formDialog.showModal();
+    toggleModal(refs.formDialog, true);
   };
 
-  const closeForm = () => refs.formDialog.close();
+  const toggleModal = (el, visible) => {
+    if (!el) return;
+    el.classList.toggle('hidden', !visible);
+  };
+
+  const closeForm = () => toggleModal(refs.formDialog, false);
 
   const renderTimeline = groupId => {
     const store = getGroupStore();
@@ -443,7 +448,7 @@ function initGroupManagementPage() {
         <div class="summary">${log.fieldName === 'all' ? '创建群组' : `${log.fieldName}: ${log.oldValue || '-'} → ${log.newValue || '-'}`}</div>
       </div>
     `).join('') : '<p class="desc">暂无时间轴记录</p>';
-    refs.timelineDialog.showModal();
+    toggleModal(refs.timelineDialog, true);
   };
 
   page.addEventListener('click', e => {
@@ -503,7 +508,9 @@ function initGroupManagementPage() {
   });
   document.getElementById('addGroupBtn').addEventListener('click', () => openForm());
   document.getElementById('cancelGroupFormBtn').addEventListener('click', closeForm);
-  document.getElementById('closeTimelineBtn').addEventListener('click', () => refs.timelineDialog.close());
+  refs.formDialog.addEventListener('click', e => { if (e.target === refs.formDialog) closeForm(); });
+  refs.timelineDialog.addEventListener('click', e => { if (e.target === refs.timelineDialog) toggleModal(refs.timelineDialog, false); });
+  document.getElementById('closeTimelineBtn').addEventListener('click', () => toggleModal(refs.timelineDialog, false));
 
   document.getElementById('saveGroupBtn').addEventListener('click', () => {
     const region = document.getElementById('groupRegion').value;

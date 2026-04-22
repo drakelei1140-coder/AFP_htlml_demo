@@ -48,26 +48,30 @@
   </main>
 </div>
 
-<dialog id="groupFormDialog" style="border:1px solid #e6dfd2;border-radius:8px;padding:16px;max-width:760px;width:94%;">
-  <h3 class="section-title" id="groupDialogTitle">新增群组</h3>
-  <div class="form-grid">
-    <div class="field"><label>群组ID</label><input id="groupIdInput" class="readonly" readonly /></div>
-    <div class="field"><label>地区 *</label><select id="groupRegion"><option value="">请选择地区</option><option>香港</option><option>澳门</option><option>新加坡</option></select></div>
-    <div class="field"><label>对象类型 *</label><select id="groupObjectType"><option value="">请选择对象类型</option><option value="enterprise">企业</option><option value="store">商铺</option></select></div>
-    <div class="field"><label>群组名称 *</label><input id="groupName" placeholder="请输入群组名称" /></div>
-    <div class="field"><label>用途分类 *</label><select id="groupUsageType"><option value="">请选择用途分类</option><option value="analytics">统计分析</option><option value="operations">运营处理</option><option value="custom">其他 / 自定义</option></select></div>
-    <div class="field"><label>排序号</label><input id="groupSortNo" type="number" value="100" /></div>
-    <div class="field"><label>状态</label><select id="groupStatus"><option value="enabled">启用</option><option value="disabled">停用</option></select></div>
-    <div class="field"><label>备注</label><textarea id="groupRemark" placeholder="请输入备注"></textarea></div>
+<div id="groupFormDialog" class="modal-mask hidden">
+  <div class="modal-card">
+    <h3 class="section-title" id="groupDialogTitle">新增群组</h3>
+    <div class="form-grid">
+      <div class="field"><label>群组ID</label><input id="groupIdInput" class="readonly" readonly /></div>
+      <div class="field"><label>地区 *</label><select id="groupRegion"><option value="">请选择地区</option><option>香港</option><option>澳门</option><option>新加坡</option></select></div>
+      <div class="field"><label>对象类型 *</label><select id="groupObjectType"><option value="">请选择对象类型</option><option value="enterprise">企业</option><option value="store">商铺</option></select></div>
+      <div class="field"><label>群组名称 *</label><input id="groupName" placeholder="请输入群组名称" /></div>
+      <div class="field"><label>用途分类 *</label><select id="groupUsageType"><option value="">请选择用途分类</option><option value="analytics">统计分析</option><option value="operations">运营处理</option><option value="custom">其他 / 自定义</option></select></div>
+      <div class="field"><label>排序号</label><input id="groupSortNo" type="number" value="100" /></div>
+      <div class="field"><label>状态</label><select id="groupStatus"><option value="enabled">启用</option><option value="disabled">停用</option></select></div>
+      <div class="field"><label>备注</label><textarea id="groupRemark" placeholder="请输入备注"></textarea></div>
+    </div>
+    <div class="btns"><button class="btn" id="cancelGroupFormBtn">取消</button><button class="btn primary" id="saveGroupBtn">保存</button></div>
   </div>
-  <div class="btns"><button class="btn" id="cancelGroupFormBtn">取消</button><button class="btn primary" id="saveGroupBtn">保存</button></div>
-</dialog>
+</div>
 
-<dialog id="timelineDialog" style="border:1px solid #e6dfd2;border-radius:8px;padding:16px;max-width:720px;width:92%;">
-  <h3 class="section-title" id="timelineTitle">群组时间轴</h3>
-  <div class="timeline" id="groupTimeline"></div>
-  <div class="btns"><button class="btn" id="closeTimelineBtn">关闭</button></div>
-</dialog>
+<div id="timelineDialog" class="modal-mask hidden">
+  <div class="modal-card modal-card-sm">
+    <h3 class="section-title" id="timelineTitle">群组时间轴</h3>
+    <div class="timeline" id="groupTimeline"></div>
+    <div class="btns"><button class="btn" id="closeTimelineBtn">关闭</button></div>
+  </div>
+</div>
 
 <script src="assets/app.js"></script>
 <script>

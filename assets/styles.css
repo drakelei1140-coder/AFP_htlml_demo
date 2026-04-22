@@ -332,3 +332,26 @@ table td:last-child {
   font-size: 13px;
   color: var(--text);
 }
+
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 8, 0.36);
+  display: grid;
+  place-items: center;
+  z-index: 1400;
+  padding: 24px;
+}
+.modal-card {
+  width: min(900px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(35, 24, 9, 0.2);
+}
+.modal-card-sm {
+  width: min(720px, 94vw);
+}
