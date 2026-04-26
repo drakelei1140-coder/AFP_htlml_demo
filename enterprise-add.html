@@ -1,24 +1,184 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>新增企业</title><link rel="stylesheet" href="assets/styles.css"/></head>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>新增企业</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .create-top { position: sticky; top: 72px; z-index: 950; }
+    .top-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .top-left { display:flex; align-items:center; gap:12px; }
+    .section-nav { margin-top: 12px; display:flex; flex-wrap:wrap; gap:8px; }
+    .section-nav .nav-btn { border:1px solid var(--border); background:var(--panel-2); border-radius:999px; padding:6px 10px; color:var(--muted); cursor:pointer; }
+    .form-grid-3 { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:12px 16px; }
+    .form-item label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .form-item .req::after { content:' *'; color:#d4380d; }
+    .readonly-box { background:#f7f5f1; }
+    .tag-wrap { display:flex; flex-wrap:wrap; gap:6px; }
+    .bottom-bar { position: fixed; left: 260px; right:0; bottom:0; height:64px; border-top:1px solid var(--border); background:var(--panel); display:flex; justify-content:flex-end; align-items:center; gap:10px; padding:0 20px; z-index:980; }
+    .with-bottom { padding-bottom: 88px; }
+    .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.25); display:none; align-items:center; justify-content:center; z-index:1200; }
+    .modal-mask.show { display:flex; }
+    .modal-box { width:620px; max-height:80vh; overflow:auto; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    .table-small input, .table-small select { min-width: 140px; }
+    .error { color:#d4380d; font-size:12px; margin-top:4px; }
+  </style>
+</head>
 <body>
 <header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
-<div class="layout"><aside class="sidebar">
-      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
-      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
-      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
-    </aside>
-<main class="main with-bottom-space">
-<section id="overview" class="card section-anchor"><h3 class="section-title">页面顶部概览区</h3><p class="desc">页面标题：新增企业</p><p class="desc">页面说明：用于创建新的企业主体资料，保存后进入待审核状态</p><div class="kv"><div class="kv-item"><div class="k">当前操作人</div><div class="v">Olivia</div></div><div class="kv-item"><div class="k">上單來源</div><div class="v">CRM</div></div></div></section>
-<section class="sticky-nav card"><button class="nav-tag" data-target="overview">企业概览</button><button class="nav-tag" data-target="key">企业主键与关联</button><button class="nav-tag" data-target="name">企业名称信息</button><button class="nav-tag" data-target="biz">企业主体与经营信息</button><button class="nav-tag" data-target="base">企业基础经营数据</button><button class="nav-tag" data-target="contact">企业联系信息</button><button class="nav-tag" data-target="addr">企业地址信息</button><button class="nav-tag" data-target="file">企业文件信息</button><button class="nav-tag" data-target="risk">风控 / 业务信息</button><button class="nav-tag" data-target="person">相关人员</button></section>
-<section id="key" class="card section-anchor"><h3 class="section-title">企业主键与关联信息区</h3><div class="form-grid"><div class="field"><label>上級公司ID</label><input placeholder="选择后自动回填"/></div><div class="field"><label>上级公司名称</label><input placeholder="选择后自动回填"/></div><div class="field"><label>企业群组</label><div class="group-picker" data-object-type="enterprise" data-region="香港" data-selected=""></div></div><div class="field"><label>&nbsp;</label><button class="btn">选择企业</button></div></div></section>
-<section id="name" class="card section-anchor"><h3 class="section-title">企业名称信息区</h3><div class="form-grid"><div class="field"><label>企業中文名稱</label><input/></div><div class="field"><label>企業中文簡稱</label><input/></div><div class="field"><label>企業英文名稱</label><input/></div><div class="field"><label>企業英文簡稱</label><input/></div><div class="field"><label>企業其它名稱</label><textarea></textarea></div><div class="field"><label>企業所有名稱（中文）</label><textarea></textarea></div><div class="field"><label>企業所有名稱（英文）</label><textarea></textarea></div><div class="field"><label>商業登記證名稱</label><input/></div><div class="field"><label>公司登記証名稱(非必須)</label><input/></div></div></section>
-<section id="biz" class="card section-anchor"><h3 class="section-title">企业主体与经营信息区</h3><div class="form-grid"><div class="field"><label>公司模式</label><select><option>直营</option><option>加盟</option><option>连锁</option></select></div><div class="field"><label>是否子公司</label><select><option>是</option><option>否</option></select></div><div class="field"><label>公司結構</label><input/></div><div class="field"><label>行業分類 / 業務性質 / 產品服務</label><input placeholder="三级选择mock"/></div><div class="field"><label>MCC Code</label><input/></div><div class="field"><label>進階MCC Code</label><input/></div><div class="field"><label>special MCC 附件</label><input type="file"/></div><div class="field"><label>小微商戶</label><select><option>是</option><option>否</option></select></div><div class="field"><label>SME 設定</label><input/></div><div class="field"><label>成立日期</label><input type="date"/></div><div class="field"><label>法律地位</label><select><option>有限公司</option></select></div><div class="field"><label>僱員人數</label><input/></div><div class="field"><label>注冊資本</label><input/></div><div class="field"><label>周年申報表 / 法團成立表(非必須)</label><input type="file"/></div><div class="field"><label>企业成立 / 适用法国家</label><input/></div><div class="field"><label>企业治理法律所在国</label><input/></div><div class="field"><label>企业税务申报分类</label><input/></div><div class="field"><label>企业税务业务类型</label><input/></div><div class="field"><label>公司層級</label><input/></div></div></section>
-<section id="base" class="card section-anchor"><h3 class="section-title">企业基础经营数据区</h3><div class="form-grid"><div class="field"><label>進件通道(必須)</label><select multiple><option>Adyen-AFP</option><option>Adyen-payfac</option><option>其他</option></select></div><div class="field"><label>每宗交易平均金額</label><input/></div><div class="field"><label>每宗交易最大交易額</label><input/></div><div class="field"><label>預計每年交易宗數</label><input/></div><div class="field"><label>過往拒付比例</label><input/></div><div class="field"><label>拒付平均處理日數</label><input/></div><div class="field"><label>過往退款比例</label><input/></div><div class="field"><label>退款平均處理日數</label><input/></div><div class="field"><label>平均每月營業額</label><input/></div><div class="field"><label>經營方式</label><input/></div><div class="field"><label>提前收款日數</label><input/></div><div class="field"><label>貨物 / 服務最短送達時間</label><input/></div><div class="field"><label>貨物 / 服務最長送達時間</label><input/></div><div class="field"><label>退貨政策</label><textarea></textarea></div><div class="field"><label>退貨政策截圖</label><input type="file"/></div><div class="field"><label>財務報表審計</label><select><option>是</option><option>否</option></select></div><div class="field"><label>經營年限</label><input/></div><div class="field"><label>職稱 / 職位</label><input/></div><div class="field"><label>T1特選商戶</label><select><option>是</option><option>否</option></select></div><div class="field"><label>歸屬國編號</label><input/></div><div class="field"><label>歸屬省編號</label><input/></div></div></section>
-<section id="contact" class="card section-anchor"><h3 class="section-title">企业联系信息区</h3><div class="form-grid"><div class="field"><label>公司電話</label><input/></div><div class="field"><label>手提電話</label><input/></div><div class="field"><label>管理員電郵</label><input/></div><div class="field"><label>運營電郵</label><input/></div><div class="field"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div><div class="field"><label>微信ID</label><input/></div><div class="field"><label>企业电话类型</label><select><option>固定电话</option><option>手机</option><option>座机+手机</option></select></div></div></section>
-<section id="addr" class="card section-anchor"><h3 class="section-title">企业地址信息区</h3><div class="form-grid"><div class="field"><label>註冊辦事處地址</label><textarea></textarea></div><div class="field"><label>註冊辦事處地址(英文)</label><textarea></textarea></div><div class="field"><label>郵寄地址</label><textarea></textarea></div><div class="field"><label>電郵地址</label><input /></div><div class="field"><label>注册地址（原始全文）</label><textarea></textarea></div><div class="field"><label>注册地址-街道</label><input/></div><div class="field"><label>注册地址-补充地址</label><input/></div><div class="field"><label>注册地址-城市</label><input/></div><div class="field"><label>注册地址-州 / 省</label><input/></div><div class="field"><label>注册地址-邮编</label><input/></div><div class="field"><label>注册地址-国家</label><input/></div><div class="field"><label>主要营业地址（原始全文）</label><textarea></textarea></div><div class="field"><label>主要营业地址-街道</label><input/></div><div class="field"><label>主要营业地址-补充地址</label><input/></div><div class="field"><label>主要营业地址-城市</label><input/></div><div class="field"><label>主要营业地址-州 / 省</label><input/></div><div class="field"><label>主要营业地址-邮编</label><input/></div><div class="field"><label>主要营业地址-国家</label><input/></div></div></section>
-<section id="file" class="card section-anchor"><h3 class="section-title">企业文件信息区</h3><div class="form-grid"><div class="field"><label>商戶篩查報告</label><input type="file"/></div><div class="field"><label>企業架構文件</label><input type="file"/></div><div class="field"><label>財務報表文件</label><input type="file"/></div><div class="field"><label>商業登記證號碼</label><input/></div><div class="field"><label>證書有效期</label><input type="date"/></div><div class="field"><label>商業登記證副本照片</label><input type="file"/></div><div class="field"><label>請提供重複簽約證明附件</label><input type="file"/></div><div class="field"><label>商業登記冊內的資料的電子摘錄（獨資經營者 / 合夥人適用）</label><input type="file"/></div><div class="field"><label>公司註冊證明書(非必須)</label><input type="file"/></div><div class="field"><label>慈善機構資料</label><input type="file"/></div><div class="field"><label>教育資料</label><input type="file"/></div><div class="field"><label>社團 / 協會資料</label><input type="file"/></div><div class="field"><label>業主立案法團資料</label><input type="file"/></div><div class="field"><label>入貨單</label><input type="file"/></div><div class="field"><label>閉路電視錄影</label><input type="file"/></div><div class="field"><label>最高交易金額的客戶單據</label><input type="file"/></div></div></section>
-<section id="risk" class="card section-anchor"><h3 class="section-title">风控 / 业务信息区</h3><div class="form-grid"><div class="field"><label>風控類型</label><select><option>标准风控</option><option>强化风控</option></select></div><div class="field"><label>風險等級</label><select><option>低</option><option>中</option><option>高</option></select></div><div class="field"><label>風險評估報告</label><input type="file"/></div><div class="field"><label>審核類型</label><select><option>标准审核</option><option>人工复核</option></select></div><div class="field"><label>上單來源</label><input value="CRM"/></div><div class="field"><label>服務類型</label><input/></div><div class="field"><label>合作夥伴推薦人</label><input/></div><div class="field"><label>合作夥伴編號</label><input/></div><div class="field"><label>交單備註</label><textarea></textarea></div><div class="field"><label>是否高額商戶</label><select><option>否</option><option>是</option></select></div></div></section>
-<section id="person" class="card section-anchor"><h3 class="section-title">相关人员区域</h3><p class="desc">支持新增、编辑、删除相关人员；仅允许一位默认主联系人。</p><div class="btns" style="justify-content:flex-start;margin:0 0 10px 0;"><button class="btn add-person-btn">新增相关人员</button></div><div class="table-wrap"><table id="add-person-table" class="person-table" style="min-width:1200px"><thead><tr><th>人员姓名</th><th>人员角色</th><th>手机号码</th><th>电邮地址</th><th>证件类型</th><th>证件号码</th><th>是否默认主联系人</th><th>更新时间</th><th>操作</th></tr></thead><tbody><tr><td><input value="张敏" /></td><td><select><option selected>负责人</option><option>财务联系人</option><option>运营联系人</option></select></td><td><input value="+852-6000-8888" /></td><td><input value="owner@newco.hk" /></td><td><select><option selected>身份证</option><option>护照</option></select></td><td><input value="Z1234567" /></td><td><input type="radio" name="add-person-table-default" checked /></td><td>2026-04-18</td><td class="ops"><button class="btn link">编辑</button><button class="btn link delete-person">删除</button></td></tr></tbody></table></div></section>
-</main></div>
-<div class="bottom-actions"><button class="btn">从草稿复制</button><button class="btn">存成草稿</button><button class="btn primary">保存</button><a class="btn" href="enterprise-list.html">取消</a></div>
-<script src="assets/app.js"></script>
-</body></html>
+<div class="layout">
+  <aside class="sidebar"><div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li></ul></div></aside>
+  <main class="main with-bottom">
+    <section class="card create-top">
+      <div class="top-head">
+        <div class="top-left"><a class="btn" href="enterprise-list.html">返回</a><h2 style="margin:0;">新增企业</h2><span class="badge processing">草稿</span></div>
+        <div class="desc">入口：企业列表页【新增】按钮</div>
+      </div>
+      <div class="section-nav">
+        <button class="nav-btn" data-target="sec1">主要数据</button><button class="nav-btn" data-target="sec2">企业名称</button><button class="nav-btn" data-target="sec3">企业地址</button><button class="nav-btn" data-target="sec4">企业主体/经营</button><button class="nav-btn" data-target="sec5">企业基础</button><button class="nav-btn" data-target="sec6">风控/业务</button><button class="nav-btn" data-target="sec7">企业联系</button><button class="nav-btn" data-target="sec8">企业证件</button><button class="nav-btn" data-target="sec9">企业文件</button><button class="nav-btn" data-target="sec10">线上资料</button><button class="nav-btn" data-target="sec11">相关人员</button><button class="nav-btn" data-target="sec12">其他</button>
+      </div>
+    </section>
+
+    <form id="enterpriseForm">
+      <section id="sec1" class="card"><h3 class="section-title">1. 主要数据</h3><div class="form-grid-3">
+        <div class="form-item"><label>CID</label><input class="readonly-box" value="系统生成" readonly /></div>
+        <div class="form-item"><label>上級公司ID</label><input name="上級公司ID" /></div>
+        <div class="form-item"><label class="req">商戶營業狀態(企業口徑)</label><select name="商戶營業狀態(企業口徑)" required><option value="">请选择</option><option>營業中</option><option>停業中</option></select></div>
+        <div class="form-item"><label class="req">商戶類型</label><input name="商戶類型" required /></div>
+        <div class="form-item"><label>关联银行账号</label><input name="关联银行账号" /></div>
+        <div class="form-item"><label>开通Kpay服务</label><select name="开通Kpay服务"><option>是</option><option>否</option></select></div>
+        <div class="form-item"><label>关联群组</label><div style="display:flex;gap:8px;"><button type="button" class="btn" id="openGroup">选择群组</button><div id="groupTags" class="tag-wrap"></div></div></div>
+        <div class="form-item"><label>企业启用状态</label><select name="企业启用状态"><option>启用</option><option>停用</option></select></div>
+        <div class="form-item"><label>企业审核状态</label><select name="企业审核状态"><option>待审核</option><option>待风控审核</option><option>审核通过</option><option>审核不通过</option></select></div>
+        <div class="form-item"><label>创建时间</label><input class="readonly-box" value="提交后生成" readonly /></div>
+        <div class="form-item"><label>更新时间</label><input class="readonly-box" value="提交后生成" readonly /></div>
+      </div></section>
+
+      <section id="sec2" class="card"><h3 class="section-title">2. 企业名称</h3><div class="form-grid-3">
+        <div class="form-item"><label class="req">企业当地语言名稱</label><input required /></div><div class="form-item"><label>企业当地语言簡稱</label><input /></div><div class="form-item"><label class="req">企业英文名稱</label><input required /></div>
+        <div class="form-item"><label>企业英文簡稱</label><input /></div><div class="form-item"><label>企业第三语言名稱</label><input /></div><div class="form-item"><label>企业第三语言簡稱</label><input /></div>
+        <div class="form-item"><label>企业其它名稱</label><input /></div><div class="form-item"><label>企业所有名稱（当地语言）</label><textarea></textarea></div><div class="form-item"><label>企业所有名稱（英文）</label><textarea></textarea></div>
+        <div class="form-item"><label>切換企業顯示名稱（中文）</label><input /></div><div class="form-item"><label>切換企業顯示名稱（英文）</label><input /></div>
+      </div></section>
+
+      <section id="sec3" class="card"><h3 class="section-title">3. 企业地址</h3><div class="form-grid-3">
+        <div class="form-item"><label class="req">企业注册国家</label><input required /></div><div class="form-item"><label class="req">企业注册地址-城市</label><input required /></div><div class="form-item"><label>企业注册地址-邮编</label><input /></div>
+        <div class="form-item"><label>企业注册地址-州/省</label><input /></div><div class="form-item"><label>企业注册地址-街道</label><input /></div><div class="form-item"><label>企业注册地址-补充地址</label><input /></div>
+        <div class="form-item"><label>註冊辦事處地址(当地语言)</label><textarea></textarea></div><div class="form-item"><label>註冊辦事處地址(英文)</label><textarea></textarea></div><div class="form-item"><label>郵寄地址</label><textarea></textarea></div>
+        <div class="form-item"><label>地址行1</label><input /></div><div class="form-item"><label>地址行2</label><input /></div><div class="form-item"><label>地址行3</label><input /></div>
+      </div></section>
+
+      <section id="sec4" class="card"><h3 class="section-title">4. 企业主体/经营</h3><div class="form-grid-3">
+        <div class="form-item"><label>公司模式</label><input /></div><div class="form-item"><label>是否子公司</label><select><option>是</option><option>否</option></select></div><div class="form-item"><label>公司結構</label><input /></div>
+        <div class="form-item"><label>行業分類</label><input /></div><div class="form-item"><label>/業務性質</label><input /></div><div class="form-item"><label>//產品服務</label><input /></div>
+        <div class="form-item"><label>法律地位</label><input /></div><div class="form-item"><label>企业治理法律所在国</label><input /></div><div class="form-item"><label>企业税务申报分类</label><input /></div>
+        <div class="form-item"><label>企业税务业务类型</label><input /></div><div class="form-item"><label>公司層級</label><input /></div><div class="form-item"><label>僱員人數</label><input type="number" /></div>
+        <div class="form-item"><label>注冊資本</label><input type="number" /></div>
+      </div></section>
+
+      <section id="sec5" class="card"><h3 class="section-title">5. 企业基础</h3><div class="form-grid-3">
+        <div class="form-item"><label>預計年銷售額</label><input type="number" /></div><div class="form-item"><label>每宗交易平均金額</label><input type="number" /></div><div class="form-item"><label>每宗交易最大交易額</label><input type="number" /></div>
+        <div class="form-item"><label>預計每年交易宗數</label><input type="number" /></div><div class="form-item"><label>過往拒付比例</label><input /></div><div class="form-item"><label>拒付平均處理日數</label><input type="number" /></div>
+        <div class="form-item"><label>過往退款比例</label><input /></div><div class="form-item"><label>退款平均處理日數</label><input type="number" /></div><div class="form-item"><label>平均每月營業額</label><input type="number" /></div>
+        <div class="form-item"><label>經營方式</label><input /></div><div class="form-item"><label>提前收款日數</label><input type="number" /></div><div class="form-item"><label>貨物/服務最短送達時間</label><input /></div>
+        <div class="form-item"><label>貨物/服務最長送達時間</label><input /></div><div class="form-item"><label>退貨政策</label><textarea></textarea></div><div class="form-item"><label>退貨政策截圖</label><input type="file" accept="image/*" /></div>
+        <div class="form-item"><label>財務報表審計</label><input /></div><div class="form-item"><label>經營年限</label><input type="number" /></div><div class="form-item"><label>T1特選商戶</label><select><option>是</option><option>否</option></select></div>
+        <div class="form-item"><label>歸屬國編號</label><input /></div><div class="form-item"><label>歸屬省編號</label><input /></div><div class="form-item"><label>合約期</label><input /></div>
+        <div class="form-item"><label>是否NGO</label><select><option>是</option><option>否</option></select></div><div class="form-item"><label>重複簽約原因</label><input /></div><div class="form-item"><label>官网 / App Store URL</label><input /></div>
+        <div class="form-item"><label>第三方通道品牌名（渠道） /服务</label><div style="display:flex;gap:8px;"><button type="button" class="btn" id="openChannel">选择</button><div id="channelTags" class="tag-wrap"></div></div></div><div class="form-item"><label>企业税务国家</label><input /></div><div class="form-item"><label>企业税号</label><input /></div>
+        <div class="form-item"><label>企业税号类型</label><input /></div><div class="form-item"><label>VAT号</label><input /></div><div class="form-item"><label>无VAT原因</label><input /></div>
+        <div class="form-item"><label>税务申报分类</label><input /></div><div class="form-item"><label>税务业务类型</label><input /></div><div class="form-item"><label>MCC Code</label><input /></div>
+        <div class="form-item"><label>成立日期</label><input type="date" /></div>
+      </div></section>
+
+      <section id="sec6" class="card"><h3 class="section-title">6. 风控/业务</h3><div class="form-grid-3">
+        <div class="form-item"><label>風控類型</label><input /></div><div class="form-item"><label>風險等級</label><select><option>低</option><option>中</option><option>高</option></select></div><div class="form-item"><label>風險評估報告</label><input type="file" multiple /></div>
+        <div class="form-item"><label>審核類型</label><input /></div><div class="form-item"><label>上單來源</label><input /></div><div class="form-item"><label>服務類型</label><input /></div>
+        <div class="form-item"><label>合作夥伴推薦人</label><input /></div><div class="form-item"><label>合作夥伴編號</label><input /></div><div class="form-item"><label>交單備註</label><textarea></textarea></div>
+        <div class="form-item"><label>是否高額商戶</label><select><option>是</option><option>否</option></select></div>
+      </div></section>
+
+      <section id="sec7" class="card"><h3 class="section-title">7. 企业联系</h3><div class="form-grid-3">
+        <div class="form-item"><label>公司電話</label><input /></div><div class="form-item"><label>手提電話</label><input /></div><div class="form-item"><label class="req">電郵地址</label><input type="email" required /></div>
+        <div class="form-item"><label>管理員電郵</label><input type="email" /></div><div class="form-item"><label>運營電郵</label><input type="email" /></div><div class="form-item"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div>
+        <div class="form-item"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div><div class="form-item"><label>微信ID</label><input /></div>
+      </div></section>
+
+      <section id="sec8" class="card"><h3 class="section-title">8. 企业证件</h3><div class="form-grid-3">
+        <div class="form-item"><label>商業登記證號碼</label><input /></div><div class="form-item"><label>商業登記證名稱</label><input /></div><div class="form-item"><label>證書有效期</label><input type="date" /></div>
+        <div class="form-item"><label>商業登記證副本照片</label><input type="file" accept="image/*" /></div><div class="form-item"><label>商業登記冊內的資料的電子摘錄 (獨資經營者/合夥人適用)</label><input type="file" multiple /></div><div class="form-item"><label>公司註冊証號碼(非必須)</label><input /></div>
+        <div class="form-item"><label>公司登記証名稱(非必須)</label><input /></div><div class="form-item"><label>周年申報表有效期(非必須)</label><input type="date" /></div><div class="form-item"><label>公司註冊證明書(非必須)</label><input type="file" multiple /></div>
+      </div></section>
+
+      <section id="sec9" class="card"><h3 class="section-title">9. 企业文件</h3><div class="form-grid-3">
+        <div class="form-item"><label>商戶（企业）篩查報告</label><input type="file" multiple /></div><div class="form-item"><label>周年申報表/法團成立表(非必須)</label><input type="file" multiple /></div><div class="form-item"><label>公司章程大綱包括章程細則（如適用）(非必須)</label><input type="file" multiple /></div>
+        <div class="form-item"><label>財務報表文件</label><input type="file" multiple /></div><div class="form-item"><label>企業架構文件</label><input type="file" multiple /></div><div class="form-item"><label>慈善機構資料</label><input type="file" multiple /></div>
+        <div class="form-item"><label>教育資料</label><input type="file" multiple /></div><div class="form-item"><label>社團/協會資料</label><input type="file" multiple /></div><div class="form-item"><label>業主立案法團資料</label><input type="file" multiple /></div>
+        <div class="form-item"><label>NP其他文檔</label><input type="file" multiple /></div><div class="form-item"><label>入貨單</label><input type="file" multiple /></div><div class="form-item"><label>閉路電視錄影</label><input type="file" multiple /></div>
+        <div class="form-item"><label>最高交易金額的客戶單據</label><input type="file" multiple /></div><div class="form-item"><label>JDM Result File</label><input type="file" multiple /></div><div class="form-item"><label>CSRSII文件</label><input type="file" multiple /></div>
+        <div class="form-item"><label>其它文件</label><input type="file" multiple /></div>
+      </div></section>
+
+      <section id="sec10" class="card"><h3 class="section-title">10. 线上资料</h3><div class="form-grid-3">
+        <div class="form-item"><label>Website(Desktop)</label><input /></div><div class="form-item"><label>Website(Mobile)</label><input /></div><div class="form-item"><label>APP(Andrioid)</label><input /></div>
+        <div class="form-item"><label>APP(IOS)</label><input /></div><div class="form-item"><label>Facebook</label><input /></div><div class="form-item"><label>Instagram</label><input /></div>
+        <div class="form-item"><label>Openrice</label><input /></div><div class="form-item"><label>H5經營網址</label><input /></div><div class="form-item"><label>H5支付域名</label><input /></div>
+      </div></section>
+
+      <section id="sec11" class="card"><h3 class="section-title">11. 相关人员</h3>
+        <div class="btns" style="justify-content:flex-start;margin:0 0 10px;"><button type="button" class="btn" id="addPerson">新增人员</button></div>
+        <div class="table-wrap table-small"><table style="min-width:980px;"><thead><tr><th>人员名称</th><th>角色类型</th><th>是否主联系人</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="personBody"></tbody></table></div>
+        <div id="personError" class="error"></div>
+      </section>
+
+      <section id="sec12" class="card"><h3 class="section-title">12. 其他</h3><div class="form-grid-3">
+        <div class="form-item"><label>企业logo</label><input type="file" accept="image/*" /></div><div class="form-item"><label>私隱政策</label><input type="file" /></div>
+      </div></section>
+    </form>
+  </main>
+</div>
+
+<div class="bottom-bar"><button class="btn" type="button">保存草稿</button><button class="btn primary" type="button" id="submitBtn">提交审核</button><a class="btn" href="enterprise-list.html">取消</a></div>
+
+<div class="modal-mask" id="groupModal"><div class="modal-box"><h3 style="margin-top:0;">选择关联群组</h3><input id="groupSearch" placeholder="搜索群组" /><div id="groupList" style="margin:12px 0;display:grid;gap:8px;"></div><div class="btns"><button class="btn" id="groupCancel">取消</button><button class="btn primary" id="groupOk">确定</button></div></div></div>
+<div class="modal-mask" id="channelModal"><div class="modal-box"><h3 style="margin-top:0;">选择第三方通道 / 服务</h3><div id="channelList" style="margin:12px 0;display:grid;gap:8px;"></div><div class="btns"><button class="btn" id="channelCancel">取消</button><button class="btn primary" id="channelOk">确定</button></div></div></div>
+
+<script>
+  document.querySelectorAll('.nav-btn').forEach(btn=>btn.onclick=()=>document.getElementById(btn.dataset.target).scrollIntoView({behavior:'smooth',block:'start'}));
+  const groupData=['高风险行业','跨境电商','教育','NGO','国际品牌'];
+  const groupModal=document.getElementById('groupModal'), groupList=document.getElementById('groupList'), groupTags=document.getElementById('groupTags');
+  let groupSelected=['高风险行业','跨境电商'];
+  function renderGroups(filter=''){groupList.innerHTML='';groupData.filter(g=>g.includes(filter)).forEach(g=>{const l=document.createElement('label');l.innerHTML=`<input type="checkbox" ${groupSelected.includes(g)?'checked':''} value="${g}"> ${g}`;groupList.appendChild(l);});}
+  function renderGroupTags(){groupTags.innerHTML=groupSelected.map(g=>`<span class='badge processing'>${g}</span>`).join('');}
+  document.getElementById('openGroup').onclick=()=>{groupModal.classList.add('show');renderGroups();};
+  document.getElementById('groupSearch').oninput=e=>renderGroups(e.target.value);
+  document.getElementById('groupCancel').onclick=()=>groupModal.classList.remove('show');
+  document.getElementById('groupOk').onclick=()=>{groupSelected=[...groupList.querySelectorAll('input:checked')].map(i=>i.value);renderGroupTags();groupModal.classList.remove('show');}; renderGroupTags();
+
+  const chData=['Adyen_AFP','Adyen_payfac','Stripe_payfac','Worldpay_gateway'];
+  const channelModal=document.getElementById('channelModal'), channelList=document.getElementById('channelList'), channelTags=document.getElementById('channelTags');
+  let channelSelected=['Adyen_AFP'];
+  function renderCh(){channelList.innerHTML='';chData.forEach(c=>{const l=document.createElement('label');l.innerHTML=`<input type="checkbox" ${channelSelected.includes(c)?'checked':''} value="${c}"> ${c}`;channelList.appendChild(l);});channelTags.innerHTML=channelSelected.map(c=>`<span class='badge processing'>${c}</span>`).join('');}
+  document.getElementById('openChannel').onclick=()=>{channelModal.classList.add('show');renderCh();};
+  document.getElementById('channelCancel').onclick=()=>channelModal.classList.remove('show');
+  document.getElementById('channelOk').onclick=()=>{channelSelected=[...channelList.querySelectorAll('input:checked')].map(i=>i.value);renderCh();channelModal.classList.remove('show');}; renderCh();
+
+  const personBody=document.getElementById('personBody');
+  function addPersonRow(){const tr=document.createElement('tr');tr.innerHTML=`<td><input placeholder='人员名称' required></td><td><input placeholder='角色类型' required></td><td><select><option>是</option><option>否</option></select></td><td><input placeholder='电话' required></td><td><input type='email' placeholder='邮箱' required></td><td><button type='button' class='btn del'>删除</button></td>`;tr.querySelector('.del').onclick=()=>tr.remove();personBody.appendChild(tr);} 
+  document.getElementById('addPerson').onclick=addPersonRow; addPersonRow();
+
+  function validate(){
+    const form=document.getElementById('enterpriseForm');
+    const personError=document.getElementById('personError');
+    if(!form.reportValidity()) return false;
+    if(personBody.querySelectorAll('tr').length<1){personError.textContent='相关人员至少1条';return false;} else personError.textContent='';
+    const emails=[...form.querySelectorAll('input[type=email]')].map(i=>i.value).filter(Boolean);
+    const ok=emails.every(e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    if(!ok){alert('邮箱格式不正确');return false;}
+    return true;
+  }
+  document.getElementById('submitBtn').onclick=()=>{if(validate()) alert('提交审核成功（示例）');};
+</script>
+</body>
+</html>
