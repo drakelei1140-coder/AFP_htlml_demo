@@ -24,6 +24,18 @@
     .file-chip, .image-chip { border: 1px solid var(--border); background: var(--panel-2); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; width: 100%; }
     .image-thumb { width: 64px; height: 64px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
     .file-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; width: 100%; }
+    .bank-card-list { display: grid; gap: 8px; width: 100%; }
+    .bank-mini-card { text-align: left; border: 1px solid var(--border); background: var(--panel-2); border-radius: 8px; padding: 10px; cursor: pointer; display: grid; gap: 4px; }
+    .bank-mini-card:hover { border-color: var(--primary); }
+    .bank-modal-mask { position: fixed; inset: 0; background: rgba(20, 14, 8, 0.38); display: none; place-items: center; z-index: 1300; }
+    .bank-modal-mask.show { display: grid; }
+    .bank-modal { width: min(760px, 96vw); background: var(--panel); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 16px 30px rgba(0,0,0,.18); }
+    .bank-modal-hd, .bank-modal-ft { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .bank-modal-ft { border-top: 1px solid var(--border); border-bottom: 0; display: flex; justify-content: flex-end; }
+    .bank-modal-bd { padding: 12px 16px; max-height: 60vh; overflow: auto; }
+    .bank-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+    .bank-modal-grid .k { color: var(--muted); font-size: 12px; }
+    .bank-modal-grid .v { font-size: 14px; }
     .toolbar-line { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
     .search-input { width: 280px; border: 1px solid var(--border); border-radius: 6px; height: 34px; padding: 0 10px; background: var(--panel); }
     .pager { margin-top: 10px; display: flex; justify-content: flex-end; color: var(--muted); font-size: 12px; }
@@ -34,13 +46,17 @@
 <body>
 <header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
 <div class="layout">
-  <aside class="sidebar"><div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li></ul></div></aside>
+  <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
   <main class="main">
     <section class="card enterprise-header">
       <div class="title-wrap"><h2>星河零售有限公司</h2><div class="meta-grid">
         <div><span class="k">CID:</span><span>CID-2026-0001</span></div>
-        <div><span class="k">商戶營業狀態(企業口徑):</span><span class="badge success">營業中</span></div>
-        <div><span class="k">商戶類型:</span><span>企業商戶</span></div>
+        <div><span class="k">企业营业状态:</span><span class="badge success">營業中</span></div>
+        <div><span class="k">企业类型:</span><span>企業商戶</span></div>
         <div><span class="k">地区 / 国家:</span><span>香港 / 中国</span></div>
         <div><span class="k">创建时间:</span><span>2026-04-01 10:22</span></div>
         <div><span class="k">更新时间:</span><span>2026-04-17 15:48</span></div>
@@ -64,9 +80,9 @@
     <section id="main-data" class="card section-block"><h3 class="section-title">1. 主要数据</h3><div class="detail-grid">
       <div class="detail-item"><div class="label">CID</div><div class="value">CID-2026-0001</div></div>
       <div class="detail-item"><div class="label">上級公司ID</div><div class="value">CID-2023-0888</div></div>
-      <div class="detail-item"><div class="label">商戶營業狀態(企業口徑)</div><div class="value"><span class="badge success">營業中</span></div></div>
-      <div class="detail-item"><div class="label">商戶類型</div><div class="value">企業商戶</div></div>
-      <div class="detail-item"><div class="label">关联银行账号</div><div class="value">-</div></div>
+      <div class="detail-item"><div class="label">企业营业状态</div><div class="value"><span class="badge success">營業中</span></div></div>
+      <div class="detail-item"><div class="label">企业类型</div><div class="value">企業商戶</div></div>
+      <div class="detail-item"><div class="label">关联银行账号</div><div class="value"><div class="bank-card-list"><button class="bank-mini-card open-bank-modal" type="button" data-account="0"><div><strong>SID-1001 / MID-9001</strong></div><div>收款銀行賬戶名稱：Nova Retail Holdings</div><div>銀行名稱：HSBC Hong Kong</div></button><button class="bank-mini-card open-bank-modal" type="button" data-account="1"><div><strong>SID-1005 / MID-9005</strong></div><div>收款銀行賬戶名稱：Nova Retail Settlement</div><div>銀行名稱：Bank of China (HK)</div></button></div></div></div>
       <div class="detail-item"><div class="label">开通Kpay服务</div><div class="value">是</div></div>
       <div class="detail-item"><div class="label">关联群组</div><div class="value"><span class="badge processing">高风险行业</span><span class="badge processing">跨境电商</span></div></div>
       <div class="detail-item"><div class="label">企业启用状态</div><div class="value"><span class="badge danger">停用</span></div></div>
@@ -126,6 +142,7 @@
     <section id="timeline" class="card section-block"><h3 class="section-title">修改记录时间轴区</h3><div class="timeline"><div class="item"><strong>2026-04-17 15:48</strong> - 风控审核更新结论。</div><div class="item"><strong>2026-04-10 11:20</strong> - 上传补充资料。</div><div class="item"><strong>2026-04-01 10:22</strong> - 企业创建提交。</div></div></section>
   </main>
 </div>
+<div class="bank-modal-mask" id="bankAccountModal"><div class="bank-modal"><div class="bank-modal-hd"><strong>银行账号详情（来自下属商铺关联 MID）</strong></div><div class="bank-modal-bd"><div class="bank-modal-grid" id="bankAccountGrid"></div></div><div class="bank-modal-ft"><button class="btn" type="button" id="closeBankModalBtn">关闭</button></div></div></div>
 <script>
   const shellTopHeight = 72;
   const stickyGap = 8;
@@ -154,6 +171,18 @@
     });
   }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
   sections.forEach(sec => observer.observe(sec));
+
+  const bankAccounts = [{"結算週期":"T+1","結算幣種":"HKD","歸屬國編號":"852","歸屬省編號":"HK","是否對公":"是","收款銀行賬戶名稱":"Nova Retail Holdings","銀行名稱":"HSBC Hong Kong","銀行號碼":"004","銀行編號":"128-445566-001","分行號":"789","卡類型":"對公賬戶","結算身份證號":"-"},{"結算週期":"T+2","結算幣種":"HKD","歸屬國編號":"852","歸屬省編號":"HK","是否對公":"是","收款銀行賬戶名稱":"Nova Retail Settlement","銀行名稱":"Bank of China (HK)","銀行號碼":"012","銀行編號":"992-334455-002","分行號":"112","卡類型":"對公賬戶","結算身份證號":"-"}];
+  const bankModal = document.getElementById('bankAccountModal');
+  const bankGrid = document.getElementById('bankAccountGrid');
+  function openBankModal(idx) {
+    const account = bankAccounts[idx] || bankAccounts[0];
+    bankGrid.innerHTML = Object.entries(account).map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+    bankModal.classList.add('show');
+  }
+  document.querySelectorAll('.open-bank-modal').forEach(btn => btn.addEventListener('click', () => openBankModal(Number(btn.dataset.account || 0))));
+  document.getElementById('closeBankModalBtn').addEventListener('click', () => bankModal.classList.remove('show'));
+  bankModal.addEventListener('click', (e) => { if (e.target === bankModal) bankModal.classList.remove('show'); });
 </script>
 </body>
 </html>
