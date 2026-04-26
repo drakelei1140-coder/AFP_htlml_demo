@@ -10,8 +10,8 @@
     .create-header { position: sticky; top: 72px; z-index: 930; display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
     .create-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .create-title { margin: 0 0 8px; font-size: 24px; }
-    .section-nav { position: sticky; top: 162px; z-index: 920; display: flex; flex-wrap: wrap; gap: 8px; }
-    .section-block { scroll-margin-top: 230px; }
+    .section-nav { position: sticky; top: var(--detail-nav-top, 200px); z-index: 920; display: flex; flex-wrap: wrap; gap: 8px; }
+    .section-block { scroll-margin-top: var(--detail-scroll-offset, 300px); }
     .inline-addr { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
     .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
     .tag-row { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -33,7 +33,11 @@
 <body>
 <header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
 <div class="layout">
-  <aside class="sidebar"><div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li></ul></div></aside>
+  <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
 
   <main class="main with-bottom-space">
     <section class="card create-header">
@@ -57,18 +61,15 @@
       <section id="main-data" class="card section-block"><h3 class="section-title">1. 主要数据</h3><div class="form-grid">
         <div class="field"><label>CID</label><div class="readonly-box">系统生成</div></div>
         <div class="field"><label>上級公司ID</label><input /></div>
-        <div class="field"><label class="required">商戶營業狀態(企業口徑)</label><select required><option value="">请选择</option><option>營業中</option><option>暫停營業</option></select></div>
-        <div class="field"><label class="required">商戶類型</label><input required /></div>
-        <div class="field"><label>关联银行账号</label><input /></div>
-        <div class="field"><label class="required">开通Kpay服务</label><select required><option value="">请选择</option><option>是</option><option>否</option></select></div>
+        <div class="field"><label class="required">企业营业状态</label><select required><option value="">请选择</option><option>營業中</option><option>暫停營業</option></select></div>
+        <div class="field"><label class="required">企业类型</label><input required /></div>
+                <div class="field"><label class="required">开通Kpay服务</label><select required><option value="">请选择</option><option>是</option><option>否</option></select></div>
         <div class="field">
           <label class="required">关联群组</label>
           <button class="btn" type="button" id="openGroupModal">弹窗选择群组</button>
           <div class="tag-row" id="groupTags"></div>
         </div>
-        <div class="field"><label>企业启用状态</label><select><option>启用</option><option>停用</option></select></div>
-        <div class="field"><label class="required">企业审核状态</label><select required><option value="">请选择</option><option>待审核</option><option>审核中</option></select></div>
-      </div></section>
+                      </div></section>
 
       <section id="name" class="card section-block"><h3 class="section-title">2. 企业名称</h3><div class="form-grid">
         <div class="field"><label class="required">企业当地语言名稱</label><input required /></div><div class="field"><label>企业当地语言簡稱</label><input /></div><div class="field"><label class="required">企业英文名稱</label><input required /></div><div class="field"><label>企业英文簡稱</label><input /></div><div class="field"><label>企业第三语言名稱</label><input /></div><div class="field"><label>企业第三语言簡稱</label><input /></div><div class="field"><label>企业其它名稱</label><input /></div><div class="field"><label>企业所有名稱（当地语言）</label><textarea></textarea></div><div class="field"><label>企业所有名稱（英文）</label><textarea></textarea></div><div class="field"><label>切換企業顯示名稱（中文）</label><input /></div><div class="field"><label>切換企業顯示名稱（英文）</label><input /></div>
@@ -143,6 +144,19 @@
 <div class="modal-mask" id="groupModal"><div class="modal-card"><div class="modal-hd"><strong>选择关联群组</strong></div><div class="modal-bd"><div class="inline-2"><input id="groupKeyword" placeholder="搜索群组" /><div class="hint">支持多选返回 Tag 展示</div></div><div class="table-wrap"><table><thead><tr><th></th><th>群组名称</th><th>风险标签</th></tr></thead><tbody id="groupBody"></tbody></table></div></div><div class="modal-ft"><button class="btn" id="cancelGroupBtn">取消</button><button class="btn primary" id="confirmGroupBtn">确认</button></div></div></div>
 
 <script>
+  const shellTopHeight = 72;
+  const stickyGap = 8;
+  function syncStickyOffsets() {
+    const headerCard = document.querySelector('.create-header');
+    if (!headerCard) return;
+    const navTop = shellTopHeight + headerCard.offsetHeight + stickyGap;
+    const scrollOffset = navTop + 56;
+    document.documentElement.style.setProperty('--detail-nav-top', `${navTop}px`);
+    document.documentElement.style.setProperty('--detail-scroll-offset', `${scrollOffset}px`);
+  }
+  syncStickyOffsets();
+  window.addEventListener('resize', syncStickyOffsets);
+
   const navBtns = document.querySelectorAll('.nav-tag');
   navBtns.forEach((btn) => btn.addEventListener('click', () => {
     const target = document.getElementById(btn.dataset.target);
