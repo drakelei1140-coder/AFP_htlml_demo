@@ -141,7 +141,7 @@
   <a class="btn" href="enterprise-list.html">取消</a>
 </div>
 
-<div class="modal-mask" id="groupModal"><div class="modal-card"><div class="modal-hd"><strong>选择关联群组</strong></div><div class="modal-bd"><div class="inline-2"><input id="groupKeyword" placeholder="搜索群组" /><div class="hint">支持多选返回 Tag 展示</div></div><div class="table-wrap"><table><thead><tr><th></th><th>群组名称</th><th>风险标签</th></tr></thead><tbody id="groupBody"></tbody></table></div></div><div class="modal-ft"><button class="btn" id="cancelGroupBtn">取消</button><button class="btn primary" id="confirmGroupBtn">确认</button></div></div></div>
+<div class="modal-mask" id="groupModal"><div class="modal-card"><div class="modal-hd"><strong>选择关联群组</strong></div><div class="modal-bd"><div class="inline-2"><input id="groupKeyword" placeholder="搜索群组" /><div class="hint">支持多选返回 Tag 展示</div></div><div class="table-wrap"><table><thead><tr><th></th><th>群组名称</th></tr></thead><tbody id="groupBody"></tbody></table></div></div><div class="modal-ft"><button class="btn" id="cancelGroupBtn">取消</button><button class="btn primary" id="confirmGroupBtn">确认</button></div></div></div>
 
 <script>
   const shellTopHeight = 72;
@@ -180,17 +180,17 @@
   renderServiceTags();
 
   const groupPool = [
-    { id: 'g1', name: '高风险行业', risk: '中风险' },
-    { id: 'g2', name: '跨境电商', risk: '高风险' },
-    { id: 'g3', name: '连锁零售', risk: '低风险' },
-    { id: 'g4', name: '新兴品牌', risk: '中风险' }
+    { id: 'g1', name: '高风险行业' },
+    { id: 'g2', name: '跨境电商' },
+    { id: 'g3', name: '连锁零售' },
+    { id: 'g4', name: '新兴品牌' }
   ];
   const selectedGroupIds = new Set();
   const groupBody = document.getElementById('groupBody');
   const groupTags = document.getElementById('groupTags');
   function renderGroups(keyword = '') {
     const list = groupPool.filter((g) => g.name.includes(keyword.trim()));
-    groupBody.innerHTML = list.map((g) => `<tr><td><input type="checkbox" data-id="${g.id}" ${selectedGroupIds.has(g.id) ? 'checked' : ''}></td><td>${g.name}</td><td>${g.risk}</td></tr>`).join('');
+    groupBody.innerHTML = list.map((g) => `<tr><td><input type="checkbox" data-id="${g.id}" ${selectedGroupIds.has(g.id) ? 'checked' : ''}></td><td>${g.name}</td></tr>`).join('');
     groupBody.querySelectorAll('input[type="checkbox"]').forEach((box) => {
       box.addEventListener('change', (e) => {
         if (e.target.checked) selectedGroupIds.add(e.target.dataset.id);
