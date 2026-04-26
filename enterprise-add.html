@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>新增企业</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .required::before { content: '* '; color: #d4380d; }
+    .create-header { position: sticky; top: 72px; z-index: 930; display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .create-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .create-title { margin: 0 0 8px; font-size: 24px; }
+    .section-nav { position: sticky; top: 162px; z-index: 920; display: flex; flex-wrap: wrap; gap: 8px; }
+    .section-block { scroll-margin-top: 230px; }
+    .inline-addr { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .tag-row { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .table-editor table { min-width: 900px; }
+    .table-editor input, .table-editor select { min-width: 130px; }
+    .upload-box { border: 1px dashed var(--border); border-radius: 8px; padding: 10px; background: var(--panel-2); }
+    .image-preview { margin-top: 8px; width: 84px; height: 84px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); }
+    .readonly-box { min-height: 34px; border: 1px solid var(--border); background: #f7f5f1; border-radius: 6px; display: flex; align-items: center; padding: 0 10px; color: var(--muted); }
+    .modal-mask { position: fixed; inset: 0; background: rgba(20,14,8,.36); display: none; place-items: center; z-index: 1500; }
+    .modal-mask.show { display: grid; }
+    .modal-card { width: min(900px, 96vw); background: var(--panel); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
+    .modal-hd, .modal-ft { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .modal-ft { border-top: 1px solid var(--border); border-bottom: 0; display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-bd { padding: 12px 16px; max-height: 60vh; overflow: auto; }
+    .inline-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .error-box { display: none; margin-bottom: 12px; border: 1px solid #f1b5b2; background: #fff2f0; color: #a8071a; border-radius: 8px; padding: 10px; font-size: 13px; }
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
+<div class="layout">
+  <aside class="sidebar"><div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li></ul></div></aside>
+
+  <main class="main with-bottom-space">
+    <section class="card create-header">
+      <div>
+        <h2 class="create-title">新增企业</h2>
+        <div class="create-meta">
+          <a class="btn" href="enterprise-list.html">返回</a>
+          <span class="badge warning">草稿</span>
+          <span class="desc">CID / 创建时间 / 更新时间将在保存后自动生成</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section-nav sticky-nav">
+      <button class="nav-tag" data-target="main-data">主要数据</button><button class="nav-tag" data-target="name">企业名称</button><button class="nav-tag" data-target="address">企业地址</button><button class="nav-tag" data-target="subject">企业主体/经营</button><button class="nav-tag" data-target="basic">企业基础</button><button class="nav-tag" data-target="risk">风控/业务</button><button class="nav-tag" data-target="contact">企业联系</button><button class="nav-tag" data-target="license">企业证件</button><button class="nav-tag" data-target="files">企业文件</button><button class="nav-tag" data-target="online">线上资料</button><button class="nav-tag" data-target="people">相关人员</button><button class="nav-tag" data-target="other">其他</button>
+    </section>
+
+    <form id="enterpriseForm">
+      <div class="error-box" id="errorBox"></div>
+
+      <section id="main-data" class="card section-block"><h3 class="section-title">1. 主要数据</h3><div class="form-grid">
+        <div class="field"><label>CID</label><div class="readonly-box">系统生成</div></div>
+        <div class="field"><label>上級公司ID</label><input /></div>
+        <div class="field"><label class="required">商戶營業狀態(企業口徑)</label><select required><option value="">请选择</option><option>營業中</option><option>暫停營業</option></select></div>
+        <div class="field"><label class="required">商戶類型</label><input required /></div>
+        <div class="field"><label>关联银行账号</label><input /></div>
+        <div class="field"><label class="required">开通Kpay服务</label><select required><option value="">请选择</option><option>是</option><option>否</option></select></div>
+        <div class="field">
+          <label class="required">关联群组</label>
+          <button class="btn" type="button" id="openGroupModal">弹窗选择群组</button>
+          <div class="tag-row" id="groupTags"></div>
+        </div>
+        <div class="field"><label>企业启用状态</label><select><option>启用</option><option>停用</option></select></div>
+        <div class="field"><label class="required">企业审核状态</label><select required><option value="">请选择</option><option>待审核</option><option>审核中</option></select></div>
+      </div></section>
+
+      <section id="name" class="card section-block"><h3 class="section-title">2. 企业名称</h3><div class="form-grid">
+        <div class="field"><label class="required">企业当地语言名稱</label><input required /></div><div class="field"><label>企业当地语言簡稱</label><input /></div><div class="field"><label class="required">企业英文名稱</label><input required /></div><div class="field"><label>企业英文簡稱</label><input /></div><div class="field"><label>企业第三语言名稱</label><input /></div><div class="field"><label>企业第三语言簡稱</label><input /></div><div class="field"><label>企业其它名稱</label><input /></div><div class="field"><label>企业所有名稱（当地语言）</label><textarea></textarea></div><div class="field"><label>企业所有名稱（英文）</label><textarea></textarea></div><div class="field"><label>切換企業顯示名稱（中文）</label><input /></div><div class="field"><label>切換企業顯示名稱（英文）</label><input /></div>
+      </div></section>
+
+      <section id="address" class="card section-block"><h3 class="section-title">3. 企业地址</h3><div class="form-grid">
+        <div class="field"><label class="required">企业注册国家</label><input required /></div>
+        <div class="field"><label>企业注册地址-城市</label><input /></div>
+        <div class="field"><label>企业注册地址-邮编</label><input class="number-field" /></div>
+        <div class="field"><label>企业注册地址-州/省</label><input /></div>
+        <div class="field"><label>企业注册地址-街道</label><input /></div>
+        <div class="field"><label>企业注册地址-补充地址</label><input /></div>
+        <div class="field"><label>註冊辦事處地址(当地语言)</label><textarea></textarea></div>
+        <div class="field"><label>註冊辦事處地址(英文)</label><textarea></textarea></div>
+        <div class="field"><label>郵寄地址</label><textarea></textarea></div>
+      </div>
+      <div class="upload-box" style="margin-top:10px;">
+        <div class="desc" style="margin-bottom:8px;">地址拆分输入（用于结构化地址校验）</div>
+        <div class="inline-addr">
+          <input placeholder="国家" />
+          <input placeholder="省/州" />
+          <input placeholder="城市" />
+          <input placeholder="地址行1" />
+          <input placeholder="地址行2" />
+          <input placeholder="地址行3" />
+          <input class="number-field" placeholder="邮编" />
+        </div>
+      </div>
+      </section>
+
+      <section id="subject" class="card section-block"><h3 class="section-title">4. 企业主体/经营</h3><div class="form-grid">
+        <div class="field"><label>公司模式</label><input /></div><div class="field"><label>是否子公司</label><select><option>是</option><option>否</option></select></div><div class="field"><label>公司結構</label><input /></div><div class="field"><label>行業分類</label><input /></div><div class="field"><label>/業務性質</label><input /></div><div class="field"><label>//產品服務</label><input /></div><div class="field"><label>法律地位</label><input /></div><div class="field"><label>企业治理法律所在国</label><input /></div><div class="field"><label>企业税务申报分类</label><input /></div><div class="field"><label>企业税务业务类型</label><input /></div><div class="field"><label>公司層級</label><input /></div><div class="field"><label>僱員人數</label><input class="number-field" /></div><div class="field"><label>注冊資本</label><input /></div>
+      </div></section>
+
+      <section id="basic" class="card section-block"><h3 class="section-title">5. 企业基础</h3><div class="form-grid">
+        <div class="field"><label>預計年銷售額</label><input class="number-field" /></div><div class="field"><label>每宗交易平均金額</label><input class="number-field" /></div><div class="field"><label>每宗交易最大交易額</label><input class="number-field" /></div><div class="field"><label>預計每年交易宗數</label><input class="number-field" /></div><div class="field"><label>過往拒付比例</label><input class="number-field" placeholder="如 0.8" /></div><div class="field"><label>拒付平均處理日數</label><input class="number-field" /></div><div class="field"><label>過往退款比例</label><input class="number-field" placeholder="如 1.4" /></div><div class="field"><label>退款平均處理日數</label><input class="number-field" /></div><div class="field"><label>平均每月營業額</label><input class="number-field" /></div><div class="field"><label>經營方式</label><input /></div><div class="field"><label>提前收款日數</label><input class="number-field" /></div><div class="field"><label>貨物/服務最短送達時間</label><input /></div><div class="field"><label>貨物/服務最長送達時間</label><input /></div><div class="field"><label>退貨政策</label><textarea></textarea></div><div class="field"><label>退貨政策截圖</label><div class="upload-box"><input type="file" accept="image/*" /><img class="image-preview" src="logo.jpg" alt="退貨政策截圖预览" /></div></div><div class="field"><label>財務報表審計</label><input /></div><div class="field"><label>經營年限</label><input class="number-field" /></div><div class="field"><label>T1特選商戶</label><select><option>是</option><option>否</option></select></div><div class="field"><label>歸屬國編號</label><input /></div><div class="field"><label>歸屬省編號</label><input /></div><div class="field"><label>合約期</label><input /></div><div class="field"><label>是否NGO</label><select><option>是</option><option>否</option></select></div><div class="field"><label>重複簽約原因</label><input /></div><div class="field"><label>官网 / App Store URL</label><input type="url" /></div>
+        <div class="field"><label>第三方通道品牌名（渠道） /服务</label>
+          <select id="serviceSelect" multiple style="min-height:110px;">
+            <option>Adyen_AFP</option><option>Adyen_payfac</option><option>Nuvei_Direct</option><option>CyberSource_Card</option>
+          </select>
+          <div class="tag-row" id="serviceTags"></div>
+        </div>
+        <div class="field"><label>企业税务国家</label><input /></div><div class="field"><label>企业税号</label><input /></div><div class="field"><label>企业税号类型</label><input /></div><div class="field"><label>VAT号</label><input /></div><div class="field"><label>无VAT原因</label><input /></div><div class="field"><label>税务申报分类</label><input /></div><div class="field"><label>税务业务类型</label><input /></div><div class="field"><label>MCC Code</label><input class="number-field" /></div><div class="field"><label>成立日期</label><input type="date" /></div>
+      </div></section>
+
+      <section id="risk" class="card section-block"><h3 class="section-title">6. 风控/业务</h3><div class="form-grid"><div class="field"><label>風控類型</label><input /></div><div class="field"><label>風險等級</label><select><option>低風險</option><option>中風險</option><option>高風險</option></select></div><div class="field"><label>風險評估報告</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>審核類型</label><input /></div><div class="field"><label>上單來源</label><input /></div><div class="field"><label>服務類型</label><input /></div><div class="field"><label>合作夥伴推薦人</label><input /></div><div class="field"><label>合作夥伴編號</label><input /></div><div class="field"><label>交單備註</label><textarea></textarea></div><div class="field"><label>是否高額商戶</label><select><option>是</option><option>否</option></select></div></div></section>
+
+      <section id="contact" class="card section-block"><h3 class="section-title">7. 企业联系</h3><div class="form-grid"><div class="field"><label>公司電話</label><input /></div><div class="field"><label>手提電話</label><input /></div><div class="field"><label class="required">電郵地址</label><input type="email" required class="email-field" /></div><div class="field"><label>管理員電郵</label><input type="email" class="email-field" /></div><div class="field"><label>運營電郵</label><input type="email" class="email-field" /></div><div class="field"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div><div class="field"><label>接收營銷資訊</label><select><option>是</option><option>否</option></select></div><div class="field"><label>微信ID</label><input /></div></div></section>
+
+      <section id="license" class="card section-block"><h3 class="section-title">8. 企业证件</h3><div class="form-grid"><div class="field"><label>商業登記證號碼</label><input /></div><div class="field"><label>商業登記證名稱</label><input /></div><div class="field"><label>證書有效期</label><input type="date" /></div><div class="field"><label>商業登記證副本照片</label><div class="upload-box"><input type="file" accept="image/*" /><img class="image-preview" src="logo.jpg" alt="商業登記證副本照片预览" /></div></div><div class="field"><label>商業登記冊內的資料的電子摘錄 (獨資經營者/合夥人適用)</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>公司註冊証號碼(非必須)</label><input /></div><div class="field"><label>公司登記証名稱(非必須)</label><input /></div><div class="field"><label>周年申報表有效期(非必須)</label><input type="date" /></div><div class="field"><label>公司註冊證明書(非必須)</label><div class="upload-box"><input type="file" multiple /></div></div></div></section>
+
+      <section id="files" class="card section-block"><h3 class="section-title">9. 企业文件</h3><div class="form-grid"><div class="field"><label>商戶（企业）篩查報告</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>周年申報表/法團成立表(非必須)</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>公司章程大綱包括章程細則（如適用）(非必須)</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>財務報表文件</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>企業架構文件</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>慈善機構資料</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>教育資料</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>社團/協會資料</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>業主立案法團資料</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>NP其他文檔</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>入貨單</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>閉路電視錄影</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>最高交易金額的客戶單據</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>JDM Result File</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>CSRSII文件</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>其它文件</label><div class="upload-box"><input type="file" multiple /></div></div></div></section>
+
+      <section id="online" class="card section-block"><h3 class="section-title">10. 线上资料</h3><div class="form-grid"><div class="field"><label>Website(Desktop)</label><input type="url" /></div><div class="field"><label>Website(Mobile)</label><input type="url" /></div><div class="field"><label>APP(Andrioid)</label><input type="url" /></div><div class="field"><label>APP(IOS)</label><input type="url" /></div><div class="field"><label>Facebook</label><input type="url" /></div><div class="field"><label>Instagram</label><input type="url" /></div><div class="field"><label>Openrice</label><input type="url" /></div><div class="field"><label>H5經營網址</label><input type="url" /></div><div class="field"><label>H5支付域名</label><input /></div></div></section>
+
+      <section id="people" class="card section-block"><h3 class="section-title">11. 相关人员</h3>
+        <div class="btns" style="justify-content:flex-start;margin:0 0 10px;"><button class="btn" type="button" id="addPersonBtn">添加人员</button></div>
+        <div class="table-wrap table-editor"><table><thead><tr><th>人员名称</th><th>角色类型</th><th>是否主联系人</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div>
+      </section>
+
+      <section id="other" class="card section-block"><h3 class="section-title">12. 其他</h3><div class="form-grid"><div class="field"><label>企业logo</label><div class="upload-box"><input type="file" accept="image/*" id="logoUpload" /><img id="logoPreview" class="image-preview" src="logo.jpg" alt="企业logo预览" /></div></div><div class="field"><label>私隱政策</label><div class="upload-box"><input type="file" multiple /></div></div><div class="field"><label>创建时间</label><div class="readonly-box">系统生成</div></div><div class="field"><label>更新时间</label><div class="readonly-box">系统生成</div></div></div></section>
+    </form>
+  </main>
+</div>
+
+<div class="bottom-actions">
+  <button class="btn" id="saveDraftBtn">保存草稿</button>
+  <button class="btn primary" id="submitBtn">提交审核</button>
+  <a class="btn" href="enterprise-list.html">取消</a>
+</div>
+
+<div class="modal-mask" id="groupModal"><div class="modal-card"><div class="modal-hd"><strong>选择关联群组</strong></div><div class="modal-bd"><div class="inline-2"><input id="groupKeyword" placeholder="搜索群组" /><div class="hint">支持多选返回 Tag 展示</div></div><div class="table-wrap"><table><thead><tr><th></th><th>群组名称</th><th>风险标签</th></tr></thead><tbody id="groupBody"></tbody></table></div></div><div class="modal-ft"><button class="btn" id="cancelGroupBtn">取消</button><button class="btn primary" id="confirmGroupBtn">确认</button></div></div></div>
+
+<script>
+  const navBtns = document.querySelectorAll('.nav-tag');
+  navBtns.forEach((btn) => btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        navBtns.forEach((btn) => btn.classList.toggle('active', btn.dataset.target === entry.target.id));
+      }
+    });
+  }, { rootMargin: '-35% 0px -58% 0px' });
+  document.querySelectorAll('.section-block').forEach((sec) => observer.observe(sec));
+
+  const services = document.getElementById('serviceSelect');
+  const serviceTags = document.getElementById('serviceTags');
+  function renderServiceTags() {
+    serviceTags.innerHTML = [...services.selectedOptions].map((o) => `<span class="ant-tag">${o.value}</span>`).join('') || '<span class="desc">未选择服务</span>';
+  }
+  services.addEventListener('change', renderServiceTags);
+  renderServiceTags();
+
+  const groupPool = [
+    { id: 'g1', name: '高风险行业', risk: '中风险' },
+    { id: 'g2', name: '跨境电商', risk: '高风险' },
+    { id: 'g3', name: '连锁零售', risk: '低风险' },
+    { id: 'g4', name: '新兴品牌', risk: '中风险' }
+  ];
+  const selectedGroupIds = new Set();
+  const groupBody = document.getElementById('groupBody');
+  const groupTags = document.getElementById('groupTags');
+  function renderGroups(keyword = '') {
+    const list = groupPool.filter((g) => g.name.includes(keyword.trim()));
+    groupBody.innerHTML = list.map((g) => `<tr><td><input type="checkbox" data-id="${g.id}" ${selectedGroupIds.has(g.id) ? 'checked' : ''}></td><td>${g.name}</td><td>${g.risk}</td></tr>`).join('');
+    groupBody.querySelectorAll('input[type="checkbox"]').forEach((box) => {
+      box.addEventListener('change', (e) => {
+        if (e.target.checked) selectedGroupIds.add(e.target.dataset.id);
+        else selectedGroupIds.delete(e.target.dataset.id);
+      });
+    });
+  }
+  function renderGroupTags() {
+    const selected = groupPool.filter((g) => selectedGroupIds.has(g.id));
+    groupTags.innerHTML = selected.map((g) => `<span class="ant-tag">${g.name}</span>`).join('') || '<span class="desc">未关联群组</span>';
+  }
+  renderGroups(); renderGroupTags();
+
+  const groupModal = document.getElementById('groupModal');
+  document.getElementById('openGroupModal').addEventListener('click', () => groupModal.classList.add('show'));
+  document.getElementById('cancelGroupBtn').addEventListener('click', () => groupModal.classList.remove('show'));
+  document.getElementById('confirmGroupBtn').addEventListener('click', () => { renderGroupTags(); groupModal.classList.remove('show'); });
+  document.getElementById('groupKeyword').addEventListener('input', (e) => renderGroups(e.target.value));
+
+  const peopleBody = document.getElementById('peopleBody');
+  function addPersonRow(data = {}) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input value="${data.name || ''}" placeholder="人员名称" required></td><td><input value="${data.role || ''}" placeholder="角色类型" required></td><td><select><option ${data.main === '是' ? 'selected' : ''}>是</option><option ${data.main !== '是' ? 'selected' : ''}>否</option></select></td><td><input value="${data.phone || ''}" placeholder="电话" required></td><td><input type="email" class="person-email" value="${data.email || ''}" placeholder="邮箱" required></td><td><button class="btn" type="button">删除</button></td>`;
+    tr.querySelector('button').addEventListener('click', () => tr.remove());
+    peopleBody.appendChild(tr);
+  }
+  document.getElementById('addPersonBtn').addEventListener('click', () => addPersonRow());
+  addPersonRow({ name: '示例联系人', role: '董事', main: '是', phone: '+852-6000-0000', email: 'contact@example.com' });
+
+  const logoUpload = document.getElementById('logoUpload');
+  const logoPreview = document.getElementById('logoPreview');
+  logoUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) logoPreview.src = URL.createObjectURL(file);
+  });
+
+  function validateForm() {
+    const errors = [];
+    const form = document.getElementById('enterpriseForm');
+    form.querySelectorAll('[required]').forEach((el) => {
+      if (!el.value.trim()) errors.push(`必填字段未填写：${el.closest('.field')?.querySelector('label')?.innerText || '未命名字段'}`);
+    });
+    form.querySelectorAll('.email-field, .person-email').forEach((el) => {
+      if (el.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value)) errors.push(`邮箱格式错误：${el.value}`);
+    });
+    form.querySelectorAll('.number-field').forEach((el) => {
+      if (el.value && Number.isNaN(Number(el.value.replace(/,/g, '')))) errors.push(`数值字段格式错误：${el.previousElementSibling?.innerText || el.placeholder || '数字字段'}`);
+    });
+    if (!peopleBody.querySelector('tr')) errors.push('相关人员至少需要 1 条数据');
+    return errors;
+  }
+
+  function submitForm(action) {
+    const errorBox = document.getElementById('errorBox');
+    if (action === 'submit') {
+      const errors = validateForm();
+      if (errors.length) {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>提交失败，请先修正以下问题：</strong><ul>${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    }
+    errorBox.style.display = 'none';
+    alert(action === 'submit' ? '已提交审核（示意）' : '草稿已保存（示意）');
+  }
+
+  document.getElementById('saveDraftBtn').addEventListener('click', () => submitForm('draft'));
+  document.getElementById('submitBtn').addEventListener('click', () => submitForm('submit'));
+</script>
+</body>
+</html>
