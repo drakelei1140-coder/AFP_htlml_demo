@@ -10,7 +10,7 @@
     .title-wrap h2 { margin: 0 0 10px; font-size: 24px; }
     .meta-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px 16px; font-size: 13px; }
     .meta-grid .k { color: var(--muted); margin-right: 6px; }
-    .section-nav { position: sticky; top: 248px; z-index: 901; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .section-nav { position: sticky; top: var(--detail-nav-top, 200px); z-index: 901; display: flex; flex-wrap: wrap; gap: 8px; }
     .section-nav .nav-btn { border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
     .section-nav .nav-btn.active { background: var(--primary-soft); color: var(--primary-dark); border-color: color-mix(in srgb, var(--primary) 35%, white); }
     .summary-cards { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
@@ -27,7 +27,7 @@
     .toolbar-line { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
     .search-input { width: 280px; border: 1px solid var(--border); border-radius: 6px; height: 34px; padding: 0 10px; background: var(--panel); }
     .pager { margin-top: 10px; display: flex; justify-content: flex-end; color: var(--muted); font-size: 12px; }
-    .section-block { scroll-margin-top: 320px; }
+    .section-block { scroll-margin-top: var(--detail-scroll-offset, 300px); }
     @media (max-width: 1400px) { .meta-grid,.detail-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
   </style>
 </head>
@@ -126,6 +126,19 @@
   </main>
 </div>
 <script>
+  const shellTopHeight = 72;
+  const stickyGap = 8;
+  function syncStickyOffsets() {
+    const headerCard = document.querySelector('.enterprise-header');
+    if (!headerCard) return;
+    const navTop = shellTopHeight + headerCard.offsetHeight + stickyGap;
+    const scrollOffset = navTop + 56;
+    document.documentElement.style.setProperty('--detail-nav-top', `${navTop}px`);
+    document.documentElement.style.setProperty('--detail-scroll-offset', `${scrollOffset}px`);
+  }
+  syncStickyOffsets();
+  window.addEventListener('resize', syncStickyOffsets);
+
   const navBtns = document.querySelectorAll('.nav-btn');
   const sections = [...navBtns].map(btn => document.getElementById(btn.dataset.target)).filter(Boolean);
   navBtns.forEach(btn => btn.addEventListener('click', () => {
