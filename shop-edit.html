@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>新增商铺</title>
+  <title>编辑商铺</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <style>
     .page-head { position: sticky; top: 72px; z-index: 905; display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
@@ -32,6 +32,8 @@
     .help { color: var(--muted); font-size: 12px; margin-top: 8px; }
     .error { color: #cf1322; font-size: 12px; margin-top: 4px; }
     .ok { color: #237804; font-size: 12px; }
+    .shop-meta { display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:8px 16px; margin-top:8px; font-size:13px; }
+    .shop-meta .k { color: var(--muted); margin-right: 6px; }
   </style>
 </head>
 <body>
@@ -46,10 +48,15 @@
   <main class="main with-bottom-space">
     <section class="card page-head">
       <div>
-        <h2>新增商铺</h2>
-        <p class="desc">用于创建 SID 商铺主体资料，并关联到已存在企业</p>
+        <h2>编辑商铺</h2>
+        <p class="desc">可编辑商铺基础资料，保留已有关联关系与历史设备数据。</p>
+        <div class="shop-meta">
+          <div><span class="k">SID:</span><span id="metaSid">SID-3001</span></div>
+          <div><span class="k">商铺名称:</span><span id="metaName">Everpeak Central Flagship</span></div>
+          <div><span class="k">商铺营业状态:</span><span id="metaStatus">營業中</span></div>
+          <div><span class="k">CID:</span><span id="metaCid">CID-2026-0004</span></div>
+        </div>
       </div>
-
     </section>
 
     <section class="card section-nav">
@@ -58,8 +65,7 @@
 
     <section id="enterprise" class="card section-block">
       <h3 class="section-title">关联企业信息</h3>
-      <div class="inline-actions"><button class="btn" id="chooseEnterpriseBtn">选择企业</button><button class="btn" id="reChooseEnterpriseBtn" style="display:none;">重新选择</button><button class="btn" id="copyEnterpriseBtn" style="display:none;">从企业复制信息</button></div>
-      <p class="help">新增商铺必须先关联企业；仅支持弹窗列表选择，不支持普通下拉选择。</p>
+      <p class="help">编辑商铺时不可修改关联企业，仅展示已关联企业信息。</p>
       <div class="form-grid-3">
         <div class="field"><label class="required">CID</label><div class="muted-box" id="enterpriseCid">未选择</div></div>
         <div class="field"><label>企业名称</label><div class="muted-box" id="enterpriseName">未选择</div></div>
@@ -113,9 +119,9 @@
     <section id="name" class="card section-block">
       <h3 class="section-title">商铺名称</h3>
       <div class="form-grid-3">
-        <div class="field"><label>商铺当地语言名稱</label><input id="localName" /></div><div class="field"><label>商铺当地语言簡稱</label><input /></div><div class="field"><label>商铺英文名稱</label><input id="enName" /></div>
+        <div class="field"><label>商铺当地语言名稱</label><input id="localName" value="遠峰中環旗艦店" /></div><div class="field"><label>商铺当地语言簡稱</label><input /></div><div class="field"><label>商铺英文名稱</label><input id="enName" value="Everpeak Central Flagship" /></div>
         <div class="field"><label>商铺英文簡稱</label><input /></div><div class="field"><label>商铺第三语言名稱</label><input id="thirdName" /></div><div class="field"><label>商铺第三语言簡稱</label><input /></div>
-        <div class="field"><label>商铺其它名稱</label><input id="otherName" /></div><div class="field"><label>商铺所有名稱（当地语言）</label><input id="allLocal" /></div><div class="field"><label>商铺所有名稱（英文）</label><input id="allEn" /></div>
+        <div class="field"><label>商铺其它名稱</label><input id="otherName" value="Everpeak Main Branch" /></div><div class="field"><label>商铺所有名稱（当地语言）</label><input id="allLocal" value="遠峰中環旗艦店；遠峰中環門市" /></div><div class="field"><label>商铺所有名稱（英文）</label><input id="allEn" value="Everpeak Central Flagship; Everpeak Main Branch" /></div>
         <div class="field"><label>切換商铺顯示名稱（中文）</label><select id="switchCn"><option value="">请选择</option></select></div>
         <div class="field"><label>切換商铺顯示名稱（英文）</label><select id="switchEn"><option value="">请选择</option></select></div>
       </div>
@@ -160,12 +166,12 @@
       <div class="field"><label>小費功能</label><select><option>启用</option><option>关闭</option></select></div>
     </div></section>
 
-    <section id="device" class="card section-block"><h3 class="section-title">终端设备</h3><div class="inline-actions"><button class="btn" id="addDeviceBtn">新增设备</button></div><p class="help">新增商铺阶段仅允许加机，不提供回收设备操作。设备数量与总金额由下方明细自动汇总。</p>
-      <div class="table-wrap" style="margin-top:10px;"><table style="min-width:1100px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>数量</th><th>支付金额</th><th>操作</th></tr></thead><tbody id="selectedDeviceRows"><tr><td colspan="7">暂无已选设备</td></tr></tbody></table></div>
+    <section id="device" class="card section-block"><h3 class="section-title">终端设备</h3><div class="inline-actions"><button class="btn" id="addDeviceBtn">添加设备</button></div><p class="help">已有设备数据不可直接编辑；可通过“添加设备”新增设备，并填写数量与支付金额。相同设备型号允许多行展示，金额可不同。</p>
+      <div class="table-wrap" style="margin-top:10px;"><table style="min-width:1100px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>数量</th><th>支付金额</th><th>数据来源</th><th>操作</th></tr></thead><tbody id="selectedDeviceRows"><tr><td colspan="8">暂无设备数据</td></tr></tbody></table></div>
       <div class="form-grid-3" style="margin-top:12px;">
-        <div class="field"><label>終端數量</label><input id="terminalQtyTotal" type="number" readonly /></div><div class="field"><label>總金額</label><input id="terminalPayTotal" type="text" readonly /></div><div class="field"><label>終端（自助場景專用）數量</label><input type="number" min="0" step="1" class="number-field" /></div>
-        <div class="field"><label>配件數量</label><input type="number" min="0" step="1" class="number-field" /></div><div class="field"><label>每部終端機開戶費</label><input type="number" min="0" step="0.01" class="number-field" /></div><div class="field"><label>配件申請表</label><input type="file" /></div>
-        <div class="field"><label>自動打印收據(卡類)</label><select><option>启用</option><option>关闭</option></select></div><div class="field"><label>自動打印收據(非卡類)</label><select><option>启用</option><option>关闭</option></select></div>
+        <div class="field"><label>終端數量</label><input id="terminalQtyTotal" type="number" readonly /></div><div class="field"><label>總金額</label><input id="terminalPayTotal" type="text" readonly /></div><div class="field"><label>終端（自助場景專用）數量</label><input type="number" min="0" step="1" class="number-field" value="2" /></div>
+        <div class="field"><label>配件數量</label><input type="number" min="0" step="1" class="number-field" value="4" /></div><div class="field"><label>每部終端機開戶費</label><input type="number" min="0" step="0.01" class="number-field" value="2000" /></div><div class="field"><label>配件申請表</label><input type="file" /></div>
+        <div class="field"><label>自動打印收據(卡類)</label><select><option selected>启用</option><option>关闭</option></select></div><div class="field"><label>自動打印收據(非卡類)</label><select><option>启用</option><option selected>关闭</option></select></div>
       </div></section>
 
     <section id="people" class="card section-block"><h3 class="section-title">相关人员</h3>
@@ -209,13 +215,14 @@
     { id: 'P-10035', name: '林嘉敏', role: '财务联系人', primary: '否', phone: '+852-6555-2211', email: 'finance@everpeak.hk' },
     { id: 'P-10088', name: '黄晓东', role: '运营联系人', primary: '否', phone: '+852-6333-9876', email: 'ops2@everpeak.hk' }
   ];
-  let selectedEnterprise = null;
-  let selectedServices = [];
+  let selectedEnterprise = enterprises[0];
+  let selectedServices = ['SaaS', 'Payment'];
   const selectedPeople = [];
   const devicePool = [
     { model: "V400m", category: "POS", serial: "SN-900001", status: "库存可分配" },
     { model: "A920", category: "POS", serial: "SN-900002", status: "库存可分配" },
-    { model: "MPOS-601", category: "mPOS", serial: "SN-900003", status: "库存可分配" }
+    { model: "MPOS-601", category: "mPOS", serial: "SN-900003", status: "库存可分配" },
+    { model: "V400m", category: "POS", serial: "SN-900004", status: "库存可分配" }
   ];
   const selectedDevices = [];
 
@@ -223,41 +230,17 @@
   const closeModal = id => document.getElementById(id).style.display = 'none';
   document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.close)));
 
-  const enterpriseRows = document.getElementById('enterpriseRows');
-  const renderEnterpriseRows = () => {
-    const cid = document.getElementById('filterCid').value.trim().toLowerCase();
-    const name = document.getElementById('filterName').value.trim().toLowerCase();
-    const status = document.getElementById('filterStatus').value;
-    const type = document.getElementById('filterType').value;
-    enterpriseRows.innerHTML = enterprises.filter(e => (!cid || e.cid.toLowerCase().includes(cid)) && (!name || e.name.toLowerCase().includes(name)) && (!status || e.status === status) && (!type || e.type === type)).map(e => `<tr><td>${e.cid}</td><td>${e.name}</td><td>${e.status}</td><td>${e.type}</td><td>${e.region}</td><td>${e.group}</td><td><button class="btn" data-cid="${e.cid}">选择</button></td></tr>`).join('') || '<tr><td colspan="7">无匹配企业</td></tr>';
-    enterpriseRows.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => chooseEnterprise(btn.dataset.cid)));
-  };
   const fillEnterprise = () => {
     const set = (id, v) => document.getElementById(id).textContent = v || '未选择';
-    set('enterpriseCid', selectedEnterprise?.cid); set('enterpriseName', selectedEnterprise?.name); set('enterpriseStatus', selectedEnterprise?.status);
-    set('enterpriseType', selectedEnterprise?.type); set('enterpriseRegion', selectedEnterprise?.region); set('enterpriseGroup', selectedEnterprise?.group);
+    set('enterpriseCid', selectedEnterprise?.cid);
+    set('enterpriseName', selectedEnterprise?.name);
+    set('enterpriseStatus', selectedEnterprise?.status);
+    set('enterpriseType', selectedEnterprise?.type);
+    set('enterpriseRegion', selectedEnterprise?.region);
+    set('enterpriseGroup', selectedEnterprise?.group);
     document.getElementById('pkCid').value = selectedEnterprise?.cid || '';
-    document.getElementById('reChooseEnterpriseBtn').style.display = selectedEnterprise ? 'inline-flex' : 'none';
-    document.getElementById('copyEnterpriseBtn').style.display = selectedEnterprise ? 'inline-flex' : 'none';
-  };
-  const chooseEnterprise = cid => {
-    selectedEnterprise = enterprises.find(e => e.cid === cid) || null;
-    fillEnterprise();
     document.getElementById('enterpriseError').textContent = '';
-    closeModal('enterpriseModal');
   };
-  document.getElementById('chooseEnterpriseBtn').addEventListener('click', () => { renderEnterpriseRows(); openModal('enterpriseModal'); });
-  document.getElementById('reChooseEnterpriseBtn').addEventListener('click', () => { renderEnterpriseRows(); openModal('enterpriseModal'); });
-  ['filterCid','filterName','filterStatus','filterType'].forEach(id => document.getElementById(id).addEventListener('input', renderEnterpriseRows));
-
-  document.getElementById('copyEnterpriseBtn').addEventListener('click', () => {
-    if (!selectedEnterprise) return;
-    document.querySelector('#address textarea').value = selectedEnterprise.addressCn;
-    document.querySelectorAll('#address textarea')[1].value = selectedEnterprise.addressEn;
-    document.querySelector('.email-field').value = selectedEnterprise.email;
-    document.querySelector('#contact input').value = selectedEnterprise.phone;
-    alert('已从企业复制名称/地址/联系方式到商铺对应字段。');
-  });
 
   const renderServiceTags = () => {
     const box = document.getElementById('serviceTags');
@@ -312,30 +295,45 @@
     return Number.isFinite(n) && n >= 0 ? n : 0;
   };
 
+  const existingDevices = [
+    { model: 'V400m', category: 'POS', serial: 'SN-880001', status: '已绑定', qty: 4, amount: 8000 },
+    { model: 'A920', category: 'POS', serial: 'SN-880002', status: '已绑定', qty: 3, amount: 6000 }
+  ];
+  const appendedDevices = [];
+
   const syncDeviceSummary = () => {
-    const qtyTotal = selectedDevices.reduce((sum, one) => sum + safeNumber(one.qty), 0);
-    const payTotal = selectedDevices.reduce((sum, one) => sum + safeNumber(one.amount), 0);
+    const qtyTotal = [...existingDevices, ...appendedDevices].reduce((sum, one) => sum + safeNumber(one.qty), 0);
+    const payTotal = [...existingDevices, ...appendedDevices].reduce((sum, one) => sum + safeNumber(one.amount), 0);
     document.getElementById('terminalQtyTotal').value = qtyTotal;
     document.getElementById('terminalPayTotal').value = formatMoney(payTotal);
   };
 
   const renderSelectedDevices = () => {
-    selectedDeviceRows.innerHTML = selectedDevices.map((d, i) => `
+    const existingRows = existingDevices.map(d => `
+      <tr>
+        <td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td>
+        <td>${d.qty}</td><td>${formatMoney(safeNumber(d.amount))}</td><td>存量设备（只读）</td><td>-</td>
+      </tr>
+    `);
+    const appendedRows = appendedDevices.map((d, i) => `
       <tr>
         <td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td>
         <td><input type="number" min="0" step="1" value="${d.qty}" data-device-idx="${i}" data-k="qty" /></td>
         <td><input type="number" min="0" step="0.01" value="${d.amount}" data-device-idx="${i}" data-k="amount" /></td>
+        <td>本次新增</td>
         <td><button class="btn" data-device-del="${i}">移除</button></td>
       </tr>
-    `).join('') || '<tr><td colspan="7">暂无已选设备</td></tr>';
+    `);
+    const rows = [...existingRows, ...appendedRows].join('');
+    selectedDeviceRows.innerHTML = rows || '<tr><td colspan="8">暂无设备数据</td></tr>';
     selectedDeviceRows.querySelectorAll('[data-k]').forEach(el => el.addEventListener('input', () => {
       const idx = Number(el.dataset.deviceIdx);
       const key = el.dataset.k;
-      selectedDevices[idx][key] = safeNumber(el.value);
+      appendedDevices[idx][key] = safeNumber(el.value);
       syncDeviceSummary();
     }));
     selectedDeviceRows.querySelectorAll('[data-device-del]').forEach(btn => btn.addEventListener('click', () => {
-      selectedDevices.splice(Number(btn.dataset.deviceDel), 1);
+      appendedDevices.splice(Number(btn.dataset.deviceDel), 1);
       renderSelectedDevices();
       syncDeviceSummary();
     }));
@@ -345,13 +343,13 @@
     const modelKeyword = document.getElementById('deviceModelKeyword').value.trim().toLowerCase();
     const snKeyword = document.getElementById('deviceSnKeyword').value.trim().toLowerCase();
     deviceRows.innerHTML = devicePool.filter(d => (!modelKeyword || d.model.toLowerCase().includes(modelKeyword)) && (!snKeyword || d.serial.toLowerCase().includes(snKeyword))).map(d => {
-      const selected = selectedDevices.some(one => one.serial === d.serial);
+      const selected = appendedDevices.some(one => one.serial === d.serial);
       return `<tr><td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td><td><button class="btn" data-device-pick="${d.serial}" ${selected ? 'disabled' : ''}>${selected ? '已选择' : '选择'}</button></td></tr>`;
     }).join('') || '<tr><td colspan="5">无可选设备</td></tr>';
     deviceRows.querySelectorAll('[data-device-pick]').forEach(btn => btn.addEventListener('click', () => {
       const one = devicePool.find(d => d.serial === btn.dataset.devicePick);
-      if (!one || selectedDevices.some(d => d.serial === one.serial)) return;
-      selectedDevices.push({ ...one, qty: 1, amount: 0 });
+      if (!one || appendedDevices.some(d => d.serial === one.serial)) return;
+      appendedDevices.push({ ...one, qty: 1, amount: 0 });
       closeModal('deviceModal');
       renderSelectedDevices();
       syncDeviceSummary();
@@ -424,6 +422,13 @@
   ['submitReviewBottom'].forEach(id => document.getElementById(id).addEventListener('click', submit));
   ['saveDraftBottom'].forEach(id => document.getElementById(id).addEventListener('click', saveDraft));
 
+  const fillInitialForm = () => {
+    document.querySelector('#contact input').value = '+852-2111-1000';
+    document.querySelectorAll('#address textarea')[0].value = selectedEnterprise.addressCn;
+    document.querySelectorAll('#address textarea')[1].value = selectedEnterprise.addressEn;
+    document.querySelector('.email-field').value = 'store@everpeak.hk';
+  };
+
   const shellTopHeight = 72, gap = 8;
   const syncOffsets = () => {
     const topCard = document.querySelector('.page-head');
@@ -440,7 +445,10 @@
   navBtns.forEach(btn => { const sec = document.getElementById(btn.dataset.target); if (sec) observer.observe(sec); });
 
   fillEnterprise();
+  fillInitialForm();
+  renderServiceTags();
   renderPeople();
+  refreshNameOptions();
   renderSelectedDevices();
   syncDeviceSummary();
 </script>
