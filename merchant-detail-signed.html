@@ -82,18 +82,14 @@
     <section id="enterprise-review" class="card section-anchor">
       <h3 class="section-title">企业审核信息区</h3>
       <div class="warn-bar" id="enterpriseBlockTip">企业尚未完成风控审核，商户审核暂不可完成</div>
-      <div class="form-grid" id="enterpriseSummary"></div>
-      <div class="sub-card"><h4 class="mini-title">企业审核关键字段摘要</h4><div class="form-grid" id="enterpriseKeyFields"></div></div>
-      <div class="sub-card"><h4 class="mini-title">企业风险与业务信息摘要</h4><div class="form-grid" id="enterpriseRiskFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">企业审核关键字段（精简）</h4><div class="form-grid" id="enterpriseSummary"></div></div>
       <div class="btns" style="justify-content:flex-start;"><a class="btn" href="enterprise-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="enterpriseAuditBtn">审核</button></div>
     </section>
 
     <section id="shop-review" class="card section-anchor">
       <h3 class="section-title">商铺审核信息区</h3>
       <div class="warn-bar" id="shopBlockTip">商铺尚未完成风控审核，商户审核暂不可完成</div>
-      <div class="form-grid" id="shopSummary"></div>
-      <div class="sub-card"><h4 class="mini-title">商铺审核关键字段摘要</h4><div class="form-grid" id="shopKeyFields"></div></div>
-      <div class="sub-card"><h4 class="mini-title">商铺风险与业务信息摘要</h4><div class="form-grid" id="shopRiskFields"></div></div>
+      <div class="sub-card"><h4 class="mini-title">商铺审核关键字段（精简）</h4><div class="form-grid" id="shopSummary"></div></div>
       <div class="btns" style="justify-content:flex-start;"><a class="btn" href="shop-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="shopAuditBtn">审核</button></div>
     </section>
 
@@ -267,6 +263,27 @@
 
   function fillMap(id, map){ document.getElementById(id).innerHTML = Object.entries(map).map(([k,v])=>fieldHTML(k,v)).join(''); }
 
+  const enterpriseDisplayKeys = ['企业主显示名称','CID','企业审核状态','企业启用状态','進件通道(必須)','行業分類 / 業務性質 / 產品服務','MCC Code','風險等級','上單來源','更新時間'];
+  const shopDisplayKeys = ['商铺主显示名称','SID','所属企业名称','商铺审核状态','商铺启用状态','進件通道(必須)','商铺类型','MCC Code','風險等級','更新時間'];
+
+  function pickFields(source, keys){
+    return keys.reduce((acc, key) => {
+      acc[key] = source[key] ?? EMPTY;
+      return acc;
+    }, {});
+  }
+
+  function isApproved(status){
+    return String(status || '').includes('审核通过');
+  }
+
+  function toggleAuditBtn(btnId, status){
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.style.display = isApproved(status) ? 'none' : '';
+  }
+
+
   function buildMerchantBlock(){
     let text = '无阻塞，可继续商户审核流程';
     if (!merchantState.isAfpOnly) {
@@ -342,20 +359,22 @@
     buildOverview();
     buildActionButtons();
     buildForms();
-    fillMap('enterpriseSummary', enterpriseSummaryData);
-    fillMap('enterpriseKeyFields', enterpriseKeyData);
-    fillMap('enterpriseRiskFields', enterpriseRiskData);
-    fillMap('shopSummary', shopSummaryData);
-    fillMap('shopKeyFields', shopKeyData);
-    fillMap('shopRiskFields', shopRiskData);
+    const enterpriseMergedData = { ...enterpriseSummaryData, ...enterpriseKeyData, ...enterpriseRiskData };
+    const shopMergedData = { ...shopSummaryData, ...shopKeyData, ...shopRiskData };
+    fillMap('enterpriseSummary', pickFields(enterpriseMergedData, enterpriseDisplayKeys));
+    fillMap('shopSummary', pickFields(shopMergedData, shopDisplayKeys));
+    toggleAuditBtn('enterpriseAuditBtn', enterpriseSummaryData['企业审核状态']);
+    toggleAuditBtn('shopAuditBtn', shopSummaryData['商铺审核状态']);
     buildMerchantBlock();
     buildSettlement();
     buildRateTable();
     buildSpecialRate();
     buildTimeline();
 
-    document.getElementById('enterpriseAuditBtn').onclick = () => openDrawer('企业审核', enterpriseSummaryData, ['退回审核','审核通过']);
-    document.getElementById('shopAuditBtn').onclick = () => openDrawer('商铺审核', shopSummaryData, ['退回审核','审核通过']);
+    const enterpriseAuditBtn = document.getElementById('enterpriseAuditBtn');
+    const shopAuditBtn = document.getElementById('shopAuditBtn');
+    if (enterpriseAuditBtn) enterpriseAuditBtn.onclick = () => openDrawer('企业审核', enterpriseSummaryData, ['退回审核','审核通过']);
+    if (shopAuditBtn) shopAuditBtn.onclick = () => openDrawer('商铺审核', shopSummaryData, ['退回审核','审核通过']);
     document.getElementById('drawerMask').onclick = closeDrawer;
     document.getElementById('closeDrawerBtn').onclick = closeDrawer;
     document.getElementById('cancelTransfer').onclick = closeTransferModal;
