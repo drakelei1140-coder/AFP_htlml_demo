@@ -87,7 +87,6 @@
     <section id="enterprise-review" class="card section-anchor">
       <h3 class="section-title">企业审核信息区</h3>
       <div class="warn-bar" id="enterpriseBlockTip">企业尚未完成风控审核，商户审核暂不可完成</div>
-      <div class="status-bar processing" id="enterpriseStatusTip"></div>
       <div class="sub-card"><h4 class="mini-title">企业审核关键字段（精简）</h4><div class="form-grid" id="enterpriseSummary"></div></div>
       <div class="btns" style="justify-content:flex-start;"><a class="btn" href="enterprise-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="enterpriseAuditBtn">审核</button></div>
     </section>
@@ -95,7 +94,6 @@
     <section id="shop-review" class="card section-anchor">
       <h3 class="section-title">商铺审核信息区</h3>
       <div class="warn-bar" id="shopBlockTip">商铺尚未完成风控审核，商户审核暂不可完成</div>
-      <div class="status-bar processing" id="shopStatusTip"></div>
       <div class="sub-card"><h4 class="mini-title">商铺审核关键字段（精简）</h4><div class="form-grid" id="shopSummary"></div></div>
       <div class="btns" style="justify-content:flex-start;"><a class="btn" href="shop-detail-risk.html" target="_blank">查看详情</a><button class="btn primary" id="shopAuditBtn">审核</button></div>
     </section>
@@ -283,22 +281,6 @@
     return String(status || '').includes('审核通过');
   }
 
-  function resolveStatusMeta(status){
-    const text = String(status || EMPTY);
-    if (text.includes('审核通过')) return { cls: 'approved', tip: `当前状态：${text}，无需再发起审核。` };
-    if (text.includes('拒绝') || text.includes('驳回') || text.includes('退回')) return { cls: 'rejected', tip: `当前状态：${text}，可查看详情后重新审核。` };
-    if (text.includes('待')) return { cls: 'pending', tip: `当前状态：${text}，请尽快处理。` };
-    return { cls: 'processing', tip: `当前状态：${text}，审核进行中。` };
-  }
-
-  function buildReviewStatusTip(elId, status){
-    const el = document.getElementById(elId);
-    if (!el) return;
-    const meta = resolveStatusMeta(status);
-    el.className = `status-bar ${meta.cls}`;
-    el.textContent = meta.tip;
-  }
-
   function toggleAuditBtn(btnId, status){
     const btn = document.getElementById(btnId);
     if (!btn) return;
@@ -385,8 +367,6 @@
     const shopMergedData = { ...shopSummaryData, ...shopKeyData, ...shopRiskData };
     fillMap('enterpriseSummary', pickFields(enterpriseMergedData, enterpriseDisplayKeys));
     fillMap('shopSummary', pickFields(shopMergedData, shopDisplayKeys));
-    buildReviewStatusTip('enterpriseStatusTip', enterpriseSummaryData['企业审核状态']);
-    buildReviewStatusTip('shopStatusTip', shopSummaryData['商铺审核状态']);
     toggleAuditBtn('enterpriseAuditBtn', enterpriseSummaryData['企业审核状态']);
     toggleAuditBtn('shopAuditBtn', shopSummaryData['商铺审核状态']);
     buildMerchantBlock();
