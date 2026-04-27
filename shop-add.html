@@ -49,7 +49,7 @@
         <h2>新增商铺</h2>
         <p class="desc">用于创建 SID 商铺主体资料，并关联到已存在企业</p>
       </div>
-      <div class="inline-actions"><a class="btn" href="shop-list.html">返回</a><button class="btn" id="saveDraftTop">保存草稿</button><button class="btn primary" id="submitTop">提交</button></div>
+
     </section>
 
     <section class="card section-nav">
@@ -160,11 +160,13 @@
       <div class="field"><label>小費功能</label><select><option>启用</option><option>关闭</option></select></div>
     </div></section>
 
-    <section id="device" class="card section-block"><h3 class="section-title">终端设备</h3><p class="help">新增商铺阶段仅允许加机，不提供回收设备操作。</p><div class="form-grid-3">
-      <div class="field"><label>終端數量</label><input type="number" min="0" step="1" class="number-field" /></div><div class="field"><label>終端（自助場景專用）數量</label><input type="number" min="0" step="1" class="number-field" /></div><div class="field"><label>配件數量</label><input type="number" min="0" step="1" class="number-field" /></div>
-      <div class="field"><label>每部終端機開戶費</label><input type="number" min="0" step="0.01" class="number-field" /></div><div class="field"><label>配件申請表</label><input type="file" /></div><div class="field"><label>自動打印收據(卡類)</label><select><option>启用</option><option>关闭</option></select></div>
-      <div class="field"><label>自動打印收據(非卡類)</label><select><option>启用</option><option>关闭</option></select></div>
-    </div></section>
+    <section id="device" class="card section-block"><h3 class="section-title">终端设备</h3><div class="inline-actions"><button class="btn" id="addDeviceBtn">新增设备</button></div><p class="help">新增商铺阶段仅允许加机，不提供回收设备操作。设备数量与总金额由下方明细自动汇总。</p>
+      <div class="table-wrap" style="margin-top:10px;"><table style="min-width:1100px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>数量</th><th>支付金额</th><th>操作</th></tr></thead><tbody id="selectedDeviceRows"><tr><td colspan="7">暂无已选设备</td></tr></tbody></table></div>
+      <div class="form-grid-3" style="margin-top:12px;">
+        <div class="field"><label>終端數量</label><input id="terminalQtyTotal" type="number" readonly /></div><div class="field"><label>總金額</label><input id="terminalPayTotal" type="text" readonly /></div><div class="field"><label>終端（自助場景專用）數量</label><input type="number" min="0" step="1" class="number-field" /></div>
+        <div class="field"><label>配件數量</label><input type="number" min="0" step="1" class="number-field" /></div><div class="field"><label>每部終端機開戶費</label><input type="number" min="0" step="0.01" class="number-field" /></div><div class="field"><label>配件申請表</label><input type="file" /></div>
+        <div class="field"><label>自動打印收據(卡類)</label><select><option>启用</option><option>关闭</option></select></div><div class="field"><label>自動打印收據(非卡類)</label><select><option>启用</option><option>关闭</option></select></div>
+      </div></section>
 
     <section id="people" class="card section-block"><h3 class="section-title">相关人员</h3>
       <div class="inline-actions"><button class="btn" id="addPersonBtn">新增人员</button><button class="btn" id="choosePersonBtn">选择已有人员</button></div>
@@ -180,7 +182,7 @@
   </main>
 </div>
 
-<div class="bottom-actions"><a class="btn" href="shop-list.html">取消</a><button class="btn" id="saveDraftBottom">保存草稿</button><button class="btn primary" id="submitBottom">提交</button></div>
+<div class="bottom-actions"><button class="btn" id="saveDraftBottom">保存草稿</button><button class="btn primary" id="submitReviewBottom">提交审核</button><a class="btn" href="shop-list.html">取消</a></div>
 
 <div class="modal-mask" id="enterpriseModal"><div class="modal"><div class="modal-hd"><strong>选择企业</strong></div><div class="modal-bd">
   <div class="search-grid"><input id="filterCid" placeholder="CID" /><input id="filterName" placeholder="企业名称" /><select id="filterStatus"><option value="">企业营业状态</option><option>正常营业</option><option>暂停营业</option></select><select id="filterType"><option value="">企业类型</option><option>企業商戶</option><option>个体户</option></select></div>
@@ -188,6 +190,12 @@
 </div><div class="modal-ft"><button class="btn" data-close="enterpriseModal">关闭</button></div></div></div>
 
 <div class="modal-mask" id="serviceModal"><div class="modal" style="max-width:560px;"><div class="modal-hd"><strong>选择服务</strong></div><div class="modal-bd"><label><input type="checkbox" value="SaaS" class="svc" /> SaaS</label><br/><label><input type="checkbox" value="Payment" class="svc" /> Payment</label><br/><label><input type="checkbox" value="KFund" class="svc" /> KFund</label></div><div class="modal-ft"><button class="btn" data-close="serviceModal">取消</button><button class="btn primary" id="confirmService">确定</button></div></div></div>
+
+
+<div class="modal-mask" id="deviceModal"><div class="modal"><div class="modal-hd" style="display:flex;justify-content:space-between;align-items:center;"><strong>选择设备</strong><button class="btn" data-close="deviceModal" style="border:0;background:transparent;font-size:22px;line-height:1;padding:0 4px;">×</button></div><div class="modal-bd">
+  <div class="search-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));"><input id="deviceModelKeyword" placeholder="按设备型号搜索" /><input id="deviceSnKeyword" placeholder="按设备序列号搜索" /></div>
+  <div class="table-wrap"><table><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>操作</th></tr></thead><tbody id="deviceRows"></tbody></table></div>
+</div></div></div>
 
 <div class="modal-mask" id="personModal"><div class="modal"><div class="modal-hd"><strong>选择已有人员</strong></div><div class="modal-bd"><div class="search-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));"><input id="personIdKeyword" placeholder="人员ID" /><input id="personNameKeyword" placeholder="姓名" /><input id="personPhoneKeyword" placeholder="电话" /><input id="personEmailKeyword" placeholder="邮箱" /></div><div class="table-wrap person-modal"><table><thead><tr><th>人员ID</th><th>姓名</th><th>角色身份类型</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="personRows"></tbody></table></div></div><div class="modal-ft"><button class="btn" data-close="personModal">关闭</button></div></div></div>
 
@@ -204,6 +212,12 @@
   let selectedEnterprise = null;
   let selectedServices = [];
   const selectedPeople = [];
+  const devicePool = [
+    { model: "V400m", category: "POS", serial: "SN-900001", status: "库存可分配" },
+    { model: "A920", category: "POS", serial: "SN-900002", status: "库存可分配" },
+    { model: "MPOS-601", category: "mPOS", serial: "SN-900003", status: "库存可分配" }
+  ];
+  const selectedDevices = [];
 
   const openModal = id => document.getElementById(id).style.display = 'flex';
   const closeModal = id => document.getElementById(id).style.display = 'none';
@@ -289,6 +303,67 @@
   document.getElementById('choosePersonBtn').addEventListener('click', () => { renderPersonPool(); openModal('personModal'); });
   ['personIdKeyword','personNameKeyword','personPhoneKeyword','personEmailKeyword'].forEach(id => document.getElementById(id).addEventListener('input', renderPersonPool));
 
+
+  const deviceRows = document.getElementById('deviceRows');
+  const selectedDeviceRows = document.getElementById('selectedDeviceRows');
+  const formatMoney = n => `HKD ${n.toFixed(2)}`;
+  const safeNumber = v => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : 0;
+  };
+
+  const syncDeviceSummary = () => {
+    const qtyTotal = selectedDevices.reduce((sum, one) => sum + safeNumber(one.qty), 0);
+    const payTotal = selectedDevices.reduce((sum, one) => sum + safeNumber(one.amount), 0);
+    document.getElementById('terminalQtyTotal').value = qtyTotal;
+    document.getElementById('terminalPayTotal').value = formatMoney(payTotal);
+  };
+
+  const renderSelectedDevices = () => {
+    selectedDeviceRows.innerHTML = selectedDevices.map((d, i) => `
+      <tr>
+        <td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td>
+        <td><input type="number" min="0" step="1" value="${d.qty}" data-device-idx="${i}" data-k="qty" /></td>
+        <td><input type="number" min="0" step="0.01" value="${d.amount}" data-device-idx="${i}" data-k="amount" /></td>
+        <td><button class="btn" data-device-del="${i}">移除</button></td>
+      </tr>
+    `).join('') || '<tr><td colspan="7">暂无已选设备</td></tr>';
+    selectedDeviceRows.querySelectorAll('[data-k]').forEach(el => el.addEventListener('input', () => {
+      const idx = Number(el.dataset.deviceIdx);
+      const key = el.dataset.k;
+      selectedDevices[idx][key] = safeNumber(el.value);
+      syncDeviceSummary();
+    }));
+    selectedDeviceRows.querySelectorAll('[data-device-del]').forEach(btn => btn.addEventListener('click', () => {
+      selectedDevices.splice(Number(btn.dataset.deviceDel), 1);
+      renderSelectedDevices();
+      syncDeviceSummary();
+    }));
+  };
+
+  const renderDevicePool = () => {
+    const modelKeyword = document.getElementById('deviceModelKeyword').value.trim().toLowerCase();
+    const snKeyword = document.getElementById('deviceSnKeyword').value.trim().toLowerCase();
+    deviceRows.innerHTML = devicePool.filter(d => (!modelKeyword || d.model.toLowerCase().includes(modelKeyword)) && (!snKeyword || d.serial.toLowerCase().includes(snKeyword))).map(d => {
+      const selected = selectedDevices.some(one => one.serial === d.serial);
+      return `<tr><td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td><td><button class="btn" data-device-pick="${d.serial}" ${selected ? 'disabled' : ''}>${selected ? '已选择' : '选择'}</button></td></tr>`;
+    }).join('') || '<tr><td colspan="5">无可选设备</td></tr>';
+    deviceRows.querySelectorAll('[data-device-pick]').forEach(btn => btn.addEventListener('click', () => {
+      const one = devicePool.find(d => d.serial === btn.dataset.devicePick);
+      if (!one || selectedDevices.some(d => d.serial === one.serial)) return;
+      selectedDevices.push({ ...one, qty: 1, amount: 0 });
+      closeModal('deviceModal');
+      renderSelectedDevices();
+      syncDeviceSummary();
+    }));
+  };
+
+  document.getElementById('addDeviceBtn').addEventListener('click', () => {
+    renderDevicePool();
+    openModal('deviceModal');
+  });
+  ['deviceModelKeyword','deviceSnKeyword'].forEach(id => document.getElementById(id).addEventListener('input', renderDevicePool));
+
   const refreshNameOptions = () => {
     const cnCandidates = [document.getElementById('localName').value, document.getElementById('thirdName').value, document.getElementById('otherName').value, document.getElementById('allLocal').value].filter(Boolean);
     const enCandidates = [document.getElementById('enName').value, document.getElementById('allEn').value].filter(Boolean);
@@ -339,15 +414,15 @@
 
   const submit = () => {
     if (!validate(true)) return;
-    alert('提交成功（示意）：系统将生成 SID 并进入审核流程。');
+    alert('提交审核成功（示意）：系统将生成 SID 并进入审核流程。');
   };
   const saveDraft = () => {
     if (!validate(false)) return;
     alert('草稿已保存（示意）：保存草稿不触发完整必填校验。');
   };
 
-  ['submitTop','submitBottom'].forEach(id => document.getElementById(id).addEventListener('click', submit));
-  ['saveDraftTop','saveDraftBottom'].forEach(id => document.getElementById(id).addEventListener('click', saveDraft));
+  ['submitReviewBottom'].forEach(id => document.getElementById(id).addEventListener('click', submit));
+  ['saveDraftBottom'].forEach(id => document.getElementById(id).addEventListener('click', saveDraft));
 
   const shellTopHeight = 72, gap = 8;
   const syncOffsets = () => {
@@ -366,6 +441,8 @@
 
   fillEnterprise();
   renderPeople();
+  renderSelectedDevices();
+  syncDeviceSummary();
 </script>
 </body>
 </html>
