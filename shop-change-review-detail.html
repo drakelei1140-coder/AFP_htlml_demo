@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商铺资料修改待审核-详情</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .shop-header { position: sticky; top: 72px; z-index: 902; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .title-wrap h2 { margin: 0 0 10px; font-size: 24px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px 16px; font-size: 13px; }
+    .meta-grid .k { color: var(--muted); margin-right: 6px; }
+    .section-nav { position: sticky; top: var(--detail-nav-top, 200px); z-index: 901; display: flex; flex-wrap: wrap; gap: 8px; }
+    .section-nav .nav-btn { border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+    .section-nav .nav-btn.active { background: var(--primary-soft); color: var(--primary-dark); border-color: color-mix(in srgb, var(--primary) 35%, white); }
+    .section-block { scroll-margin-top: var(--detail-scroll-offset, 300px); }
+    .detail-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px 16px; }
+    .detail-item { border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+    .detail-item.wide { grid-column: span 2; }
+    .detail-item.full { grid-column: 1 / -1; }
+    .label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .value { font-size: 14px; min-height: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ant-tag { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 6px; font-size: 12px; border: 1px solid var(--border); background: var(--panel-2); }
+    .ant-tag-green { color: #237804; background: #f6ffed; border-color: #b7eb8f; }
+    .ant-tag-blue { color: #0958d9; background: #e6f4ff; border-color: #91caff; }
+    .ant-tag-gold { color: #ad6800; background: #fffbe6; border-color: #ffe58f; }
+    .ant-tag-red { color: #cf1322; background: #fff1f0; border-color: #ffa39e; }
+    .ant-tag-purple { color: #531dab; background: #f9f0ff; border-color: #d3adf7; }
+    .media-card, .file-card { border: 1px solid var(--border); background: var(--panel-2); border-radius: 8px; padding: 8px; width: 100%; display: grid; gap: 6px; }
+    .thumb-list { display: flex; gap: 8px; flex-wrap: wrap; }
+    .thumb { width: 64px; height: 64px; object-fit: cover; border: 1px solid var(--border); border-radius: 6px; }
+    .file-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .link { color: #1677ff; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+    .cid-highlight { font-weight: 700; font-size: 16px; }
+    @media (max-width: 1400px) { .meta-grid,.detail-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option><option>地区：新加坡</option></select><select><option>语言：简体中文</option><option>English</option></select><button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button><div class="user-pill"><div class="avatar">OP</div> Olivia</div></div></header>
+<div class="layout">
+  <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a class="active" href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
+  <main class="main">
+    <section class="card shop-header">
+      <div class="title-wrap">
+        <h2>Everpeak Central Flagship（商铺资料修改待审核）</h2>
+        <div class="meta-grid">
+          <div><span class="k">SID:</span><span>SID-3001</span></div>
+          <div><span class="k">商铺营业状态:</span><span class="ant-tag ant-tag-gold">待审核</span></div>
+          <div><span class="k">门店类型:</span><span>线下门店</span></div>
+          <div><span class="k">开通 Kpay 服务:</span><span class="ant-tag ant-tag-blue">已开通</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section-nav">
+      <button class="nav-btn" data-target="enterprise">关联企业信息</button><button class="nav-btn" data-target="change-reason">修改理由</button><button class="nav-btn" data-target="timeline">修改记录时间轴区</button><button class="nav-btn" data-target="mid">关联的MID</button><button class="nav-btn" data-target="pk">主键 / 关联</button><button class="nav-btn" data-target="basic">商铺基础</button><button class="nav-btn" data-target="name">商铺名称</button><button class="nav-btn" data-target="contact">商铺联系</button><button class="nav-btn" data-target="address">商铺地址</button><button class="nav-btn" data-target="online">线上资料</button><button class="nav-btn" data-target="files">商铺文件</button><button class="nav-btn" data-target="feature">门店经营特征</button><button class="nav-btn" data-target="device">终端设备</button><button class="nav-btn" data-target="people">相关人员</button><button class="nav-btn" data-target="other">其他信息</button>
+    </section>
+
+    <section id="enterprise" class="card section-block"><h3 class="section-title">关联企业信息</h3><div class="detail-grid"><div class="detail-item"><div class="label">CID</div><div class="value cid-highlight">CID-2026-0004</div></div><div class="detail-item"><div class="label">企业名称</div><div class="value cid-highlight">Everpeak Digital Commerce</div></div><div class="detail-item"><div class="label">企业营业状态</div><div class="value"><span class="ant-tag ant-tag-gold">待审核</span></div></div><div class="detail-item"><div class="label">企业类型</div><div class="value">企業商戶</div></div><div class="detail-item"><div class="label">所属地区</div><div class="value">香港</div></div><div class="detail-item"><div class="label">关联群组</div><div class="value"><span class="ant-tag ant-tag-purple">高风险行业</span><span class="ant-tag ant-tag-purple">跨境电商</span></div></div><div class="detail-item"><div class="label">操作：查看企业详情</div><div class="value"><a class="link" href="enterprise-detail-approved-enabled.html">查看企业详情</a></div></div></div></section>
+
+    <section id="change-reason" class="card section-block"><h3 class="section-title">修改理由</h3><div class="detail-grid"><div class="detail-item"><div class="label">修改理由</div><div class="value">門店搬遷至新地址，需同步更新商铺地址、營業地址證明及商铺管理員電郵。</div></div><div class="detail-item"><div class="label">修改申请文件</div><div class="value file-card"><div class="file-row"><span>shop-change-request-20260427.pdf</span><span>2026-04-27 10:18</span><a class="link" href="#">查看</a></div></div></div></div></section>
+
+    <section id="timeline" class="card section-block"><h3 class="section-title">修改记录时间轴区</h3><div class="timeline"><div class="item"><strong>2026-04-27 10:20</strong> - 提交人：陳嘉怡（商戶管理員）提交資料修改申請。<br />修改字段：商铺主要營業地址、商铺管理員電郵、營業地址證明。<br />修改前：香港中环皇后大道中99号19楼A室 / ops.central@everpeak.hk / address-proof-v1.pdf。<br />修改後：香港中环德輔道中188號21樓B室 / compliance.central@everpeak.hk / address-proof-v2.pdf。</div><div class="item"><strong>2026-04-27 11:05</strong> - 提交人：王志遠（銷售主管）完成初審並轉交風控中級審核。<br />修改字段：審核進度。<br />修改前：销售主管審核。<br />修改後：風控中級審核。</div><div class="item"><strong>2026-04-27 12:10</strong> - 提交人：劉子豪（風控專員）補充審核意見。<br />修改字段：風險等級說明。<br />修改前：缺少地址搬遷證明。<br />修改後：已補交租約與水電單，建議流轉下一節點。</div></div></section>
+
+    <section id="mid" class="card section-block"><h3 class="section-title">关联的MID</h3><div class="table-wrap"><table style="min-width:1200px;"><thead><tr><th>MID</th><th>通道</th><th>服务</th><th>MID状态</th><th>第三方MID</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr><td>MID-88901</td><td>AFP</td><td>paymentProcessing / POS</td><td><span class="ant-tag ant-tag-green">Active</span></td><td>ADYEN-3349001</td><td>2026-04-11 09:20</td><td><a class="link" href="mid-detail.html?id=MID-88901">查看详情</a></td></tr><tr><td>MID-88902</td><td>Adyen PayFac</td><td>eCommerce / PayByLink</td><td><span class="ant-tag ant-tag-blue">Pending</span></td><td>ADYEN-3349002</td><td>2026-04-12 11:10</td><td><a class="link" href="mid-detail.html?id=MID-88902">查看详情</a></td></tr><tr><td>MID-88903</td><td>其他通道</td><td>POS</td><td><span class="ant-tag ant-tag-gold">Suspended</span></td><td>-</td><td>2026-04-13 16:22</td><td><a class="link" href="mid-detail.html?id=MID-88903">查看详情</a></td></tr></tbody></table></div></section>
+
+    <section id="pk" class="card section-block"><h3 class="section-title">主键 / 关联</h3><div class="detail-grid"><div class="detail-item"><div class="label">SID</div><div class="value">SID-3001</div></div><div class="detail-item"><div class="label">CID</div><div class="value">CID-2026-0004</div></div></div></section>
+
+    <section id="basic" class="card section-block"><h3 class="section-title">商铺基础</h3><div class="detail-grid">
+      <div class="detail-item"><div class="label">开通Kpay服务</div><div class="value"><span class="ant-tag ant-tag-blue">Kpay</span><span class="ant-tag ant-tag-blue">Kplus</span></div></div>
+      <div class="detail-item"><div class="label">店面相片</div><div class="value media-card"><div class="thumb-list"><img class="thumb" src="logo.jpg" alt="店面相片" /></div><a class="link" href="#">查看</a></div></div>
+      <div class="detail-item"><div class="label">存倉相片</div><div class="value media-card"><div class="thumb-list"><img class="thumb" src="logo.jpg" alt="存倉相片" /></div><a class="link" href="#">查看</a></div></div>
+      <div class="detail-item"><div class="label">租金</div><div class="value">HKD 120,000 / 月</div></div><div class="detail-item"><div class="label">租約年期</div><div class="value">36个月</div></div>
+      <div class="detail-item"><div class="label">私隱政策</div><div class="value file-card"><div class="file-row"><span>privacy-policy.pdf</span><a class="link" href="#">下载</a></div></div></div>
+      <div class="detail-item"><div class="label">產品目錄</div><div class="value file-card"><div class="file-row"><span>catalog-2026.pdf</span><a class="link" href="#">下载</a></div></div></div>
+      <div class="detail-item"><div class="label">送貨政策</div><div class="value file-card"><div class="file-row"><span>delivery-policy.pdf</span><a class="link" href="#">下载</a></div></div></div>
+      <div class="detail-item"><div class="label">门店类型</div><div class="value">线下门店</div></div><div class="detail-item"><div class="label">聯絡語言</div><div class="value">中文 / English</div></div>
+      <div class="detail-item"><div class="label">商戶營業狀態(必須)</div><div class="value"><span class="ant-tag ant-tag-green">正常营业</span></div></div>
+      <div class="detail-item"><div class="label">特殊業務屬性標籤</div><div class="value"><span class="ant-tag ant-tag-purple">跨境电商</span><span class="ant-tag ant-tag-purple">高客单</span></div></div>
+      <div class="detail-item"><div class="label">退貨政策</div><div class="value">7天无理由退貨</div></div>
+      <div class="detail-item"><div class="label">退貨政策截圖</div><div class="value media-card"><div class="thumb-list"><img class="thumb" src="logo.jpg" alt="退貨政策截圖" /></div><a class="link" href="#">查看</a></div></div>
+      <div class="detail-item"><div class="label">審核類型</div><div class="value">人工复核</div></div><div class="detail-item"><div class="label">上單來源</div><div class="value">CRM</div></div><div class="detail-item"><div class="label">服務類型</div><div class="value">门店收单</div></div><div class="detail-item"><div class="label">合作夥伴推薦人</div><div class="value">Alice Wong</div></div><div class="detail-item"><div class="label">合作夥伴編號</div><div class="value">PARTNER-9001</div></div>
+      <div class="detail-item full"><div class="label">交單備註</div><div class="value">资料齐全，风险可控。</div></div>
+      <div class="detail-item"><div class="label">是否高額商戶</div><div class="value">否</div></div><div class="detail-item"><div class="label">是否首次申請卡機商戶（包括KPay及其他卡機）</div><div class="value">否</div></div>
+      <div class="detail-item"><div class="label">申請過的卡機品牌 （多選）</div><div class="value"><span class="ant-tag ant-tag-blue">KPay</span><span class="ant-tag ant-tag-blue">Verifone</span></div></div>
+      <div class="detail-item"><div class="label">在上述卡機中，商戶預計使用KPay的業務占比</div><div class="value">65%</div></div><div class="detail-item"><div class="label">重複簽約原因</div><div class="value">业务扩展新增门店</div></div>
+    </div></section>
+
+    <section id="name" class="card section-block"><h3 class="section-title">商铺名称</h3><div class="detail-grid"><div class="detail-item"><div class="label">商铺当地语言名稱</div><div class="value">遠峰中環旗艦店</div></div><div class="detail-item"><div class="label">商铺当地语言簡稱</div><div class="value">遠峰中環店</div></div><div class="detail-item"><div class="label">商铺英文名稱</div><div class="value">Everpeak Central Flagship</div></div><div class="detail-item"><div class="label">商铺英文簡稱</div><div class="value">Everpeak Central</div></div><div class="detail-item"><div class="label">商铺第三语言名稱</div><div class="value">-</div></div><div class="detail-item"><div class="label">商铺第三语言簡稱</div><div class="value">-</div></div><div class="detail-item"><div class="label">商铺其它名稱</div><div class="value">Everpeak Main Branch</div></div><div class="detail-item"><div class="label">商铺所有名稱（当地语言）</div><div class="value">遠峰中環旗艦店；遠峰中環門市</div></div><div class="detail-item"><div class="label">商铺所有名稱（英文）</div><div class="value">Everpeak Central Flagship; Everpeak Main Branch</div></div><div class="detail-item"><div class="label">切換商铺顯示名稱（中文）</div><div class="value">遠峰旗艦店</div></div><div class="detail-item"><div class="label">切換商铺顯示名稱（英文）</div><div class="value">Everpeak Flagship</div></div></div></section>
+
+    <section id="contact" class="card section-block"><h3 class="section-title">商铺联系</h3><div class="detail-grid"><div class="detail-item"><div class="label">商铺固定電話</div><div class="value">+852-2111-1000</div></div><div class="detail-item"><div class="label">商铺手提電話</div><div class="value">+852-6123-0987</div></div><div class="detail-item"><div class="label">商铺電郵地址</div><div class="value">store@everpeak.hk</div></div><div class="detail-item"><div class="label">商铺管理員電郵</div><div class="value">ops.central@everpeak.hk</div></div><div class="detail-item"><div class="label">商铺運營電郵</div><div class="value">ops@everpeak.hk</div></div><div class="detail-item"><div class="label">商铺接收營銷資訊</div><div class="value"><span class="ant-tag ant-tag-green">是</span></div></div><div class="detail-item"><div class="label">商铺微信ID</div><div class="value">everpeak_ops</div></div><div class="detail-item"><div class="label">接收營銷資訊</div><div class="value"><span class="ant-tag ant-tag-red">否</span></div></div></div></section>
+
+    <section id="address" class="card section-block"><h3 class="section-title">商铺地址</h3><div class="detail-grid"><div class="detail-item wide"><div class="label">主要營業地址(当地语言)</div><div class="value">香港中环皇后大道中99号19楼A室</div></div><div class="detail-item wide"><div class="label">主要營業地址(英文)</div><div class="value">Room A, 19/F, 99 Queen's Road Central, Hong Kong</div></div><div class="detail-item"><div class="label">營業鋪位</div><div class="value">铺位A1</div></div><div class="detail-item"><div class="label">營業國家</div><div class="value">中国香港</div></div><div class="detail-item"><div class="label">營業地區</div><div class="value">中环</div></div><div class="detail-item"><div class="label">门店地址-城市</div><div class="value">香港</div></div><div class="detail-item"><div class="label">门店地址-州/省</div><div class="value">香港岛</div></div><div class="detail-item"><div class="label">门店地址-地址行1</div><div class="value">19/F, 99 Queen's Road Central</div></div><div class="detail-item"><div class="label">门店地址-地址行2</div><div class="value">Room A</div></div><div class="detail-item"><div class="label">门店地址-地址行3</div><div class="value">Central</div></div><div class="detail-item wide"><div class="label">郵寄地址</div><div class="value">香港邮政信箱0088</div></div><div class="detail-item"><div class="label">郵政編碼</div><div class="value">999077</div></div></div></section>
+
+    <section id="online" class="card section-block"><h3 class="section-title">线上资料</h3><div class="detail-grid"><div class="detail-item"><div class="label">Website(Desktop)</div><div class="value"><a class="link" href="https://everpeak.com" target="_blank" rel="noopener">https://everpeak.com</a></div></div><div class="detail-item"><div class="label">Website(Mobile)</div><div class="value"><a class="link" href="https://m.everpeak.com" target="_blank" rel="noopener">https://m.everpeak.com</a></div></div><div class="detail-item"><div class="label">APP(Andrioid)</div><div class="value"><a class="link" href="https://play.google.com/everpeak" target="_blank" rel="noopener">https://play.google.com/everpeak</a></div></div><div class="detail-item"><div class="label">APP(IOS)</div><div class="value"><a class="link" href="https://apps.apple.com/everpeak" target="_blank" rel="noopener">https://apps.apple.com/everpeak</a></div></div><div class="detail-item"><div class="label">Facebook</div><div class="value"><a class="link" href="https://facebook.com/everpeak" target="_blank" rel="noopener">https://facebook.com/everpeak</a></div></div><div class="detail-item"><div class="label">Instagram</div><div class="value"><a class="link" href="https://instagram.com/everpeak" target="_blank" rel="noopener">https://instagram.com/everpeak</a></div></div><div class="detail-item"><div class="label">Openrice</div><div class="value">-</div></div><div class="detail-item"><div class="label">H5經營網址</div><div class="value"><a class="link" href="https://h5.everpeak.com/store3001" target="_blank" rel="noopener">https://h5.everpeak.com/store3001</a></div></div></div></section>
+
+    <section id="files" class="card section-block"><h3 class="section-title">商铺文件</h3><div class="detail-grid"><div class="detail-item"><div class="label">租約證明</div><div class="value file-card"><div class="file-row"><span>lease-proof.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">商铺LOGO</div><div class="value media-card"><img class="thumb" src="logo.jpg" alt="商铺LOGO" /><a class="link" href="#">查看</a></div></div><div class="detail-item"><div class="label">營業環境照片三張</div><div class="value media-card"><div class="thumb-list"><img class="thumb" src="logo.jpg" alt="營業環境照片1" /><img class="thumb" src="logo.jpg" alt="營業環境照片2" /><img class="thumb" src="logo.jpg" alt="營業環境照片3" /></div><a class="link" href="#">查看</a></div></div><div class="detail-item"><div class="label">營業地址證明</div><div class="value file-card"><div class="file-row"><span>address-proof.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">營業牌照</div><div class="value file-card"><div class="file-row"><span>license.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">入貨單</div><div class="value file-card"><div class="file-row"><span>purchase-order.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">閉路電視錄影</div><div class="value file-card"><div class="file-row"><span>cctv.mp4</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">最高交易金額的客戶單據</div><div class="value file-card"><div class="file-row"><span>max-ticket.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">商業登記證號碼</div><div class="value">BR-8899123</div></div><div class="detail-item"><div class="label">商業登記證名稱</div><div class="value">Everpeak Digital Commerce</div></div><div class="detail-item"><div class="label">證書有效期</div><div class="value">2027-12-31</div></div><div class="detail-item"><div class="label">商業登記證副本照片</div><div class="value media-card"><img class="thumb" src="logo.jpg" alt="商業登記證副本照片" /><a class="link" href="#">查看</a></div></div><div class="detail-item"><div class="label">請提供重複簽約證明附件</div><div class="value file-card"><div class="file-row"><span>duplicate-signing-proof.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">商業登記冊內的資料的電子摘錄 (獨資經營者/合夥人適用)</div><div class="value file-card"><div class="file-row"><span>extract.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div></div></section>
+
+    <section id="feature" class="card section-block"><h3 class="section-title">门店经营特征</h3><div class="detail-grid"><div class="detail-item"><div class="label">每宗交易平均金額</div><div class="value">HKD 380.00</div></div><div class="detail-item"><div class="label">每宗交易最大交易額</div><div class="value">HKD 5,000.00</div></div><div class="detail-item"><div class="label">預計每年交易宗數</div><div class="value">150,000</div></div><div class="detail-item"><div class="label">過往拒付比例</div><div class="value">0.6%</div></div><div class="detail-item"><div class="label">拒付平均處理日數</div><div class="value">13</div></div><div class="detail-item"><div class="label">過往退款比例</div><div class="value">1.1%</div></div><div class="detail-item"><div class="label">退款平均處理日數</div><div class="value">6</div></div><div class="detail-item"><div class="label">平均每月營業額</div><div class="value">HKD 3,200,000.00</div></div><div class="detail-item"><div class="label">經營方式</div><div class="value">线上+线下</div></div><div class="detail-item"><div class="label">提前收款日數</div><div class="value">2</div></div><div class="detail-item"><div class="label">貨物/服務最短送達時間</div><div class="value">1天</div></div><div class="detail-item"><div class="label">貨物/服務最長送達時間</div><div class="value">5天</div></div><div class="detail-item"><div class="label">行業分類</div><div class="value">零售</div></div><div class="detail-item"><div class="label">/業務性質</div><div class="value">服饰</div></div><div class="detail-item"><div class="label">//產品服務</div><div class="value">潮流配件</div></div><div class="detail-item"><div class="label">小費功能</div><div class="value"><span class="ant-tag ant-tag-green">启用</span></div></div></div></section>
+
+    <section id="device" class="card section-block"><h3 class="section-title">终端设备</h3><div class="table-wrap"><table style="min-width:1000px;"><thead><tr><th>设备型号</th><th>设备分类</th><th>数量</th><th>支付金额</th></tr></thead><tbody><tr><td>V400m</td><td>POS</td><td>4</td><td>HKD 8,000.00</td></tr><tr><td>A920</td><td>POS</td><td>3</td><td>HKD 6,000.00</td></tr><tr><td>KS8223</td><td>自助终端</td><td>2</td><td>HKD 4,000.00</td></tr><tr><td>扫码枪</td><td>配件</td><td>4</td><td>HKD 2,000.00</td></tr></tbody></table></div><div class="detail-grid"><div class="detail-item"><div class="label">終端數量</div><div class="value">8</div></div><div class="detail-item"><div class="label">總金額</div><div class="value">HKD 20,000.00</div></div><div class="detail-item"><div class="label">終端（自助場景專用）數量</div><div class="value">2</div></div><div class="detail-item"><div class="label">配件數量</div><div class="value">4</div></div><div class="detail-item"><div class="label">每部終端機開戶費</div><div class="value">HKD 2,000.00</div></div><div class="detail-item"><div class="label">配件申請表</div><div class="value file-card"><div class="file-row"><span>accessory-form.pdf</span><span><a class="link" href="#">查看</a> / <a class="link" href="#">下载</a></span></div></div></div><div class="detail-item"><div class="label">自動打印收據(卡類)</div><div class="value"><span class="ant-tag ant-tag-green">启用</span></div></div><div class="detail-item"><div class="label">自動打印收據(非卡類)</div><div class="value"><span class="ant-tag ant-tag-red">未启用</span></div></div></div></section>
+
+    <section id="people" class="card section-block"><h3 class="section-title">相关人员</h3><div class="table-wrap"><table style="min-width:1000px;"><thead><tr><th>人员ID</th><th>姓名</th><th>角色身份类型</th><th>是否主联系人</th><th>电话</th><th>邮箱</th><th>操作：查看人员详情</th></tr></thead><tbody><tr><td>P-10009</td><td>陈一鸣</td><td>负责人</td><td>是</td><td>+852-6666-8899</td><td>owner@everpeak.hk</td><td><a class="link" href="person-detail.html?id=P-10009">查看人员详情</a></td></tr><tr><td>P-10035</td><td>林嘉敏</td><td>财务联系人</td><td>否</td><td>+852-6555-2211</td><td>finance@everpeak.hk</td><td><a class="link" href="person-detail.html?id=P-10035">查看人员详情</a></td></tr><tr><td>P-10088</td><td>黄晓东</td><td>运营联系人</td><td>否</td><td>+852-6333-9876</td><td>ops2@everpeak.hk</td><td><a class="link" href="person-detail.html?id=P-10088">查看人员详情</a></td></tr></tbody></table></div></section>
+
+    <section id="other" class="card section-block"><h3 class="section-title">其他信息</h3><div class="detail-grid"><div class="detail-item"><div class="label">風控類型</div><div class="value">标准风控</div></div><div class="detail-item"><div class="label">合約期</div><div class="value">24个月</div></div></div></section>
+
+
+  </main>
+</div>
+<script>
+  const shellTopHeight = 72;
+  const stickyGap = 8;
+  function syncStickyOffsets() {
+    const headerCard = document.querySelector('.shop-header');
+    if (!headerCard) return;
+    const navTop = shellTopHeight + headerCard.offsetHeight + stickyGap;
+    const scrollOffset = navTop + 56;
+    document.documentElement.style.setProperty('--detail-nav-top', `${navTop}px`);
+    document.documentElement.style.setProperty('--detail-scroll-offset', `${scrollOffset}px`);
+  }
+  syncStickyOffsets();
+  window.addEventListener('resize', syncStickyOffsets);
+
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const sections = [...navBtns].map(btn => document.getElementById(btn.dataset.target)).filter(Boolean);
+  navBtns.forEach(btn => btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.target === entry.target.id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+  sections.forEach(sec => observer.observe(sec));
+</script>
+</body>
+</html>
