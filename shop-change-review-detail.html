@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>商铺详情</title>
+  <title>商铺资料修改待审核-详情</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <style>
     .shop-header { position: sticky; top: 72px; z-index: 902; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
@@ -47,22 +47,27 @@
   <main class="main">
     <section class="card shop-header">
       <div class="title-wrap">
-        <h2>Everpeak Central Flagship</h2>
+        <h2>Everpeak Central Flagship（商铺资料修改待审核）</h2>
         <div class="meta-grid">
           <div><span class="k">SID:</span><span>SID-3001</span></div>
-          <div><span class="k">商铺营业状态:</span><span class="ant-tag ant-tag-gold">风控审核中</span></div>
+          <div><span class="k">启用状态:</span><span id="shopEnableStatus">空</span></div>
+          <div><span class="k">审核状态:</span><span id="shopAuditStatus" class="ant-tag ant-tag-gold">待审核</span></div>
           <div><span class="k">门店类型:</span><span>线下门店</span></div>
           <div><span class="k">开通 Kpay 服务:</span><span class="ant-tag ant-tag-blue">已开通</span></div>
         </div>
       </div>
-      <div class="btns" style="margin-top:0;"><button class="btn">编辑</button><button class="btn">审核通过（风控）</button><button class="btn">审核驳回</button><button class="btn">通知补件（风控）</button></div>
+      <div class="btns" id="detailActionButtons" style="margin-top:0;"></div>
     </section>
 
     <section class="card section-nav">
-      <button class="nav-btn" data-target="enterprise">关联企业信息</button><button class="nav-btn" data-target="mid">关联的MID</button><button class="nav-btn" data-target="pk">主键 / 关联</button><button class="nav-btn" data-target="basic">商铺基础</button><button class="nav-btn" data-target="name">商铺名称</button><button class="nav-btn" data-target="contact">商铺联系</button><button class="nav-btn" data-target="address">商铺地址</button><button class="nav-btn" data-target="online">线上资料</button><button class="nav-btn" data-target="files">商铺文件</button><button class="nav-btn" data-target="feature">门店经营特征</button><button class="nav-btn" data-target="device">终端设备</button><button class="nav-btn" data-target="people">相关人员</button><button class="nav-btn" data-target="other">其他信息</button><button class="nav-btn" data-target="timeline">修改记录时间轴区</button>
+      <button class="nav-btn" data-target="enterprise">关联企业信息</button><button class="nav-btn" data-target="change-reason">修改理由</button><button class="nav-btn" data-target="timeline">修改记录时间轴区</button><button class="nav-btn" data-target="mid">关联的MID</button><button class="nav-btn" data-target="pk">主键 / 关联</button><button class="nav-btn" data-target="basic">商铺基础</button><button class="nav-btn" data-target="name">商铺名称</button><button class="nav-btn" data-target="contact">商铺联系</button><button class="nav-btn" data-target="address">商铺地址</button><button class="nav-btn" data-target="online">线上资料</button><button class="nav-btn" data-target="files">商铺文件</button><button class="nav-btn" data-target="feature">门店经营特征</button><button class="nav-btn" data-target="device">终端设备</button><button class="nav-btn" data-target="people">相关人员</button><button class="nav-btn" data-target="other">其他信息</button>
     </section>
 
-    <section id="enterprise" class="card section-block"><h3 class="section-title">关联企业信息</h3><div class="detail-grid"><div class="detail-item"><div class="label">CID</div><div class="value cid-highlight">CID-2026-0004</div></div><div class="detail-item"><div class="label">企业名称</div><div class="value cid-highlight">Everpeak Digital Commerce</div></div><div class="detail-item"><div class="label">企业营业状态</div><div class="value"><span class="ant-tag ant-tag-gold">风控审核中</span></div></div><div class="detail-item"><div class="label">企业类型</div><div class="value">企業商戶</div></div><div class="detail-item"><div class="label">所属地区</div><div class="value">香港</div></div><div class="detail-item"><div class="label">关联群组</div><div class="value"><span class="ant-tag ant-tag-purple">高风险行业</span><span class="ant-tag ant-tag-purple">跨境电商</span></div></div><div class="detail-item"><div class="label">操作：查看企业详情</div><div class="value"><a class="link" href="enterprise-detail-approved-enabled.html">查看企业详情</a></div></div></div></section>
+    <section id="enterprise" class="card section-block"><h3 class="section-title">关联企业信息</h3><div class="detail-grid"><div class="detail-item"><div class="label">CID</div><div class="value cid-highlight">CID-2026-0004</div></div><div class="detail-item"><div class="label">企业名称</div><div class="value cid-highlight">Everpeak Digital Commerce</div></div><div class="detail-item"><div class="label">企业营业状态</div><div class="value"><span class="ant-tag ant-tag-gold">待审核</span></div></div><div class="detail-item"><div class="label">企业类型</div><div class="value">企業商戶</div></div><div class="detail-item"><div class="label">所属地区</div><div class="value">香港</div></div><div class="detail-item"><div class="label">关联群组</div><div class="value"><span class="ant-tag ant-tag-purple">高风险行业</span><span class="ant-tag ant-tag-purple">跨境电商</span></div></div><div class="detail-item"><div class="label">操作：查看企业详情</div><div class="value"><a class="link" href="enterprise-detail-approved-enabled.html">查看企业详情</a></div></div></div></section>
+
+    <section id="change-reason" class="card section-block"><h3 class="section-title">修改理由</h3><div class="detail-grid"><div class="detail-item"><div class="label">修改理由</div><div class="value">門店搬遷至新地址，需同步更新商铺地址、營業地址證明及商铺管理員電郵。</div></div><div class="detail-item"><div class="label">修改申请文件</div><div class="value file-card"><div class="file-row"><span>shop-change-request-20260427.pdf</span><span>2026-04-27 10:18</span><a class="link" href="#">查看</a></div></div></div></div></section>
+
+    <section id="timeline" class="card section-block"><h3 class="section-title">修改记录时间轴区</h3><div class="timeline"><div class="item"><strong>2026-04-27 10:20</strong> - 提交人：陳嘉怡（商戶管理員）提交資料修改申請。<br />修改字段：商铺主要營業地址、商铺管理員電郵、營業地址證明。<br />修改前：香港中环皇后大道中99号19楼A室 / ops.central@everpeak.hk / address-proof-v1.pdf。<br />修改後：香港中环德輔道中188號21樓B室 / compliance.central@everpeak.hk / address-proof-v2.pdf。</div><div class="item"><strong>2026-04-27 11:05</strong> - 提交人：王志遠（銷售主管）完成初審並轉交風控中級審核。<br />修改字段：審核進度。<br />修改前：销售主管審核。<br />修改後：風控中級審核。</div><div class="item"><strong>2026-04-27 12:10</strong> - 提交人：劉子豪（風控專員）補充審核意見。<br />修改字段：風險等級說明。<br />修改前：缺少地址搬遷證明。<br />修改後：已補交租約與水電單，建議流轉下一節點。</div></div></section>
 
     <section id="mid" class="card section-block"><h3 class="section-title">关联的MID</h3><div class="table-wrap"><table style="min-width:1200px;"><thead><tr><th>MID</th><th>通道</th><th>服务</th><th>MID状态</th><th>第三方MID</th><th>创建时间</th><th>操作</th></tr></thead><tbody><tr><td>MID-88901</td><td>AFP</td><td>paymentProcessing / POS</td><td><span class="ant-tag ant-tag-green">Active</span></td><td>ADYEN-3349001</td><td>2026-04-11 09:20</td><td><a class="link" href="mid-detail.html?id=MID-88901">查看详情</a></td></tr><tr><td>MID-88902</td><td>Adyen PayFac</td><td>eCommerce / PayByLink</td><td><span class="ant-tag ant-tag-blue">Pending</span></td><td>ADYEN-3349002</td><td>2026-04-12 11:10</td><td><a class="link" href="mid-detail.html?id=MID-88902">查看详情</a></td></tr><tr><td>MID-88903</td><td>其他通道</td><td>POS</td><td><span class="ant-tag ant-tag-gold">Suspended</span></td><td>-</td><td>2026-04-13 16:22</td><td><a class="link" href="mid-detail.html?id=MID-88903">查看详情</a></td></tr></tbody></table></div></section>
 
@@ -106,12 +111,31 @@
 
     <section id="other" class="card section-block"><h3 class="section-title">其他信息</h3><div class="detail-grid"><div class="detail-item"><div class="label">風控類型</div><div class="value">标准风控</div></div><div class="detail-item"><div class="label">合約期</div><div class="value">24个月</div></div></div></section>
 
-    <section id="timeline" class="card section-block"><h3 class="section-title">修改记录时间轴区</h3><div class="timeline"><div class="item"><strong>2026-04-21 14:30</strong>｜OPS｜启用 / 停用记录｜状态调整。</div><div class="item"><strong>2026-04-19 10:25</strong>｜Olivia｜资料修改记录｜更新线上资料与门店照片。</div><div class="item"><strong>2026-04-18 15:30</strong>｜Risk Team｜审核通过记录｜审核意见：风险可控。</div><div class="item"><strong>2026-04-16 11:05</strong>｜OPS｜通知补件记录｜补件内容：补充租約證明。</div><div class="item"><strong>2026-04-11 09:11</strong>｜Olivia｜创建记录｜新建商铺资料。</div></div></section>
+
   </main>
 </div>
 <script>
   const shellTopHeight = 72;
   const stickyGap = 8;
+  const actionMatrix = {
+    '空|待审核': ['编辑', '审核通过（OPS）', '审核驳回', '通知补件（OPS）'],
+    '空|待风控审核': ['编辑', '审核通过（风控）', '审核驳回', '通知补件（风控）'],
+    '空|待第三方审核': [],
+    '启用|审核通过': ['编辑', '停用'],
+    '停用|审核通过': ['编辑', '启用'],
+    '空|审核不通过': ['重新提交审核']
+  };
+  function renderDetailButtons() {
+    const enableStatus = (document.getElementById('shopEnableStatus')?.textContent || '空').trim();
+    const auditStatus = (document.getElementById('shopAuditStatus')?.textContent || '').trim();
+    const key = `${enableStatus}|${auditStatus}`;
+    const actions = actionMatrix[key] || [];
+    const actionWrap = document.getElementById('detailActionButtons');
+    if (!actionWrap) return;
+    actionWrap.innerHTML = actions.map(text => `<button class="btn">${text}</button>`).join('');
+  }
+  renderDetailButtons();
+
   function syncStickyOffsets() {
     const headerCard = document.querySelector('.shop-header');
     if (!headerCard) return;
