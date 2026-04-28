@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商铺资料修改待审核-列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="shell-top">
+    <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+    <div class="top-controls">
+      <select><option>地区：香港</option><option>地区：新加坡</option></select>
+      <select><option>语言：简体中文</option><option>English</option></select>
+      <button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button>
+      <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3 active" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
+
+    <main class="main">
+      <section class="card">
+        <h3 class="section-title">筛选区</h3>
+        <div class="grid-3">
+          <div class="field"><label>商戶名稱</label><input placeholder="请输入商戶名稱" /></div>
+          <div class="field"><label>紙合同編號</label><input placeholder="请输入紙合同編號" /></div>
+          <div class="field"><label>修改來源</label><select><option>全部</option><option>CRM後台</option><option>商戶端提交</option><option>API同步</option></select></div>
+          <div class="field"><label>商铺SID</label><input placeholder="请输入商铺 SID" /></div>
+          <div class="field"><label>手提電話</label><input placeholder="请输入手提電話" /></div>
+          <div class="field"><label>審核進度</label><select><option>全部</option><option>销售主管審核</option><option>風控中級審核</option><option>總經理審核</option><option>風控審核完成</option><option>支付機構核</option><option>完成審核</option><option>支付機構審核通過</option><option>支付機構審核不通過</option></select></div>
+          <div class="field"><label>商铺類型</label><select><option>全部</option><option>線下門店</option><option>網店</option><option>綜合門店</option></select></div>
+          <div class="field"><label>參與審核人員</label><input placeholder="请输入審核人員" /></div>
+          <div class="field"><label>進件通道</label><select><option>全部</option><option>Adyen-AFP</option><option>Adyen-payfac</option></select></div>
+          <div class="field"><label>審核類型</label><select><option>全部</option><option>系統自動審核拒絕</option><option>人工復審拒絕</option><option>系統自動審核通過</option><option>人工複蜜通過</option></select></div>
+        </div>
+        <div class="btns"><button class="btn primary">查询</button><button class="btn">重置</button></div>
+      </section>
+
+      <section class="card">
+        <h3 class="section-title">列表区</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>修改理由</th><th>原因說明</th><th>商铺名稱（当地语言）</th><th>商铺SID</th><th>商铺類型</th><th>進件通道</th><th>業務性質</th><th>風險等級</th><th>修改來源</th><th>審核進度</th><th>修改時間</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>更新門店營業地址</td><td>中環店搬遷，需同步更新地址與地址證明</td><td>遠峰中環旗艦店</td><td>SID-3001</td><td>線下門店</td><td>Adyen-AFP</td><td>零售</td><td><span class="badge warning">中風險</span></td><td>商戶端提交</td><td><span class="badge processing">風控中級審核</span></td><td>2026-04-27 10:20</td><td class="ops"><a href="shop-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+              <tr><td>補充線上商城資料</td><td>新增 H5 網址與支付域名，更新聯絡郵箱</td><td>藍港尖沙咀店</td><td>SID-3056</td><td>綜合門店</td><td>Adyen-payfac</td><td>連鎖餐飲</td><td><span class="badge danger">高風險</span></td><td>CRM後台</td><td><span class="badge warning">總經理審核</span></td><td>2026-04-26 16:55</td><td class="ops"><a href="shop-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+              <tr><td>修改店鋪名稱</td><td>品牌升級，門店中文名與英文名同步變更</td><td>星際旺角店</td><td>SID-3188</td><td>線下門店</td><td>Adyen-AFP</td><td>服飾零售</td><td><span class="badge">低風險</span></td><td>API同步</td><td><span class="badge success">支付機構審核通過</span></td><td>2026-04-25 11:08</td><td class="ops"><a href="shop-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>企业资料修改待审核-列表</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="shell-top">
+    <div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div>
+    <div class="top-controls">
+      <select><option>地区：香港</option><option>地区：新加坡</option></select>
+      <select><option>语言：简体中文</option><option>English</option></select>
+      <button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button>
+      <div class="user-pill"><div class="avatar">OP</div> Olivia</div>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3 active" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+      <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+    </aside>
+
+    <main class="main">
+      <section class="card">
+        <h3 class="section-title">筛选区</h3>
+        <div class="grid-3">
+          <div class="field"><label>商戶名稱</label><input placeholder="请输入商戶名稱" /></div>
+          <div class="field"><label>KBA標箋</label><select><option>全部</option><option>高風險</option><option>教育</option><option>醫療</option></select></div>
+          <div class="field"><label>修改來源</label><select><option>全部</option><option>CRM後台</option><option>商戶端提交</option><option>API同步</option></select></div>
+          <div class="field"><label>企业CID</label><input placeholder="请输入企业 CID" /></div>
+          <div class="field"><label>手提電話</label><input placeholder="请输入手提電話" /></div>
+          <div class="field"><label>審核進度</label><select><option>全部</option><option>销售主管審核</option><option>風控中級審核</option><option>總經理審核</option><option>風控審核完成</option><option>支付機構核</option><option>完成審核</option><option>支付機構審核通過</option><option>支付機構審核不通過</option></select></div>
+          <div class="field"><label>管理员電郵</label><input placeholder="请输入管理员電郵" /></div>
+          <div class="field"><label>企业類型</label><select><option>全部</option><option>企業商戶</option><option>個體商戶</option></select></div>
+          <div class="field"><label>參與審核人員</label><input placeholder="请输入審核人員" /></div>
+          <div class="field"><label>進件通道</label><select><option>全部</option><option>Adyen-AFP</option><option>Adyen-payfac</option></select></div>
+          <div class="field"><label>審核類型</label><select><option>全部</option><option>系統自動審核拒絕</option><option>人工復審拒絕</option><option>系統自動審核通過</option><option>人工複蜜通過</option></select></div>
+        </div>
+        <div class="btns"><button class="btn primary">查询</button><button class="btn">重置</button></div>
+      </section>
+
+      <section class="card">
+        <h3 class="section-title">列表区</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>修改理由</th><th>原因說明</th><th>企业名稱（当地语言）</th><th>企业CID</th><th>企业類型</th><th>進件通道</th><th>業務性質</th><th>KBA標籤</th><th>風險等級</th><th>修改來源</th><th>審核進度</th><th>修改時間</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>更新公司註冊地址</td><td>搬遷總部至觀塘商業區，需同步證照地址</td><td>星河零售有限公司</td><td>CID-2026-0001</td><td>企業商戶</td><td>Adyen-AFP</td><td>跨境零售</td><td>高風險</td><td><span class="badge warning">中風險</span></td><td>商戶端提交</td><td><span class="badge processing">風控中級審核</span></td><td>2026-04-26 14:22</td><td class="ops"><a href="enterprise-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+              <tr><td>修改受益人資訊</td><td>新增實際控制人與股權比例更新</td><td>藍港餐飲集團有限公司</td><td>CID-2026-0038</td><td>企業商戶</td><td>Adyen-payfac</td><td>連鎖餐飲</td><td>餐飲</td><td><span class="badge danger">高風險</span></td><td>CRM後台</td><td><span class="badge warning">總經理審核</span></td><td>2026-04-25 09:16</td><td class="ops"><a href="enterprise-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+              <tr><td>補充稅務資料</td><td>上傳最新稅務申報與VAT說明</td><td>天際精品有限公司</td><td>CID-2026-0072</td><td>企業商戶</td><td>Adyen-AFP</td><td>服飾零售</td><td>一般</td><td><span class="badge">低風險</span></td><td>API同步</td><td><span class="badge success">支付機構審核通過</span></td><td>2026-04-24 18:48</td><td class="ops"><a href="enterprise-change-review-detail.html">查看详情</a><button class="btn link">资料更新</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
