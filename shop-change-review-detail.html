@@ -50,11 +50,13 @@
         <h2>Everpeak Central Flagship（商铺资料修改待审核）</h2>
         <div class="meta-grid">
           <div><span class="k">SID:</span><span>SID-3001</span></div>
-          <div><span class="k">商铺营业状态:</span><span class="ant-tag ant-tag-gold">待审核</span></div>
+          <div><span class="k">启用状态:</span><span id="shopEnableStatus">空</span></div>
+          <div><span class="k">审核状态:</span><span id="shopAuditStatus" class="ant-tag ant-tag-gold">待审核</span></div>
           <div><span class="k">门店类型:</span><span>线下门店</span></div>
           <div><span class="k">开通 Kpay 服务:</span><span class="ant-tag ant-tag-blue">已开通</span></div>
         </div>
       </div>
+      <div class="btns" id="detailActionButtons" style="margin-top:0;"></div>
     </section>
 
     <section class="card section-nav">
@@ -115,6 +117,25 @@
 <script>
   const shellTopHeight = 72;
   const stickyGap = 8;
+  const actionMatrix = {
+    '空|待审核': ['编辑', '审核通过（OPS）', '审核驳回', '通知补件（OPS）'],
+    '空|待风控审核': ['编辑', '审核通过（风控）', '审核驳回', '通知补件（风控）'],
+    '空|待第三方审核': [],
+    '启用|审核通过': ['编辑', '停用'],
+    '停用|审核通过': ['编辑', '启用'],
+    '空|审核不通过': ['重新提交审核']
+  };
+  function renderDetailButtons() {
+    const enableStatus = (document.getElementById('shopEnableStatus')?.textContent || '空').trim();
+    const auditStatus = (document.getElementById('shopAuditStatus')?.textContent || '').trim();
+    const key = `${enableStatus}|${auditStatus}`;
+    const actions = actionMatrix[key] || [];
+    const actionWrap = document.getElementById('detailActionButtons');
+    if (!actionWrap) return;
+    actionWrap.innerHTML = actions.map(text => `<button class="btn">${text}</button>`).join('');
+  }
+  renderDetailButtons();
+
   function syncStickyOffsets() {
     const headerCard = document.querySelector('.shop-header');
     if (!headerCard) return;
