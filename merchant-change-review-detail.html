@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商户资料修改待审核-详情</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .detail-header { position: sticky; top: 72px; z-index: 902; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .title-wrap h2 { margin: 0 0 10px; font-size: 24px; }
+    .meta-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px 16px; font-size: 13px; }
+    .meta-grid .k { color: var(--muted); margin-right: 6px; }
+    .section-nav { position: sticky; top: var(--detail-nav-top, 200px); z-index: 901; display: flex; flex-wrap: wrap; gap: 8px; }
+    .section-nav .nav-btn { border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+    .section-nav .nav-btn.active { background: var(--primary-soft); color: var(--primary-dark); border-color: color-mix(in srgb, var(--primary) 35%, white); }
+    .section-block { scroll-margin-top: var(--detail-scroll-offset, 320px); }
+    .detail-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px 16px; }
+    .detail-item { border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+    .detail-item.wide { grid-column: span 2; }
+    .detail-item.full { grid-column: 1 / -1; }
+    .label { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .value { font-size: 14px; min-height: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .warn-bar { background: #fff7e6; border: 1px solid #ffd591; color: #ad6800; padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; }
+    .sub-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-top: 10px; background: #fff; }
+    .mini-title { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+    .timeline-item { display:flex; gap:10px; margin:10px 0; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#1677ff; margin-top:5px; }
+    @media (max-width: 1400px) { .meta-grid,.detail-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option><option>地区：新加坡</option></select><select><option>语言：简体中文</option><option>English</option></select><button title="设置">⚙️</button><button title="通知">🔔<span class="badge danger">3</span></button><div class="user-pill"><div class="avatar">OP</div> Olivia</div></div></header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="menu-group"><div class="menu-title">商户管理</div><ul class="menu-list"><li><a href="enterprise-list.html">企业管理</a></li><li><a href="shop-list.html">商铺管理</a></li><li><a href="merchant-list.html">商户审核</a></li><li><a href="group-management.html">群组管理</a></li><li><a href="signed-merchants.html">已签约商户</a></li><li><a href="cancelled-merchants.html">取消签约商户</a></li><li><a href="rejected-merchants.html">拒绝签约商户</a></li><li><div>资料修改待审核</div><a class="lvl3" href="enterprise-change-review.html">企业资料修改待审核</a><a class="lvl3" href="shop-change-review.html">商铺资料修改待审核</a><a class="lvl3 active" href="merchant-change-review.html">商户资料修改待审核</a></li><li><a href="terminal-approval.html">终端设备申请/回收单审批</a></li><li><a href="merchant-onboarding.html">商户进件</a></li><li><a href="afp-mapping.html">AFP 字段映射配置</a></li></ul></div>
+    <div class="menu-group"><div class="menu-title">合约管理</div><ul class="menu-list"><li><a href="generated-contracts.html">已生成的合约</a></li><li><a href="contract-mapping.html">合约字段映射配置</a></li></ul></div>
+    <div class="menu-group"><div class="menu-title">其他模块</div><ul class="menu-list"><li><a href="os-supplement.html">O/S补件</a></li><li><a href="channel-management.html">通道管理</a></li></ul></div>
+  </aside>
+
+  <main class="main">
+    <section id="merchant-overview" class="card detail-header section-block">
+      <div class="title-wrap">
+        <h2>MID-990101（商户资料修改待审核）</h2>
+        <div class="meta-grid">
+          <div><span class="k">MID:</span><span>MID-990101</span></div>
+          <div><span class="k">CID:</span><span>CID-2026-0001</span></div>
+          <div><span class="k">SID:</span><span>SID-3001</span></div>
+          <div><span class="k">进件通道:</span><span>Adyen-AFP</span></div>
+          <div><span class="k">商户审核状态:</span><span class="badge processing">風控中級審核</span></div>
+          <div><span class="k">当前审核人:</span><span>Ivy（Risk）</span></div>
+        </div>
+      </div>
+      <div class="btns" style="margin-top:0;"><button class="btn primary">通过</button><button class="btn">拒绝</button></div>
+    </section>
+
+    <section class="card section-nav">
+      <button class="nav-btn" data-target="merchant-overview">商户概览</button>
+      <button class="nav-btn" data-target="change-reason">修改原因</button>
+      <button class="nav-btn" data-target="timeline">修改记录时间轴</button>
+      <button class="nav-btn" data-target="enterprise-review">企业审核信息</button>
+      <button class="nav-btn" data-target="shop-review">商铺审核信息</button>
+      <button class="nav-btn" data-target="key-rel">主键与关联</button>
+      <button class="nav-btn" data-target="flow-info">审核流转</button>
+      <button class="nav-btn" data-target="merchant-block">审核阻塞提示</button>
+      <button class="nav-btn" data-target="settlement-bank">结算与银行</button>
+      <button class="nav-btn" data-target="product-rate">产品费率</button>
+      <button class="nav-btn" data-target="special-rate">特殊费率申请</button>
+    </section>
+
+    <section id="change-reason" class="card section-block">
+      <h3 class="section-title">修改原因区域</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="label">修改理由</div><div class="value">更新结算账户资料</div></div>
+        <div class="detail-item"><div class="label">修改来源</div><div class="value">商户端提交</div></div>
+        <div class="detail-item"><div class="label">审核运行单号</div><div class="value">MCR-20260427-0009</div></div>
+        <div class="detail-item full"><div class="label">原因说明</div><div class="value">财务结算银行账户更换，需同步更新账户信息及授权资料。</div></div>
+      </div>
+    </section>
+
+    <section id="timeline" class="card section-block">
+      <h3 class="section-title">修改记录时间轴区域</h3>
+      <div class="timeline">
+        <div class="timeline-item"><span class="dot"></span><div><strong>2026-04-27 10:35</strong><div>商户提交资料修改申请</div></div></div>
+        <div class="timeline-item"><span class="dot"></span><div><strong>2026-04-27 13:20</strong><div>OPS 初审通过，进入风控中级审核</div></div></div>
+        <div class="timeline-item"><span class="dot"></span><div><strong>进行中</strong><div>等待风控中级审核结果</div></div></div>
+      </div>
+    </section>
+
+    <section id="enterprise-review" class="card section-block">
+      <h3 class="section-title">企业审核信息区</h3>
+      <div class="warn-bar">企业存在未完成资料修改待审核单，商户可继续单独审核，进件将在全部审核完成后触发。</div>
+      <div class="sub-card"><h4 class="mini-title">企业审核关键字段（精简）</h4><div class="detail-grid"><div class="detail-item"><div class="label">企业主显示名称</div><div class="value">Everpeak Digital Commerce</div></div><div class="detail-item"><div class="label">CID</div><div class="value">CID-2026-0001</div></div><div class="detail-item"><div class="label">资料修改审核状态</div><div class="value"><span class="badge warning">待审核</span></div></div><div class="detail-item"><div class="label">风险等级</div><div class="value">中风险</div></div></div></div>
+      <div class="btns" style="justify-content:flex-start;"><a class="btn" href="enterprise-change-review-detail.html">查看详情</a><a class="btn primary" href="enterprise-change-review-detail.html">审核</a></div>
+    </section>
+
+    <section id="shop-review" class="card section-block">
+      <h3 class="section-title">商铺审核信息区</h3>
+      <div class="warn-bar">商铺存在未完成资料修改待审核单，商户可继续单独审核，进件将在全部审核完成后触发。</div>
+      <div class="sub-card"><h4 class="mini-title">商铺审核关键字段（精简）</h4><div class="detail-grid"><div class="detail-item"><div class="label">商铺主显示名称</div><div class="value">Everpeak Central Flagship</div></div><div class="detail-item"><div class="label">SID</div><div class="value">SID-3001</div></div><div class="detail-item"><div class="label">资料修改审核状态</div><div class="value"><span class="badge processing">风控审核中</span></div></div><div class="detail-item"><div class="label">风险等级</div><div class="value">中风险</div></div></div></div>
+      <div class="btns" style="justify-content:flex-start;"><a class="btn" href="shop-change-review-detail.html">查看详情</a><a class="btn primary" href="shop-change-review-detail.html">审核</a></div>
+    </section>
+
+    <section id="key-rel" class="card section-block"><h3 class="section-title">主键与关联信息区</h3><div class="detail-grid"><div class="detail-item"><div class="label">MID</div><div class="value">MID-990101</div></div><div class="detail-item"><div class="label">CID</div><div class="value">CID-2026-0001</div></div><div class="detail-item"><div class="label">SID</div><div class="value">SID-3001</div></div><div class="detail-item"><div class="label">渠道编码</div><div class="value">CHN-ADYEN-HK-01</div></div><div class="detail-item"><div class="label">服务编码</div><div class="value">SRV-CARD-CNP-01</div></div></div></section>
+
+    <section id="flow-info" class="card section-block"><h3 class="section-title">审核流转信息区</h3><div class="detail-grid"><div class="detail-item"><div class="label">当前审核状态</div><div class="value">风控中级审核</div></div><div class="detail-item"><div class="label">当前审核人</div><div class="value">Ivy（Risk）</div></div><div class="detail-item"><div class="label">上单来源</div><div class="value">CRM</div></div><div class="detail-item"><div class="label">创建时间</div><div class="value">2026-04-27 10:35</div></div><div class="detail-item"><div class="label">更新时间</div><div class="value">2026-04-27 13:20</div></div></div></section>
+
+    <section id="merchant-block" class="card section-block"><h3 class="section-title">商户审核阻塞提示区</h3><div class="warn-bar">当前企业和商铺资料修改审核未全部完成，但商户资料修改可独立继续审核。</div></section>
+
+    <section id="settlement-bank" class="card section-block"><h3 class="section-title">结算与银行信息区</h3><div class="detail-grid"><div class="detail-item"><div class="label">结算周期</div><div class="value">T+1</div></div><div class="detail-item"><div class="label">银行名称</div><div class="value">HSBC Hong Kong</div></div><div class="detail-item"><div class="label">账户号码</div><div class="value">***8891</div></div></div></section>
+
+    <section id="product-rate" class="card section-block"><h3 class="section-title">产品费率区</h3><div class="table-wrap"><table><thead><tr><th>支付产品</th><th>交易费率</th><th>固定收费</th><th>费率来源</th></tr></thead><tbody><tr><td>Visa/Master</td><td>2.20%</td><td>HKD 1.00</td><td>标准费率</td></tr><tr><td>UnionPay</td><td>2.10%</td><td>HKD 1.00</td><td>标准费率</td></tr></tbody></table></div></section>
+
+    <section id="special-rate" class="card section-block"><h3 class="section-title">特殊费率申请信息区</h3><div class="detail-grid"><div class="detail-item"><div class="label">是否存在在途特殊费率申请</div><div class="value">是</div></div><div class="detail-item"><div class="label">申请状态</div><div class="value">审批中</div></div><div class="detail-item"><div class="label">提交时间</div><div class="value">2026-04-27 11:00</div></div></div></section>
+  </main>
+</div>
+<script>
+  const shellTopHeight = 72;
+  const stickyGap = 8;
+  function syncStickyOffsets() {
+    const headerCard = document.querySelector('.detail-header');
+    if (!headerCard) return;
+    const navTop = shellTopHeight + headerCard.offsetHeight + stickyGap;
+    const scrollOffset = navTop + 56;
+    document.documentElement.style.setProperty('--detail-nav-top', `${navTop}px`);
+    document.documentElement.style.setProperty('--detail-scroll-offset', `${scrollOffset}px`);
+  }
+  syncStickyOffsets();
+  window.addEventListener('resize', syncStickyOffsets);
+
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const sections = [...navBtns].map(btn => document.getElementById(btn.dataset.target)).filter(Boolean);
+  navBtns.forEach(btn => btn.addEventListener('click', () => {
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) navBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.target === entry.target.id));
+    });
+  }, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+  sections.forEach(sec => observer.observe(sec));
+</script>
+</body>
+</html>
