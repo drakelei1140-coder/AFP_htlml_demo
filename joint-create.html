@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>快速创建客户（企业+商铺+商户）</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .stepper{display:flex;gap:8px;flex-wrap:wrap}
+    .step{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px}
+    .entity-card{border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:10px;background:var(--panel-2)}
+    .title-row{display:flex;justify-content:space-between;align-items:center}
+    .submodule{border:1px solid var(--border);border-radius:8px;padding:10px;margin:10px 0;background:#fff}
+    .rate-table{min-width:900px}
+    .danger-box{border:1px solid color-mix(in srgb,var(--danger) 40%,white);background:var(--danger-soft);padding:10px;border-radius:6px;color:var(--danger)}
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:1500}
+    .modal-mask.show{display:flex}
+    .modal{width:min(520px,92vw);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px}
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div></header>
+<div class="layout">
+  <aside class="sidebar" id="appSidebar"></aside>
+  <main class="main with-bottom-space">
+    <section class="sticky-nav"><div class="stepper"><span class="step">1 企业(CID)</span><span class="step">2 商铺(SID)</span><span class="step">3 商户(MID)</span><span class="step">4 提交确认</span></div></section>
+
+    <section class="card section-anchor" id="cid"><h3 class="section-title">企业信息区（CID）</h3>
+      <div class="submodule"><h4>1.主要数据</h4><div class="form-grid"><div class="field"><label>CID</label><input placeholder="自动生成" class="readonly"/></div><div class="field"><label>服务类型</label><select id="enterpriseServices" multiple><option>SaaS</option><option>payment</option><option>信贷</option></select></div></div></div>
+      <div class="submodule"><h4>2.企业名称</h4><div class="form-grid"><div class="field"><label>企业全称</label><input/></div><div class="field"><label>企业简称</label><input/></div></div></div>
+      <div class="submodule"><h4>3.企业地址</h4><div class="form-grid"><div class="field"><label>国家/地区</label><input/></div><div class="field"><label>详细地址</label><input/></div></div></div>
+      <div class="submodule"><h4>4.企业主体/经营</h4><div class="form-grid"><div class="field"><label>注册号</label><input/></div><div class="field"><label>经营范围</label><textarea></textarea></div></div></div>
+      <div class="submodule"><h4>5.企业基础</h4><div class="form-grid"><div class="field"><label>企业类型</label><input/></div><div class="field"><label>成立日期</label><input type="date"/></div></div></div>
+      <div class="submodule"><h4>6.风控/业务</h4><div class="form-grid"><div class="field"><label>风控等级</label><input/></div><div class="field"><label>AFP标记</label><select id="afpFlag"><option>是</option><option>否</option></select></div></div></div>
+      <div class="submodule"><h4>7.企业联系</h4><div class="form-grid"><div class="field"><label>联系人</label><input/></div><div class="field"><label>联系电话</label><input/></div></div></div>
+      <div class="submodule"><h4>8.企业证件</h4><div class="form-grid"><div class="field"><label>证件类型</label><input/></div><div class="field"><label>证件号码</label><input/></div></div></div>
+      <div class="submodule"><h4>9.企业文件</h4><div class="form-grid"><div class="field"><label>营业执照</label><input type="file"/></div><div class="field"><label>公司章程</label><input type="file"/></div></div></div>
+      <div class="submodule"><h4>10.线上资料</h4><div class="form-grid"><div class="field"><label>官网</label><input/></div><div class="field"><label>社媒链接</label><input/></div></div></div>
+      <div class="submodule"><h4>11.相关人员</h4><table><tr><th>姓名</th><th>角色</th><th>电话</th></tr><tr><td><input/></td><td><input/></td><td><input/></td></tr></table></div>
+    </section>
+
+    <section class="card section-anchor" id="sidWrap"><div class="title-row"><h3 class="section-title">商铺信息区（SID × N）</h3><button class="btn" id="addSidBtn">+ 新增商铺</button></div><div id="sidList"></div></section>
+
+    <section class="card section-anchor" id="confirm"><h3 class="section-title">提交确认区</h3><div class="danger-box" id="afpHint">AFP逻辑：AFP跳过内部风控，直接进入进件流程，AFP状态驱动MID状态。</div><div class="field"><label><input type="checkbox"/> 我已确认CID/SID/MID信息与费率配置准确无误并提交审核</label></div></section>
+  </main>
+</div>
+
+<div class="bottom-actions"><button class="btn">取消</button><button class="btn" id="saveDraft">保存草稿（不校验）</button><button class="btn primary" id="submitBtn">提交（全校验）</button></div>
+<div class="modal-mask" id="serviceModal"><div class="modal"><h4>是否为企业开通该服务？</h4><p>当前商铺选择了 payment，但企业未选择 payment。</p><div class="btns"><button class="btn" onclick="closeModal()">NO</button><button class="btn primary" onclick="confirmEnablePayment()">YES</button></div></div></div>
+
+<script src="assets/app.js"></script>
+<script>
+renderGlobalSidebar('appSidebar','joint-create.html'); applyBrandPaletteFromLogo();
+let sidIndex=0;
+const rateTypes=['借记卡-境外','贷记卡-境外','借记卡-境内','贷记卡-境内'];
+const products=['VISA','Mastercard','UnionPay'];
+function rateRows(){return products.map(p=>rateTypes.map(t=>`<tr><td>${p}</td><td>${t}</td><td><input value="2.50%"/></td><td><input value="0.00"/></td><td><select><option>开</option><option>关</option></select></td></tr>`).join('')).join('')}
+function sidTemplate(idx){return `<div class='entity-card' data-sid='${idx}'>
+<h4>SID #${idx+1}</h4>
+<div class='submodule'><h4>1.关联企业信息</h4><div class='form-grid'><div class='field'><label>关联CID</label><input class='readonly' value='当前CID' /></div><div class='field'><label>企业名称</label><input class='readonly' value='继承企业名称' /></div></div></div>
+<div class='submodule'><h4>2.关联MID</h4><button class='btn' onclick='addMid(${idx})'>+ 新增MID</button><div id='midList-${idx}'></div></div>
+<div class='submodule'><h4>3.主键/关联</h4><div class='form-grid'><div class='field'><label>SID</label><input class='readonly' placeholder='自动生成'/></div><div class='field'><label>服务</label><select class='sid-services' onchange='checkServiceLinkage(this)' multiple><option>SaaS</option><option>payment</option><option>信贷</option></select></div></div></div>
+<div class='submodule'><h4>4.商铺基础</h4><div class='form-grid'><div class='field'><label>业态</label><input/></div><div class='field'><label>营业时间</label><input/></div></div></div>
+<div class='submodule'><h4>5.商铺名称</h4><div class='form-grid'><div class='field'><label>商铺全称</label><input/></div><div class='field'><label>商铺简称</label><input/></div></div></div>
+<div class='submodule'><h4>6.商铺联系</h4><div class='form-grid'><div class='field'><label>联系人</label><input/></div><div class='field'><label>联系电话</label><input/></div></div></div>
+<div class='submodule'><h4>7.商铺地址</h4><div class='form-grid'><div class='field'><label>国家/地区</label><input/></div><div class='field'><label>详细地址</label><input/></div></div></div>
+<div class='submodule'><h4>8.线上资料</h4><div class='form-grid'><div class='field'><label>线上店铺链接</label><input/></div><div class='field'><label>APP下载链接</label><input/></div></div></div>
+<div class='submodule'><h4>9.商铺文件</h4><input type='file'/></div><div class='submodule'><h4>10.门店经营特征</h4><input/></div><div class='submodule'><h4>11.终端设备</h4><input/></div><div class='submodule'><h4>12.相关人员</h4><input/></div><div class='submodule'><h4>13.其他信息</h4><textarea></textarea></div><div class='submodule'><h4>14.时间轴</h4><div class='timeline'><div class='item'>创建中</div></div></div>
+</div>`}
+function midTemplate(){return `<div class='submodule'><h4>MID信息</h4>
+<h5>1.商户概览</h5><div class='form-grid'><div class='field'><label>MID</label><input class='readonly' placeholder='自动生成'/></div><div class='field'><label>状态</label><input class='readonly' value='待提交'/></div></div>
+<h5>2.主键与关联信息</h5><input placeholder='关联CID/SID'/><h5>3.商户基础资料</h5><input/><h5>4.审核流转信息</h5><input/>
+<h5>5.企业审核信息（嵌入）</h5><input class='readonly' value='读取企业审核结果'/><h5>6.商铺审核信息（嵌入）</h5><input class='readonly' value='读取商铺审核结果'/>
+<h5>7.商户审核阻塞提示</h5><div class='danger-box'>如企业或商铺未满足要求，将阻塞MID提交。</div>
+<h5>8.结算与银行信息</h5><div class='form-grid'><div class='field'><label>结算周期</label><input/></div><div class='field'><label>收款账户</label><input/></div></div>
+<h5>9.通道选择</h5><input placeholder='Adyen_AFP / Stripe_Direct 等'/>
+<h5>10.支付产品与费率</h5><div class='table-wrap'><table class='rate-table'><tr><th>支付产品</th><th>类型</th><th>交易费率</th><th>固定收费</th><th>开关</th></tr>${rateRows()}</table></div>
+<h5>11.费率模板</h5><select><option>默认模板A</option><option>默认模板B</option></select>
+<h5>12.特殊费率申请信息</h5><textarea placeholder='申请原因、审批单号'></textarea>
+<h5>13.时间轴</h5><div class='timeline'><div class='item'>待提交</div></div></div>`}
+function addSid(){document.getElementById('sidList').insertAdjacentHTML('beforeend',sidTemplate(sidIndex++));}
+function addMid(i){document.getElementById(`midList-${i}`).insertAdjacentHTML('beforeend',midTemplate());}
+function checkServiceLinkage(select){const sidHas=[...select.options].some(o=>o.selected&&o.value==='payment'); const entSel=document.getElementById('enterpriseServices'); const entHas=[...entSel.options].some(o=>o.selected&&o.value==='payment'); if(sidHas && !entHas){document.getElementById('serviceModal').classList.add('show');}}
+function closeModal(){document.getElementById('serviceModal').classList.remove('show');}
+function confirmEnablePayment(){const entSel=document.getElementById('enterpriseServices'); [...entSel.options].forEach(o=>{if(o.value==='payment')o.selected=true}); closeModal(); alert('企业已开通payment，企业字段已按最严格规则重算并触发校验（mock）。');}
+addSid(); addMid(0);
+document.getElementById('addSidBtn').addEventListener('click',addSid);
+document.getElementById('saveDraft').addEventListener('click',()=>alert('草稿已保存（未校验）'));
+document.getElementById('submitBtn').addEventListener('click',()=>alert('执行全校验：字段展示并集、必填取并、校验取最严格；通过后提交审核。'));
+</script>
+</body></html>
