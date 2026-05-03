@@ -235,6 +235,7 @@ const GLOBAL_SIDEBAR_MENU = [
       },
       { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
       { text: '商户进件', href: 'merchant-onboarding.html' },
+      { text: '快速创建客户', href: 'joint-create.html' },
       { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
     ]
   },

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>快速创建客户（渐进式）</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .progress{display:flex;gap:8px;flex-wrap:wrap}.step{padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);font-size:12px}
+    .step.done{background:var(--success-soft);color:var(--success)}.step.active{background:var(--primary-soft);color:var(--primary-dark)}
+    .hidden{display:none}.card-h{display:flex;justify-content:space-between;align-items:center}
+    .entity{border:1px solid var(--border);border-radius:8px;background:var(--panel-2);padding:12px;margin-top:10px}
+    .sub{border:1px solid var(--border);border-radius:8px;background:#fff;padding:10px;margin:10px 0}
+    .pill{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:#fff}
+    .warn{border:1px solid color-mix(in srgb,var(--danger) 36%,white);color:var(--danger);background:var(--danger-soft);padding:8px;border-radius:6px}
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:1600}.modal-mask.show{display:flex}
+    .modal{width:min(560px,94vw);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px}
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div></header>
+<div class="layout"><aside class="sidebar" id="appSidebar"></aside>
+<main class="main with-bottom-space">
+  <section class="sticky-nav"><div class="progress" id="progress"></div></section>
+
+  <section class="card" id="enterpriseCard">
+    <div class="card-h"><h3 class="section-title">企业信息卡片（CID）</h3><span class="pill" id="entStatus">未保存</span></div>
+    <div class="sub"><h4>企业基础信息（初始最小录入）</h4><div class="form-grid">
+      <div class="field"><label>企业名称 *</label><input id="e_name"/></div><div class="field"><label>企业类型 *</label><input id="e_type"/></div>
+      <div class="field"><label>注册国家 / 地区 *</label><input id="e_region"/></div><div class="field"><label>联系电话 *</label><input id="e_phone"/></div>
+      <div class="field"><label>邮箱 *</label><input id="e_email"/></div><div class="field"><label>开通 Kpay 服务 *</label>
+        <select id="enterpriseServices" multiple onchange="onEnterpriseServiceChange()"><option>SaaS</option><option>payment</option><option>信贷</option></select></div>
+    </div></div>
+    <div id="enterpriseDynamic" class="hidden"></div>
+    <div class="btns"><button class="btn" onclick="saveEnterpriseDraft()">保存企业草稿</button></div>
+    <div class="desc">配置快照：企业字段规则版本、服务规则版本。</div>
+  </section>
+
+  <section class="card hidden" id="shopSection">
+    <div class="card-h"><h3 class="section-title">商铺列表区域（SID）</h3><button class="btn" onclick="addShop()">+ 新增商铺</button></div>
+    <div id="shopList"></div>
+  </section>
+</main></div>
+
+<div class="bottom-actions"><button class="btn">取消</button><button class="btn" onclick="saveAllDraft()">保存全部草稿</button><button class="btn primary" onclick="submitAll()">提交审核</button></div>
+<div class="modal-mask" id="linkModal"><div class="modal"><h4>服务联动确认</h4><p id="linkModalText"></p><div class="btns"><button class="btn" onclick="rejectLinkage()">否</button><button class="btn primary" onclick="acceptLinkage()">是</button></div></div></div>
+<script src="assets/app.js"></script>
+<script>
+renderGlobalSidebar('appSidebar','joint-create.html');applyBrandPaletteFromLogo();
+const state={enterprise:{status:'未保存',services:[],draftNo:'',needResave:false},shops:[],pending:null};
+const enterpriseModules=['主要数据','企业名称','企业地址','企业主体 / 经营','企业基础','风控 / 业务','企业联系','企业证件','企业文件','线上资料','相关人员'];
+const shopModules=['主键 / 关联','商铺基础','商铺名称','商铺联系','商铺地址','线上资料','商铺文件','门店经营特征','终端设备','相关人员','其他信息'];
+const midModules=['商户概览','主键与关联信息','商户基础资料','审核流转信息','企业审核信息','商铺审核信息','商户审核阻塞提示','结算与银行信息','通道选择','支付产品与费率','费率模板','特殊费率申请信息','时间轴'];
+const types=['借记卡-境外','贷记卡-境外','借记卡-境内','贷记卡-境内']; const products=['VISA','Mastercard','UnionPay'];
+function renderProgress(){const ss=['企业基础','企业草稿','商铺草稿','MID草稿','提交审核'];const idx= state.enterprise.status==='未保存'?0:1;document.getElementById('progress').innerHTML=ss.map((s,i)=>`<span class='step ${i<idx?'done':''} ${i===idx?'active':''}'>${i+1}. ${s}</span>`).join('')}
+function serviceVals(sel){return [...sel.options].filter(o=>o.selected).map(o=>o.value)}
+function onEnterpriseServiceChange(){state.enterprise.services=serviceVals(document.getElementById('enterpriseServices'));renderEnterpriseDynamic();}
+function renderEnterpriseDynamic(){const box=document.getElementById('enterpriseDynamic');if(!state.enterprise.services.length){box.classList.add('hidden');box.innerHTML='';return;}box.classList.remove('hidden');box.innerHTML=enterpriseModules.map((m,i)=>`<div class='sub'><h4>${i+1}. ${m}</h4><div class='form-grid'><div class='field'><label>${m}字段A${state.enterprise.services.includes('payment')?' *':''}</label><input ${state.enterprise.needResave?'style="border-color:var(--danger)"':''}/></div><div class='field'><label>${m}字段B</label><input/></div></div></div>`).join('')+`<div class='warn'>字段展示=并集，必填=任一服务要求必填，校验=最严格规则（mock）。</div>`}
+function saveEnterpriseDraft(){state.enterprise.status='已保存草稿';state.enterprise.draftNo='EC-DRAFT-'+Date.now().toString().slice(-6);state.enterprise.needResave=false;document.getElementById('entStatus').textContent='已保存草稿';document.getElementById('shopSection').classList.remove('hidden');renderEnterpriseDynamic();renderProgress();}
+function shopCard(s){return `<div class='entity' id='shop-${s.id}'><div class='card-h'><h4>商铺 ${s.tempNo}</h4><span class='pill'>${s.status}</span></div>
+<div class='btns' style='justify-content:flex-start'><button class='btn' onclick='toggleShop(${s.id})'>展开/收起</button><button class='btn' onclick='removeShop(${s.id})'>删除商铺</button><button class='btn' onclick='saveShopDraft(${s.id})'>保存商铺草稿</button></div>
+<div id='shop-body-${s.id}'><div class='sub'><h4>商铺基础信息（初始）</h4><div class='form-grid'><div class='field'><label>商铺名称 *</label><input/></div><div class='field'><label>门店类型 *</label><input/></div><div class='field'><label>营业国家 / 地区 *</label><input/></div><div class='field'><label>门店地址 *</label><input/></div><div class='field'><label>联系电话 *</label><input/></div><div class='field'><label>邮箱 *</label><input/></div><div class='field'><label>开通服务 *</label><select multiple onchange='onShopServiceChange(${s.id},this)'><option>SaaS</option><option>payment</option><option>信贷</option></select></div></div></div><div id='shop-dyn-${s.id}'></div></div></div>`}
+function addShop(){const id=Date.now()+Math.floor(Math.random()*999);state.shops.push({id,tempNo:'ES-DRAFT-'+String(state.shops.length+1).padStart(3,'0'),status:'未保存',services:[],collapsed:false,mids:[]});renderShops()}
+function renderShops(){document.getElementById('shopList').innerHTML=state.shops.map(shopCard).join('')}
+function toggleShop(id){const b=document.getElementById('shop-body-'+id);b.classList.toggle('hidden')}
+function removeShop(id){state.shops=state.shops.filter(x=>x.id!==id);renderShops()}
+function onShopServiceChange(id,sel){const srv=serviceVals(sel);const shop=state.shops.find(x=>x.id===id);shop.services=srv;
+ if(srv.some(x=>!state.enterprise.services.includes(x))){const miss=srv.find(x=>!state.enterprise.services.includes(x));state.pending={id,sel,service:miss};document.getElementById('linkModalText').textContent=`当前商铺选择了【${miss}】服务，但企业尚未开通该服务。是否同步为企业增加【${miss}】服务？`;document.getElementById('linkModal').classList.add('show');return;}
+ renderShopDynamic(shop)}
+function acceptLinkage(){const p=state.pending;if(!p)return;document.getElementById('linkModal').classList.remove('show');const eSel=document.getElementById('enterpriseServices');[...eSel.options].forEach(o=>{if(o.value===p.service)o.selected=true});state.enterprise.services=serviceVals(eSel);state.enterprise.needResave=true;state.enterprise.status='待提交';document.getElementById('entStatus').textContent='待提交（需重新保存草稿）';renderEnterpriseDynamic();const shop=state.shops.find(x=>x.id===p.id);renderShopDynamic(shop);state.pending=null;}
+function rejectLinkage(){const p=state.pending;if(!p)return;document.getElementById('linkModal').classList.remove('show');[...p.sel.options].forEach(o=>{if(o.value===p.service)o.selected=false});const shop=state.shops.find(x=>x.id===p.id);shop.services=serviceVals(p.sel);renderShopDynamic(shop);state.pending=null;}
+function renderShopDynamic(shop){const dyn=document.getElementById('shop-dyn-'+shop.id);if(!shop.services.length){dyn.innerHTML='';return;}dyn.innerHTML=shopModules.map((m,i)=>`<div class='sub'><h4>${i+1}. ${m}</h4><div class='form-grid'><div class='field'><label>${m}字段A</label><input/></div><div class='field'><label>${m}字段B</label><input/></div></div></div>`).join('')+(shop.services.includes('payment')?midArea(shop):'')}
+function midArea(shop){return `<div class='sub'><h4>关联 MID（仅 payment）</h4><button class='btn' onclick='addMid(${shop.id})'>+ 新增 MID</button><div id='mid-list-${shop.id}'>${shop.mids.map(m=>midCard(shop.id,m)).join('')}</div></div>`}
+function midCard(shopId,m){return `<div class='entity'><div class='card-h'><h5>${m.tempNo}</h5><span class='pill'>${m.status}</span></div><div class='btns' style='justify-content:flex-start'><button class='btn' onclick='saveMidDraft(${shopId},${m.id})'>保存 MID 草稿</button></div><div class='sub'><h5>MID基础信息（初始）</h5><div class='form-grid'><div class='field'><label>MID 临时编号</label><input value='${m.tempNo}' class='readonly'/></div><div class='field'><label>MID 类型</label><select><option>online</option><option>offline</option></select></div><div class='field'><label>商户名称</label><input/></div><div class='field'><label>通道选择</label><select multiple onchange='onChannelChange(${shopId},${m.id},this)'><option>Adyen_AFP</option><option>Stripe_Direct</option></select></div><div class='field'><label>通道服务</label><input/></div><div class='field'><label>上单来源</label><input/></div><div class='field'><label>创建人</label><input value='Olivia' class='readonly'/></div></div></div><div id='mid-dyn-${m.id}'>${m.channels.length?midDynamic():''}</div></div>`}
+function addMid(shopId){const shop=state.shops.find(x=>x.id===shopId);const id=Date.now()+Math.floor(Math.random()*899);shop.mids.push({id,tempNo:'EM-DRAFT-'+(shop.mids.length+1),status:'未保存',channels:[]});renderShopDynamic(shop)}
+function onChannelChange(shopId,midId,sel){const shop=state.shops.find(x=>x.id===shopId);const mid=shop.mids.find(x=>x.id===midId);mid.channels=serviceVals(sel);document.getElementById('mid-dyn-'+midId).innerHTML=mid.channels.length?midDynamic():''}
+function midDynamic(){const table=products.map(p=>types.map(t=>`<tr><td>${p}</td><td>${t}</td><td><input value='2.50'/></td><td><input value='0.00'/></td><td><input value='0.00'/></td><td><select><option>开</option><option>关</option></select></td></tr>`).join('')).join('');
+return midModules.map((m,i)=>`<div class='sub'><h5>${i+1}. ${m}</h5>${m==='审核流转信息'?'<div class="pill">草稿 / 待提交</div>':''}${m==='企业审核信息'||m==='商铺审核信息'?'<div class="desc">待生成摘要</div>':''}${m==='特殊费率申请信息'?'<textarea class="readonly" readonly>BD APP端发起，当前页面只读预留</textarea>':''}${m==='支付产品与费率'?`<div class='table-wrap'><table><tr><th>支付产品</th><th>类型</th><th>交易费率（百分比）</th><th>固定收费-百分比</th><th>固定收费-绝对值</th><th>开关</th></tr>${table}</table></div><div class='desc'>来源：销售计划模板 / OPS手动调整 / 从已有MID复制 / 从费率模板复制。</div>`:''}</div>`).join('')}
+function saveShopDraft(id){const s=state.shops.find(x=>x.id===id);s.status='已保存草稿';renderShops()}
+function saveMidDraft(shopId,midId){const s=state.shops.find(x=>x.id===shopId);const m=s.mids.find(x=>x.id===midId);m.status='已保存草稿';renderShopDynamic(s)}
+function saveAllDraft(){alert('保存全部草稿：企业/商铺/MID + 配置快照（字段规则版本、服务规则版本、通道配置版本、支付产品配置版本、费率模板版本）。')}
+function submitAll(){alert('统一校验：企业字段、所有商铺字段、所有MID字段、费率完整性、CID/SID/MID关系完整性；提交成功后生成正式CID/SID/MID与审核任务。')}
+renderProgress();
+</script>
+</body></html>
