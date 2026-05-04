@@ -143,4 +143,95 @@ document.getElementById('confirmGroupSelect').addEventListener('click',()=>{sele
 document.querySelectorAll('#peopleModal [data-close=peopleModal]').forEach(b=>b.addEventListener('click',()=>document.getElementById('peopleModal').style.display='none'));document.querySelector('#personModal [data-close=personModal]').addEventListener('click',closeExistingPeopleModal);['personIdKeyword','personNameKeyword','personPhoneKeyword','personEmailKeyword'].forEach(id=>document.getElementById(id).addEventListener('input',renderExistingPeopleRows));
 document.getElementById('p_role').addEventListener('change',renderRoleExtra);document.getElementById('savePersonBtn').addEventListener('click',()=>{const role=(document.getElementById('p_role').value||'').trim();const person={cnLastName:document.getElementById('p_cn_last').value.trim(),cnFirstName:document.getElementById('p_cn_first').value.trim(),enLastName:document.getElementById('p_en_last').value.trim(),enFirstName:document.getElementById('p_en_first').value.trim(),localLastName:document.getElementById('p_local_last').value.trim(),localFirstName:document.getElementById('p_local_first').value.trim(),formerName:document.getElementById('p_former_name').value.trim(),name:'',role,primary:document.getElementById('p_primary').value,phone:document.getElementById('p_phone').value.trim(),email:document.getElementById('p_email').value.trim()};person.name=fullPersonName(person);if(!person.cnLastName||!person.cnFirstName||!person.role){alert('请完整填写相关人员必填字段');return;}const certRoles=new Set(['董事','股东','总经理','合伙人','相关人士']);if(certRoles.has(role)){const required=['p_nationality','p_id_number','p_id_validity','p_id_image','p_id_issue_date','p_visa_country','p_visa_place'];for(const id of required){const el=document.getElementById(id);const v=el?.type==='file'?(el.files&&el.files.length):(el?.value||'').trim();if(!v){alert('当前角色需填写完整证件信息');return;}}person.nationality=document.getElementById('p_nationality').value.trim();person.idNumber=document.getElementById('p_id_number').value.trim();person.idValidity=document.getElementById('p_id_validity').value.trim();person.idImage=(document.getElementById('p_id_image').files?.[0]?.name)||'';person.idIssueDate=document.getElementById('p_id_issue_date').value.trim();person.visaCountry=document.getElementById('p_visa_country').value.trim();person.visaPlace=document.getElementById('p_visa_place').value.trim();}if(role==='联络人'){const required=['p_contact_department','p_contact_title','p_contact_language'];for(const id of required){if(!(document.getElementById(id)?.value||'').trim()){alert('当前角色需填写联络人扩展信息');return;}}person.contactDepartment=document.getElementById('p_contact_department').value.trim();person.contactTitle=document.getElementById('p_contact_title').value.trim();person.contactLanguage=document.getElementById('p_contact_language').value.trim();}if(activePeopleType==='enterprise'){state.enterprisePeople.push(person);document.getElementById('peopleModal').style.display='none';renderDynamic();return;}const shop=state.shops.find(x=>x.id===activePeopleShop);if(shop){shop.people=shop.people||[];shop.people.push(person);document.getElementById('peopleModal').style.display='none';renderShops();}});
 
+</script>
+<style>
+.step-tabs{display:flex;gap:12px;margin-bottom:14px}
+.step-tab{padding:10px 16px;border:1px solid var(--border);border-radius:999px;background:var(--panel-2);cursor:pointer}
+.step-tab.active{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.step-tab.disabled{opacity:.55;cursor:not-allowed}
+#tag-shop.disabled-mask{position:relative}
+#tag-shop.disabled-mask:after{content:'请先完成企业信息暂存/确认';position:absolute;inset:0;background:rgba(255,255,255,.72);display:flex;align-items:center;justify-content:center;color:var(--danger);font-weight:600;border-radius:10px}
+.shop-mini-card{border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;background:#fff;cursor:pointer;transition:.2s}
+.shop-mini-card:hover{border-color:var(--primary);box-shadow:0 8px 20px rgba(0,0,0,.06)}
+.shop-mini-grid{display:grid;grid-template-columns:1fr auto;gap:8px}
+.drawer-mask{position:fixed;inset:0;background:rgba(17,24,39,.32);display:none;z-index:1400}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:min(700px,92vw);background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column}
+.drawer-h{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.drawer-b{padding:14px 16px;overflow-y:auto;flex:1}
+.drawer-f{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+</style>
+<script>
+(()=> {
+  const main=document.querySelector('main.main');
+  const enterpriseCard=main.querySelector('section.card');
+  const shopGate=document.getElementById('shopGate');
+  enterpriseCard.id='tag-enterprise';
+  shopGate.id='tag-shop';
+  shopGate.classList.remove('hidden');
+  const tabs=document.createElement('div');
+  tabs.className='step-tabs';
+  tabs.innerHTML=`<button class="step-tab active" data-step="enterprise">Step 1 企业信息</button><button class="step-tab disabled" data-step="shop">Step 2 商铺信息</button>`;
+  main.insertBefore(tabs, enterpriseCard);
+  const tagShop=document.getElementById('tag-shop');
+  tagShop.classList.add('disabled-mask');
+  let currentStep='enterprise', editingShopId='';
+  function switchStep(step){
+    currentStep=step;
+    enterpriseCard.style.display=step==='enterprise'?'block':'none';
+    tagShop.style.display=step==='shop'?'block':'none';
+    tabs.querySelectorAll('.step-tab').forEach(b=>b.classList.toggle('active',b.dataset.step===step));
+  }
+  tabs.addEventListener('click',(e)=>{
+    const t=e.target.closest('.step-tab'); if(!t) return;
+    if(t.dataset.step==='shop' && !state.enterpriseDraftSaved) return;
+    switchStep(t.dataset.step);
+  });
+  const drawerMask=document.createElement('div');
+  drawerMask.className='drawer-mask';
+  drawerMask.id='shopDrawerMask';
+  drawerMask.innerHTML=`<aside class="drawer"><div class="drawer-h"><strong id="drawerTitle">新增商铺</strong><button class="btn" id="closeDrawerBtn">关闭</button></div><div class="drawer-b" id="drawerBody"></div><div class="drawer-f"><button class="btn" id="drawerStashBtn">暂存</button><button class="btn primary" id="drawerConfirmBtn">确认</button></div></aside>`;
+  document.body.appendChild(drawerMask);
+  function openDrawerByShop(id){
+    editingShopId=id;
+    const host=document.getElementById('drawerBody');
+    const shop=state.shops.find(s=>s.id===id);
+    document.getElementById('drawerTitle').textContent=`商铺信息 - ${id}`;
+    host.innerHTML=`<div id="drawerShopHost"></div>`;
+    const origin=document.getElementById('shopCards');
+    const tmp=document.createElement('div');
+    tmp.innerHTML=origin.innerHTML;
+    const card=tmp.querySelector(`[data-shop="${id}"]`);
+    if(card){
+      const h=card.querySelector('.shop-h'); if(h) h.remove();
+      const actions=card.querySelector('.shop-actions'); if(actions) actions.remove();
+      host.querySelector('#drawerShopHost').appendChild(card);
+    }
+    drawerMask.style.display='block';
+  }
+  function closeDrawer(){drawerMask.style.display='none';editingShopId='';}
+  document.getElementById('closeDrawerBtn').onclick=closeDrawer;
+  drawerMask.addEventListener('click',(e)=>{if(e.target===drawerMask)closeDrawer();});
+  document.getElementById('drawerStashBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
+  document.getElementById('drawerConfirmBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
+  goNext=function(status,isDraft){
+    document.getElementById('entStatus').textContent=status;
+    document.getElementById('submitBtn').disabled=true;
+    state.enterpriseDraftSaved=isDraft;
+    document.getElementById('addShopBtn').disabled=!isDraft;
+    if(isDraft){
+      tabs.querySelector('[data-step="shop"]').classList.remove('disabled');
+      tagShop.classList.remove('disabled-mask');
+      switchStep('shop');
+    }
+  };
+  createShop=function(){if(!state.enterpriseDraftSaved){alert('请先保存企业草稿后再新增商铺。');return;}const id='SHOP-TMP-'+(state.shops.length+1);state.shops.push({id,services:[],saved:false,collapsed:false,devices:[],mids:[]});renderShops();openDrawerByShop(id);};
+  renderShops=function(){
+    const host=document.getElementById('shopCards');
+    host.innerHTML=state.shops.map((s,idx)=>`<article class="shop-mini-card" data-shop-open="${s.id}"><div class="shop-mini-grid"><div><strong>商铺 ${idx+1}：${s.name||s.id}</strong><div class="muted">地址：${s.addr||'未填写'}</div><div class="muted">电话：${s.phone||'未填写'}</div></div><span class="pill">${s.saved?'已保存':'未保存'}</span></div></article><div class="hidden"><div class='shop-card' data-shop='${s.id}'><div><div class='form-grid'><div class='field'><label class='req'>所属企业</label><input value='${state.enterpriseDraftId}' readonly></div><div class='field'><label class='req'>商铺名称</label><input data-bind='name' value='${s.name||''}'></div><div class='field'><label class='req'>门店类型</label><select><option>线下门店</option><option>线上店</option><option>混合</option></select></div><div class='field'><label class='req'>商铺营业状态</label><select><option>营业中</option><option>停业</option></select></div><div class='field'><label class='req'>营业国家</label><input value='${document.getElementById('f_region').value||''}'></div><div class='field'><label class='req'>营业地区</label><input></div><div class='field'><label class='req'>门店地址-城市</label><input></div><div class='field'><label class='req'>门店地址-地址行1</label><input data-bind='addr' value='${s.addr||''}'></div><div class='field'><label>门店地址-地址行2</label><input></div><div class='field'><label>门店地址-地址行3</label><input></div><div class='field'><label>邮政编码</label><input></div><div class='field'><label class='req'>商铺固定电话</label><input data-bind='phone' value='${s.phone||''}'></div><div class='field'><label class='req'>商铺手提电话</label><input></div><div class='field'><label class='req'>商铺电邮地址</label><input></div><div class='field'><label class='req'>销售人员</label><select><option>请选择销售人员</option><option>张伟（S001）</option><option>李敏（S002）</option><option>王强（S003）</option></select></div></div><div class='sub'><label class='req'>开通KPay服务</label><div class='svc-row'><label><input type='checkbox' data-svc='SaaS' ${s.services.includes('SaaS')?'checked':''}/> SaaS</label><label><input type='checkbox' data-svc='payment' ${s.services.includes('payment')?'checked':''}/> payment</label><label><input type='checkbox' data-svc='KBA' ${s.services.includes('KBA')?'checked':''}/> KBA</label></div></div>${renderShopDynamic(s)}</div></div></div>`).join('');
+    updateSummary();
+  };
+  document.getElementById('shopCards').addEventListener('click',(e)=>{const c=e.target.closest('[data-shop-open]');if(!c)return;openDrawerByShop(c.dataset.shopOpen);});
+  document.getElementById('shopCards').addEventListener('input',(e)=>{const box=e.target.closest('[data-shop]');if(!box)return;const sid=box.dataset.shop;const s=state.shops.find(x=>x.id===sid);if(!s)return;const k=e.target.dataset.bind;if(k)s[k]=e.target.value;});
+  switchStep('enterprise');
+})();
 </script></body></html>
