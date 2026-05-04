@@ -213,8 +213,17 @@ document.getElementById('p_role').addEventListener('change',renderRoleExtra);doc
   drawerMask.addEventListener('click',(e)=>{if(e.target===drawerMask)closeDrawer();});
   document.getElementById('drawerStashBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
   document.getElementById('drawerConfirmBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
-  const _goNext=goNext;
-  goNext=function(status,isDraft){_goNext(status,isDraft);if(isDraft){tabs.querySelector('[data-step="shop"]').classList.remove('disabled');tagShop.classList.remove('disabled-mask');switchStep('shop');}};
+  goNext=function(status,isDraft){
+    document.getElementById('entStatus').textContent=status;
+    document.getElementById('submitBtn').disabled=true;
+    state.enterpriseDraftSaved=isDraft;
+    document.getElementById('addShopBtn').disabled=!isDraft;
+    if(isDraft){
+      tabs.querySelector('[data-step="shop"]').classList.remove('disabled');
+      tagShop.classList.remove('disabled-mask');
+      switchStep('shop');
+    }
+  };
   createShop=function(){if(!state.enterpriseDraftSaved){alert('请先保存企业草稿后再新增商铺。');return;}const id='SHOP-TMP-'+(state.shops.length+1);state.shops.push({id,services:[],saved:false,collapsed:false,devices:[],mids:[]});renderShops();openDrawerByShop(id);};
   renderShops=function(){
     const host=document.getElementById('shopCards');
