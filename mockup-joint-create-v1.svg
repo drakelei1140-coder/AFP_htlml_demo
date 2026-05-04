@@ -1,0 +1,85 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1000" fill="#f5f7fb"/>
+  <rect x="20" y="16" width="1560" height="60" rx="12" fill="#fff" stroke="#e5e7eb"/>
+  <circle cx="50" cy="42" r="12" fill="#3b82f6"/>
+  <text x="74" y="49" font-size="24" fill="#111827" font-family="Arial, sans-serif">KPay CRM · 快速创建客户（交互改版预览）</text>
+
+  <rect x="40" y="100" width="940" height="60" rx="16" fill="#fff" stroke="#e5e7eb"/>
+  <rect x="62" y="114" width="300" height="32" rx="16" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="80" y="136" font-size="18" fill="#1d4ed8" font-family="Arial, sans-serif">Step 1 企业信息（已完成）</text>
+  <polygon points="370,130 386,122 386,138" fill="#9ca3af"/>
+  <rect x="398" y="114" width="292" height="32" rx="16" fill="#2563eb"/>
+  <text x="418" y="136" font-size="18" fill="#fff" font-family="Arial, sans-serif">Step 2 商铺信息（当前）</text>
+
+  <rect x="40" y="180" width="940" height="750" rx="16" fill="#fff" stroke="#e5e7eb"/>
+  <text x="64" y="210" font-size="30" fill="#111827" font-family="Arial, sans-serif">商铺信息</text>
+  <rect x="810" y="198" width="142" height="42" rx="10" fill="#2563eb"/>
+  <text x="835" y="225" font-size="20" fill="#fff" font-family="Arial, sans-serif">+ 新增商铺</text>
+  <text x="64" y="250" font-size="16" fill="#6b7280" font-family="Arial, sans-serif">已创建商铺（点击卡片可编辑）</text>
+
+  <rect x="64" y="278" width="892" height="138" rx="14" fill="#f8fafc" stroke="#dbe2ea"/>
+  <text x="84" y="308" font-size="24" fill="#0f172a" font-family="Arial, sans-serif">Everpeak Central Store</text>
+  <text x="84" y="340" font-size="16" fill="#475569" font-family="Arial, sans-serif">地址：香港中环皇后大道中88号</text>
+  <text x="84" y="368" font-size="16" fill="#475569" font-family="Arial, sans-serif">电话：+852 2888 1234</text>
+  <rect x="840" y="296" width="88" height="30" rx="12" fill="#dcfce7"/>
+  <text x="858" y="316" font-size="14" fill="#16a34a" font-family="Arial, sans-serif">已确认</text>
+
+  <rect x="64" y="432" width="892" height="138" rx="14" fill="#f8fafc" stroke="#dbe2ea"/>
+  <text x="84" y="462" font-size="24" fill="#0f172a" font-family="Arial, sans-serif">Everpeak TST Branch</text>
+  <text x="84" y="494" font-size="16" fill="#475569" font-family="Arial, sans-serif">地址：九龙尖沙咀海防道18号</text>
+  <text x="84" y="522" font-size="16" fill="#475569" font-family="Arial, sans-serif">电话：+852 2777 8899</text>
+  <rect x="840" y="450" width="88" height="30" rx="12" fill="#fef3c7"/>
+  <text x="858" y="470" font-size="14" fill="#d97706" font-family="Arial, sans-serif">已暂存</text>
+
+  <rect x="64" y="586" width="892" height="138" rx="14" fill="#f8fafc" stroke="#dbe2ea"/>
+  <text x="84" y="616" font-size="24" fill="#0f172a" font-family="Arial, sans-serif">Everpeak Causeway Bay</text>
+  <text x="84" y="648" font-size="16" fill="#475569" font-family="Arial, sans-serif">地址：铜锣湾轩尼诗道500号</text>
+  <text x="84" y="676" font-size="16" fill="#475569" font-family="Arial, sans-serif">电话：+852 2666 7788</text>
+  <rect x="840" y="604" width="88" height="30" rx="12" fill="#fef3c7"/>
+  <text x="858" y="624" font-size="14" fill="#d97706" font-family="Arial, sans-serif">已暂存</text>
+
+  <rect x="1010" y="100" width="558" height="850" rx="18" fill="#fff" stroke="#d1d5db"/>
+  <path d="M1010 118 Q1010 100 1028 100 L1550 100 Q1568 100 1568 118 L1568 170 L1010 170 Z" fill="#111827"/>
+  <text x="1032" y="142" font-size="24" fill="#fff" font-family="Arial, sans-serif">新增 / 编辑商铺（抽屉）</text>
+  <text x="1520" y="142" font-size="30" fill="#fff" font-family="Arial, sans-serif">×</text>
+
+  <rect x="1028" y="182" width="522" height="658" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="1044" y="206" font-size="14" fill="#6b7280" font-family="Arial, sans-serif">抽屉固定在浏览器右侧（页面滚动不影响位置）</text>
+  <text x="1044" y="228" font-size="14" fill="#6b7280" font-family="Arial, sans-serif">抽屉内部字段区域可独立滚动</text>
+
+  <rect x="1040" y="255" width="498" height="120" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="1054" y="282" font-size="18" fill="#111827" font-family="Arial, sans-serif">商铺名称</text>
+  <rect x="1054" y="300" width="234" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1300" y="300" width="224" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1054" y="336" width="470" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+
+  <rect x="1040" y="393" width="498" height="120" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="1054" y="420" font-size="18" fill="#111827" font-family="Arial, sans-serif">商铺联系</text>
+  <rect x="1054" y="438" width="234" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1300" y="438" width="224" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1054" y="474" width="470" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+
+  <rect x="1040" y="531" width="498" height="120" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="1054" y="558" font-size="18" fill="#111827" font-family="Arial, sans-serif">商铺地址</text>
+  <rect x="1054" y="576" width="234" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1300" y="576" width="224" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1054" y="612" width="470" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+
+  <rect x="1040" y="669" width="498" height="120" rx="10" fill="#fff" stroke="#e5e7eb"/>
+  <text x="1054" y="696" font-size="18" fill="#111827" font-family="Arial, sans-serif">Payment / MID 信息（按当前逻辑出现）</text>
+  <rect x="1054" y="714" width="234" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1300" y="714" width="224" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+  <rect x="1054" y="750" width="470" height="28" rx="6" fill="#fff" stroke="#d1d5db"/>
+
+  <rect x="1540" y="190" width="6" height="642" rx="3" fill="#e5e7eb"/>
+  <rect x="1540" y="360" width="6" height="160" rx="3" fill="#94a3b8"/>
+
+  <rect x="1028" y="852" width="522" height="86" fill="#fff" stroke="#e5e7eb"/>
+  <rect x="1180" y="878" width="110" height="42" rx="10" fill="#fff" stroke="#cbd5e1"/>
+  <text x="1218" y="904" font-size="20" fill="#334155" font-family="Arial, sans-serif">暂存</text>
+  <rect x="1310" y="878" width="150" height="42" rx="10" fill="#2563eb"/>
+  <text x="1362" y="904" font-size="20" fill="#fff" font-family="Arial, sans-serif">确认</text>
+
+  <rect x="40" y="944" width="1528" height="42" rx="10" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text x="58" y="970" font-size="16" fill="#3730a3" font-family="Arial, sans-serif">视觉说明：更清晰步骤导航 / 卡片化商铺管理 / 右侧固定抽屉 + 内部滚动 / 保持原字段内容不变。</text>
+</svg>
