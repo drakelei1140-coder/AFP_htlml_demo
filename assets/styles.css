@@ -98,7 +98,7 @@ a:hover { color: var(--primary); }
 .menu-group { margin-bottom: 8px; }
 .menu-title { font-weight: 600; color: var(--text); padding: 10px; border-radius: 6px; background: var(--panel-2); }
 .menu-list { list-style: none; margin: 6px 0 0; padding: 0 0 0 8px; }
-.menu-list li a, .menu-list li div {
+.menu-list li > a, .menu-list li > div, .menu-list li > button {
   display: block;
   padding: 8px 10px;
   border-radius: 6px;
@@ -359,3 +359,9 @@ table td:last-child {
 .modal-mask.hidden {
   display: none !important;
 }
+.menu-toggle{width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:6px;color:var(--text);cursor:pointer;font:inherit}
+.menu-toggle:hover{background:var(--primary-ghost)}
+.menu-caret{transition:transform .2s ease;color:var(--muted)}
+.menu-toggle.open .menu-caret{transform:rotate(90deg)}
+.menu-list .submenu{display:none;padding-left:16px}
+.menu-list .submenu.open{display:block}
