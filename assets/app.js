@@ -218,6 +218,7 @@ const GLOBAL_SIDEBAR_MENU = [
   {
     title: '商户管理',
     items: [
+      { text: '快速创建客户', href: 'joint-create.html' },
       { text: '企业管理', href: 'enterprise-list.html' },
       { text: '商铺管理', href: 'shop-list.html' },
       { text: '商户审核', href: 'merchant-list.html' },
@@ -235,7 +236,6 @@ const GLOBAL_SIDEBAR_MENU = [
       },
       { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
       { text: '商户进件', href: 'merchant-onboarding.html' },
-      { text: '快速创建客户', href: 'joint-create.html' },
       { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
     ]
   },
