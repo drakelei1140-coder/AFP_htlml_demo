@@ -359,3 +359,9 @@ table td:last-child {
 .modal-mask.hidden {
   display: none !important;
 }
+.menu-toggle{width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:6px;color:var(--text);cursor:pointer;font:inherit}
+.menu-toggle:hover{background:var(--primary-ghost)}
+.menu-caret{transition:transform .2s ease;color:var(--muted)}
+.menu-toggle.open .menu-caret{transform:rotate(90deg)}
+.submenu{display:none}
+.submenu.open{display:block}
