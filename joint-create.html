@@ -191,7 +191,7 @@ document.getElementById('p_role').addEventListener('change',renderRoleExtra);doc
   const drawerMask=document.createElement('div');
   drawerMask.className='drawer-mask';
   drawerMask.id='shopDrawerMask';
-  drawerMask.innerHTML=`<aside class="drawer"><div class="drawer-h"><strong id="drawerTitle">新增商铺</strong><button class="btn" id="closeDrawerBtn">关闭</button></div><div class="drawer-b" id="drawerBody"></div><div class="drawer-f"><button class="btn" id="drawerStashBtn">暂存</button><button class="btn primary" id="drawerConfirmBtn">确认</button></div></aside>`;
+  drawerMask.innerHTML=`<aside class="drawer"><div class="drawer-h"><strong id="drawerTitle">新增商铺</strong><div style="display:flex;gap:8px;align-items:center;"><button class="btn" id="copyEnterpriseInfoBtn">从企业信息复制</button><button class="btn" id="closeDrawerBtn">关闭</button></div></div><div class="drawer-b" id="drawerBody"></div><div class="drawer-f"><button class="btn" id="drawerStashBtn">暂存</button><button class="btn primary" id="drawerConfirmBtn">确认</button></div></aside>`;
   document.body.appendChild(drawerMask);
   function openDrawerByShop(id){
     editingShopId=id;
@@ -217,6 +217,17 @@ document.getElementById('p_role').addEventListener('change',renderRoleExtra);doc
   }
   function closeDrawer(){drawerMask.style.display='none';editingShopId='';}
   document.getElementById('closeDrawerBtn').onclick=closeDrawer;
+  document.getElementById('copyEnterpriseInfoBtn').onclick=()=>{
+    if(!editingShopId){alert('请先新增或打开一个商铺。');return;}
+    const shop=state.shops.find(x=>x.id===editingShopId);
+    if(!shop)return;
+    shop.name=shop.name||document.getElementById('f_display_name').value||'示例企业名称（已复制）';
+    shop.phone=shop.phone||document.getElementById('f_company_phone').value||'852-66668888';
+    shop.addr=shop.addr||`${document.getElementById('f_region').value||'中国香港'} 中环德辅道中 88 号`;
+    renderShops();
+    openDrawerByShop(editingShopId);
+    alert('已从企业信息复制企业名称、联系方式、地址到商铺信息（演示）。');
+  };
   drawerMask.addEventListener('click',(e)=>{if(e.target===drawerMask)closeDrawer();});
   document.getElementById('drawerStashBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
   document.getElementById('drawerConfirmBtn').onclick=()=>{if(!editingShopId)return;const i=state.shops.findIndex(s=>s.id===editingShopId);if(i>=0){state.shops[i].saved=true;renderShops();closeDrawer();}};
