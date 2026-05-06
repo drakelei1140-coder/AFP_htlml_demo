@@ -277,7 +277,7 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
         const children = item.children
           .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
           .join('');
-        return `<li class="has-children"><button type="button" class="menu-toggle ${open ? 'open' : ''}" data-submenu="${submenuId}"><span>${item.text}</span><span class="menu-caret">▸</span></button><div id="${submenuId}" class="submenu ${open ? 'open' : ''}">${children}</div></li>`;
+        return `<li class="has-children"><button type="button" class="menu-toggle"><span>${item.text}</span><span class="menu-caret">▸</span></button><div class="submenu">${children}</div></li>`;
       }
       const isActive = item.href === activeHref;
       return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
@@ -286,13 +286,13 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   }).join('');
 
   container.innerHTML = html;
-  container.querySelectorAll('.menu-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.submenu;
-      const target = container.querySelector(`#${id}`);
-      if (!target) return;
-      const open = target.classList.toggle('open');
-      btn.classList.toggle('open', open);
+  container.querySelectorAll('.has-children').forEach(row => {
+    const toggle = row.querySelector('.menu-toggle');
+    const submenu = row.querySelector('.submenu');
+    if (!toggle || !submenu) return;
+    toggle.addEventListener('click', () => {
+      submenu.classList.toggle('open');
+      toggle.classList.toggle('open');
     });
   });
 }
