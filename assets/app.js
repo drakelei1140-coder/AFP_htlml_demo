@@ -234,6 +234,14 @@ const GLOBAL_SIDEBAR_MENU = [
           { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
         ]
       },
+      {
+        text: '草稿箱',
+        children: [
+          { text: '企业草稿', href: 'enterprise-draft-list.html' },
+          { text: '商铺草稿', href: 'shop-draft-list.html' },
+          { text: '商户草稿', href: 'merchant-draft-list.html' }
+        ]
+      },
       { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
       { text: '商户进件', href: 'merchant-onboarding.html' },
       { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
@@ -262,10 +270,11 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   const html = GLOBAL_SIDEBAR_MENU.map(group => {
     const rows = group.items.map(item => {
       if (item.children) {
-        const children = item.children
-          .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
-          .join('');
-        return `<li><div>${item.text}</div>${children}</li>`;
+        const hasActive = item.children.some(child => child.href === activeHref);
+        const children = item.children.map(child =>
+          `<li><a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a></li>`
+        ).join('');
+        return `<li class="has-children"><button type="button" class="menu-toggle ${hasActive ? 'open' : ''}"><span>${item.text}</span><span class="menu-caret">▸</span></button><ul class="submenu ${hasActive ? 'open' : ''}">${children}</ul></li>`;
       }
       const isActive = item.href === activeHref;
       return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
@@ -274,6 +283,14 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   }).join('');
 
   container.innerHTML = html;
+  container.querySelectorAll('.has-children > .menu-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const submenu = toggle.nextElementSibling;
+      if (!submenu) return;
+      submenu.classList.toggle('open');
+      toggle.classList.toggle('open');
+    });
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
