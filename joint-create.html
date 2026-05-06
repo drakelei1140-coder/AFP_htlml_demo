@@ -26,7 +26,7 @@
 
 <div class="modal-mask" id="personModal"><div class="modal"><div class="modal-hd"><strong>选择已有人员</strong></div><div class="modal-bd"><div class="search-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));"><input id="personIdKeyword" placeholder="人员ID"><input id="personNameKeyword" placeholder="姓名"><input id="personPhoneKeyword" placeholder="电话"><input id="personEmailKeyword" placeholder="邮箱"></div><div class="table-wrap person-modal"><table><thead><tr><th>人员ID</th><th>姓名</th><th>角色身份类型</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="personRows"></tbody></table></div></div><div class="modal-ft"><button class="btn" data-close="personModal">关闭</button></div></div></div>
 <script src="assets/app.js"></script><script>
-renderGlobalSidebar('appSidebar','joint-create.html');applyBrandPaletteFromLogo();
+renderGlobalSidebar('appSidebar','joint-create.html');applyBrandPaletteFromLogo();syncEnterpriseAreaCodeOptions();
 const state={mode:'none',services:[],enterpriseDraftSaved:false,enterpriseDraftId:'',shops:[],enterprisePeople:[]};
 const fields={
  SaaS:[
