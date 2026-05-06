@@ -272,12 +272,11 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   const html = GLOBAL_SIDEBAR_MENU.map(group => {
     const rows = group.items.map((item, idx) => {
       if (item.children) {
-        const submenuId = `submenu-${group.title}-${idx}`.replace(/[^a-zA-Z0-9-_]/g, '');
-        const open = false;
-        const children = item.children
-          .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
-          .join('');
-        return `<li class="has-children"><button type="button" class="menu-toggle"><span>${item.text}</span><span class="menu-caret">▸</span></button><div class="submenu">${children}</div></li>`;
+        const hasActive = item.children.some(child => child.href === activeHref);
+        const children = item.children.map(child =>
+          `<li><a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a></li>`
+        ).join('');
+        return `<li class="has-children"><button type="button" class="menu-toggle ${hasActive ? 'open' : ''}"><span>${item.text}</span><span class="menu-caret">▸</span></button><ul class="submenu ${hasActive ? 'open' : ''}">${children}</ul></li>`;
       }
       const isActive = item.href === activeHref;
       return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
@@ -286,11 +285,10 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   }).join('');
 
   container.innerHTML = html;
-  container.querySelectorAll('.has-children').forEach(row => {
-    const toggle = row.querySelector('.menu-toggle');
-    const submenu = row.querySelector('.submenu');
-    if (!toggle || !submenu) return;
+  container.querySelectorAll('.has-children > .menu-toggle').forEach(toggle => {
     toggle.addEventListener('click', () => {
+      const submenu = toggle.nextElementSibling;
+      if (!submenu) return;
       submenu.classList.toggle('open');
       toggle.classList.toggle('open');
     });
