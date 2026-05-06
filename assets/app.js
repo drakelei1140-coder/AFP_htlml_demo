@@ -234,6 +234,14 @@ const GLOBAL_SIDEBAR_MENU = [
           { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
         ]
       },
+      {
+        text: '草稿箱',
+        children: [
+          { text: '企业草稿', href: 'enterprise-draft-list.html' },
+          { text: '商铺草稿', href: 'shop-draft-list.html' },
+          { text: '商户草稿', href: 'merchant-draft-list.html' }
+        ]
+      },
       { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
       { text: '商户进件', href: 'merchant-onboarding.html' },
       { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
