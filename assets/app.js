@@ -267,8 +267,10 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const hasActiveChild = item => Array.isArray(item.children) && item.children.some(child => child.href === activeHref);
+
   const html = GLOBAL_SIDEBAR_MENU.map(group => {
-    const rows = group.items.map(item => {
+    const rows = group.items.map((item, idx) => {
       if (item.children) {
         const hasActive = item.children.some(child => child.href === activeHref);
         const children = item.children.map(child =>
