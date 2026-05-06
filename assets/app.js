@@ -234,6 +234,14 @@ const GLOBAL_SIDEBAR_MENU = [
           { text: '商户资料修改待审核', href: 'merchant-change-review.html' }
         ]
       },
+      {
+        text: '草稿箱',
+        children: [
+          { text: '企业草稿', href: 'enterprise-draft-list.html' },
+          { text: '商铺草稿', href: 'shop-draft-list.html' },
+          { text: '商户草稿', href: 'merchant-draft-list.html' }
+        ]
+      },
       { text: '终端设备申请/回收单审批', href: 'terminal-approval.html' },
       { text: '商户进件', href: 'merchant-onboarding.html' },
       { text: 'AFP 字段映射配置', href: 'afp-mapping.html' }
@@ -265,7 +273,7 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
         const children = item.children
           .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
           .join('');
-        return `<li><div>${item.text}</div>${children}</li>`;
+        return `<li class="has-children"><button type="button" class="menu-toggle"><span>${item.text}</span><span class="menu-caret">▸</span></button><div class="submenu">${children}</div></li>`;
       }
       const isActive = item.href === activeHref;
       return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
@@ -274,6 +282,15 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   }).join('');
 
   container.innerHTML = html;
+  container.querySelectorAll('.has-children').forEach(row => {
+    const toggle = row.querySelector('.menu-toggle');
+    const submenu = row.querySelector('.submenu');
+    if (!toggle || !submenu) return;
+    toggle.addEventListener('click', () => {
+      submenu.classList.toggle('open');
+      toggle.classList.toggle('open');
+    });
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
