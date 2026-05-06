@@ -4,9 +4,9 @@
 <section class="card"><div class="card-h"><h3 class="section-title">企业基础信息区域（Step1）</h3><span class="pill" id="entStatus">未保存</span></div>
 <div class="sub"><div class="form-grid">
 <div class="field"><label class="req">企业主显示名称</label><input id="f_display_name"/></div><div class="field"><label class="req">企业类型</label><select id="f_ent_type"><option value="">请选择</option><option>KA</option><option>普通</option></select></div>
-<div class="field"><label class="req">注册国家 / 地区</label><select id="f_region" onchange="onRegionChange()"><option value="">请选择地区</option><option value="HK" selected>香港（+852）</option><option value="JP">日本（+81）</option><option value="UK">英国（+44）</option><option value="AU">澳洲（+61）</option><option value="SG">新加坡（+65）</option><option value="UA">阿联酋（+971）</option></select></div><div class="field"><label class="req">公司电话（二选一）</label><div class='phone-split'><input id="f_company_phone_area" class='area' placeholder='输入区号'/><input id="f_company_phone" class='number' placeholder='输入电话号码'/></div></div>
+<div class="field"><label class="req">注册国家 / 地区</label><select id="f_region"><option value="">请选择地区</option><option value="HK" selected>香港（+852）</option><option value="JP">日本（+81）</option><option value="UK">英国（+44）</option><option value="AU">澳洲（+61）</option><option value="SG">新加坡（+65）</option><option value="UA">阿联酋（+971）</option></select></div><div class="field"><label class="req">公司电话（二选一）</label><div class='phone-split'><input id="f_company_phone_area" class='area' placeholder='输入区号'/><input id="f_company_phone" class='number' placeholder='输入电话号码'/></div></div>
 <div class="field"><label class="req">手提电话（二选一）</label><div class='phone-split'><input id="f_mobile_phone_area" class='area' placeholder='输入区号'/><input id="f_mobile_phone" class='number' placeholder='输入电话号码'/></div></div>
-<div class="field"><label>电邮地址</label><input id="f_email"/></div><div class="field"><label class="req">开通KPay服务</label><div id="f_services"><label><input type="checkbox" value="SaaS" onchange="renderDynamic()"/> SaaS</label><label><input type="checkbox" value="payment" onchange="renderDynamic()"/> payment</label><label><input type="checkbox" value="KBA" onchange="renderDynamic()"/> KBA</label></div></div>
+<div class="field"><label>电邮地址</label><input id="f_email"/></div><div class="field"><label class="req">开通KPay服务</label><div id="f_services"><label><input type="checkbox" value="SaaS"/> SaaS</label><label><input type="checkbox" value="payment"/> payment</label><label><input type="checkbox" value="KBA"/> KBA</label></div></div>
 </div></div>
 <div id="dynamicFields" class="hidden"></div>
 <div class="btns"><button class="btn" onclick="stashEnterprise()">暂存</button><button class="btn primary" onclick="confirmEnterprise()">确认</button></div>
@@ -26,7 +26,6 @@
 
 <div class="modal-mask" id="personModal"><div class="modal"><div class="modal-hd"><strong>选择已有人员</strong></div><div class="modal-bd"><div class="search-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));"><input id="personIdKeyword" placeholder="人员ID"><input id="personNameKeyword" placeholder="姓名"><input id="personPhoneKeyword" placeholder="电话"><input id="personEmailKeyword" placeholder="邮箱"></div><div class="table-wrap person-modal"><table><thead><tr><th>人员ID</th><th>姓名</th><th>角色身份类型</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="personRows"></tbody></table></div></div><div class="modal-ft"><button class="btn" data-close="personModal">关闭</button></div></div></div>
 <script src="assets/app.js"></script><script>
-renderGlobalSidebar('appSidebar','joint-create.html');applyBrandPaletteFromLogo();syncEnterpriseAreaCodeOptions();
 const state={mode:'none',services:[],enterpriseDraftSaved:false,enterpriseDraftId:'',shops:[],enterprisePeople:[]};
 const fields={
  SaaS:[
@@ -95,7 +94,6 @@ const supportedRegions=[{code:'HK',label:'香港',dial:'+852'},{code:'JP',label:
 function getSelectedRegionDialCode(){const region=document.getElementById('f_region')?.value;const match=supportedRegions.find(x=>x.code===region);return match?match.dial:'';}
 function syncEnterpriseAreaCodeOptions(){const region=document.getElementById('f_region')?.value;const match=supportedRegions.find(x=>x.code===region);const code=match?match.dial:'';const company=document.getElementById('f_company_phone_area');const mobile=document.getElementById('f_mobile_phone_area');if(!company||!mobile)return;if(code){company.value=code;mobile.value=code;}}
 function onRegionChange(){syncEnterpriseAreaCodeOptions();if(typeof renderShops==='function')renderShops();}
-syncEnterpriseAreaCodeOptions();
 function baseValid(){const req=['f_display_name','f_ent_type','f_region'];for(const id of req){if(!document.getElementById(id).value.trim())return '请填写基础必填字段';}const companyArea=document.getElementById('f_company_phone_area').value.trim();const companyNum=document.getElementById('f_company_phone').value.trim();const mobileArea=document.getElementById('f_mobile_phone_area').value.trim();const mobileNum=document.getElementById('f_mobile_phone').value.trim();const companyOk=companyArea&&companyNum;const mobileOk=mobileArea&&mobileNum;if((companyArea||companyNum)&&!companyOk)return '公司电话需同时填写区号与号码';if((mobileArea||mobileNum)&&!mobileOk)return '手提电话需同时填写区号与号码';if(!companyOk&&!mobileOk)return '公司电话和手提电话需至少填写一项';if(!getServices().length)return '请至少选择一个服务';return ''}
 function goNext(status,isDraft){document.getElementById('entStatus').textContent=status;document.getElementById('shopGate').classList.remove('hidden');document.getElementById('submitBtn').disabled=true;state.enterpriseDraftSaved=isDraft;document.getElementById('addShopBtn').disabled=!isDraft;}
 function stashEnterprise(){const err=baseValid();if(err){const b=document.getElementById('errorBox');b.textContent=err;b.classList.remove('hidden');return;}document.getElementById('errorBox').classList.add('hidden');state.enterpriseDraftId='EC-DRAFT-'+Date.now().toString().slice(-6);goNext('已暂存（草稿ID: '+state.enterpriseDraftId+')',true);state.mode='stash';}
@@ -114,6 +112,20 @@ let activeExistingPeopleType='';
 let activeExistingPeopleShop='';
 const peoplePool=[{id:'P-10009',name:'陈一鸣',role:'负责人',primary:'是',phone:'+852-6666-8899',email:'owner@everpeak.hk'},{id:'P-10035',name:'林嘉敏',role:'财务联系人',primary:'否',phone:'+852-6555-2211',email:'finance@everpeak.hk'},{id:'P-10088',name:'黄晓东',role:'运营联系人',primary:'否',phone:'+852-6333-9876',email:'ops2@everpeak.hk'}];
 const selectedEnterpriseGroups=new Set();
+function initEnterpriseStepBindings(){
+ const region=document.getElementById('f_region');
+ if(region)region.addEventListener('change',onRegionChange);
+ const servicesWrap=document.getElementById('f_services');
+ if(servicesWrap)servicesWrap.addEventListener('change',(e)=>{if(e.target&&e.target.matches('input[type=checkbox]'))renderDynamic();});
+}
+function bootstrapJointCreatePage(){
+ renderGlobalSidebar('appSidebar','joint-create.html');
+ applyBrandPaletteFromLogo();
+ initEnterpriseStepBindings();
+ syncEnterpriseAreaCodeOptions();
+ renderDynamic();
+}
+bootstrapJointCreatePage();
 function renderEnterpriseGroupTags(){const host=document.getElementById('dynamicGroupTags');if(!host)return;const list=[...selectedEnterpriseGroups];host.innerHTML=list.length?list.map(x=>`<span class='ant-tag'>${x}</span>`).join(''):"<span class='desc'>未关联群组</span>";}
 function renderEnterpriseChannelTags(selectEl){const host=document.getElementById('dynamicChannelTags');if(!host||!selectEl)return;const list=[...selectEl.selectedOptions].map(o=>o.value);host.innerHTML=list.length?list.map(x=>`<span class='ant-tag'>${x}</span>`).join(''):"<span class='desc'>未选择服务</span>";}
 function openDeviceModal(shopId){activeDeviceShop=shopId;const modal=document.getElementById('deviceModal');modal.style.display='flex';renderDeviceRows();}

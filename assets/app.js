@@ -48,7 +48,13 @@ function applyBrandPaletteFromLogo() {
     if (!ctx) return;
 
     ctx.drawImage(img, 0, 0, size, size);
-    const { data } = ctx.getImageData(0, 0, size, size);
+    let data;
+    try {
+      ({ data } = ctx.getImageData(0, 0, size, size));
+    } catch (err) {
+      console.warn('applyBrandPaletteFromLogo skipped:', err?.message || err);
+      return;
+    }
     const buckets = new Map();
 
     for (let i = 0; i < data.length; i += 4) {
