@@ -267,13 +267,17 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const hasActiveChild = item => Array.isArray(item.children) && item.children.some(child => child.href === activeHref);
+
   const html = GLOBAL_SIDEBAR_MENU.map(group => {
-    const rows = group.items.map(item => {
+    const rows = group.items.map((item, idx) => {
       if (item.children) {
+        const submenuId = `submenu-${group.title}-${idx}`.replace(/[^a-zA-Z0-9-_]/g, '');
+        const open = false;
         const children = item.children
           .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
           .join('');
-        return `<li><div>${item.text}</div>${children}</li>`;
+        return `<li class="has-children"><button type="button" class="menu-toggle ${open ? 'open' : ''}" data-submenu="${submenuId}"><span>${item.text}</span><span class="menu-caret">▸</span></button><div id="${submenuId}" class="submenu ${open ? 'open' : ''}">${children}</div></li>`;
       }
       const isActive = item.href === activeHref;
       return `<li><a ${isActive ? 'class="active"' : ''} href="${item.href}">${item.text}</a></li>`;
@@ -282,6 +286,15 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   }).join('');
 
   container.innerHTML = html;
+  container.querySelectorAll('.menu-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.submenu;
+      const target = container.querySelector(`#${id}`);
+      if (!target) return;
+      const open = target.classList.toggle('open');
+      btn.classList.toggle('open', open);
+    });
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
