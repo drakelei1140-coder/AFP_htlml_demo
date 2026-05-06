@@ -267,9 +267,13 @@ function renderGlobalSidebar(containerId = 'appSidebar', activeHref = '') {
   const container = document.getElementById(containerId);
   if (!container) return;
 
+  const hasActiveChild = item => Array.isArray(item.children) && item.children.some(child => child.href === activeHref);
+
   const html = GLOBAL_SIDEBAR_MENU.map(group => {
-    const rows = group.items.map(item => {
+    const rows = group.items.map((item, idx) => {
       if (item.children) {
+        const submenuId = `submenu-${group.title}-${idx}`.replace(/[^a-zA-Z0-9-_]/g, '');
+        const open = false;
         const children = item.children
           .map(child => `<a class="lvl3 ${child.href === activeHref ? 'active' : ''}" href="${child.href}">${child.text}</a>`)
           .join('');
