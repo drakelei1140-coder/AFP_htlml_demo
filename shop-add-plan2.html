@@ -358,6 +358,6 @@ state.enterpriseDraftSaved=true; if(!state.shops.length){createShop();} switchSt
     const c=e.target.closest('[data-shop-open]');if(!c)return;openDrawerByShop(c.dataset.shopOpen);
   });
   document.getElementById('shopCards').addEventListener('input',(e)=>{const box=e.target.closest('[data-shop]');if(!box)return;const sid=box.dataset.shop;const s=state.shops.find(x=>x.id===sid);if(!s)return;const k=e.target.dataset.bind;if(k)s[k]=e.target.value;});
-  document.getElementById('cancelAllBtn').onclick=()=>alert('已取消（演示）');document.getElementById('saveAllDraftBtn').onclick=()=>alert('保存全部草稿成功（无需校验，演示）');document.getElementById('submitBtn').onclick=()=>{const err=validateForSubmit();if(err){alert(err);return;}alert('提交审核成功（演示）');};switchStep('enterprise');
+  document.getElementById('cancelAllBtn').onclick=()=>alert('已取消（演示）');document.getElementById('saveAllDraftBtn').onclick=()=>alert('保存全部草稿成功（无需校验，演示）');document.getElementById('submitBtn').onclick=()=>{const err=validateForSubmit();if(err){alert(err);return;}alert('提交审核成功（演示）');};switchStep('shop');
 })();
 </script></body></html>
