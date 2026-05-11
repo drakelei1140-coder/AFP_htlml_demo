@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>新增企业</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .card-h { display:flex; justify-content:space-between; align-items:center; }
+    .sub { border:1px solid var(--border); border-radius:8px; background:#fff; padding:10px; margin:10px 0; }
+    .pill { font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; }
+    .req:after { content:' *'; color:var(--danger); }
+    #f_services { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+    #f_services label { display:inline-flex; align-items:center; gap:6px; }
+    .phone-split { display:flex; gap:8px; }
+    .phone-split .area { flex:0 0 34%; }
+    .phone-split .number { flex:1; }
+    .warn { color:var(--danger); background:var(--danger-soft); border:1px solid color-mix(in srgb,var(--danger) 35%,white); padding:8px; border-radius:6px; }
+  </style>
+</head>
+<body>
+<header class="shell-top"><div class="logo-area"><div class="logo">K</div><a href="enterprise-list.html">Kpay CRM</a></div><div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div>Olivia</div></div></header>
+<div class="layout"><aside class="sidebar" id="appSidebar"></aside>
+<main class="main with-bottom-space">
+<section class="card">
+  <div class="card-h"><h3 class="section-title">新增企业</h3><span class="pill" id="entStatus">未保存</span></div>
+  <div class="sub"><div class="form-grid">
+    <div class="field"><label class="req">企业主显示名称</label><input id="f_display_name" /></div>
+    <div class="field"><label class="req">企业类型</label><select id="f_ent_type"><option value="">请选择</option><option>KA</option><option>普通</option></select></div>
+    <div class="field"><label class="req">注册国家 / 地区</label><select id="f_region"><option value="HK" selected>香港（+852）</option><option value="JP">日本（+81）</option><option value="UK">英国（+44）</option></select></div>
+    <div class="field"><label class="req">公司电话（二选一）</label><div class="phone-split"><input id="f_company_phone_area" class="area" placeholder="输入区号"/><input id="f_company_phone" class="number" placeholder="输入电话号码"/></div></div>
+    <div class="field"><label class="req">手提电话（二选一）</label><div class="phone-split"><input id="f_mobile_phone_area" class="area" placeholder="输入区号"/><input id="f_mobile_phone" class="number" placeholder="输入电话号码"/></div></div>
+    <div class="field"><label>电邮地址</label><input id="f_email"/></div>
+    <div class="field"><label>选择上级企业</label><input placeholder="ENT-10001 / 环球零售集团（演示）"/></div>
+    <div class="field"><label>关联群组</label><input placeholder="高风险行业, 跨境电商（演示）"/></div>
+    <div class="field"><label class="req">开通KPay服务</label><div id="f_services"><label><input type="checkbox" value="SaaS"> SaaS</label><label><input type="checkbox" value="payment"> payment</label><label><input type="checkbox" value="KBA"> KBA</label></div></div>
+  </div></div>
+  <div id="dynamicFields"></div>
+  <div class="warn" id="errorBox" style="display:none"></div>
+</section>
+</main></div>
+<div class="bottom-actions"><button class="btn" id="saveDraftBtn">保存草稿</button><button class="btn primary" id="submitBtn">提交审核</button><a class="btn" href="enterprise-list.html">取消</a></div>
+<script src="assets/app.js"></script>
+<script>
+const fields = {
+  SaaS:['企业当地语言名称*','企业英文名称','企业注册地址-城市*','企业注册地址-街道*','管理员电邮','运营电邮'],
+  payment:['企业当地语言名称*','企业英文名称*','行业分类*','业务性质*','产品服务*','预计年销售额*','MCC Code*','商業登記證號碼*'],
+  KBA:['法人姓名*','法人证件号*','结算账户*']
+};
+function selected(){return [...document.querySelectorAll('#f_services input:checked')].map(i=>i.value)}
+function renderDynamic(){
+  const host=document.getElementById('dynamicFields');
+  const services=selected();
+  if(!services.length){host.innerHTML='<div class="desc">请选择开通服务后展示企业阶段扩展字段。</div>';return;}
+  host.innerHTML=services.map(s=>`<section class="card"><h3 class="section-title">${s} 企业阶段字段</h3><div class="form-grid">${fields[s].map(f=>`<div class="field"><label>${f}</label><input ${f.includes('*')?'required':''}></div>`).join('')}</div></section>`).join('');
+}
+document.querySelectorAll('#f_services input').forEach(i=>i.addEventListener('change',renderDynamic));
+renderDynamic();
+function validate(){
+  const errs=[];
+  ['f_display_name','f_ent_type','f_region'].forEach(id=>{if(!document.getElementById(id).value.trim()) errs.push('请填写基础必填字段');});
+  if(!selected().length) errs.push('请至少选择一个开通服务');
+  document.querySelectorAll('#dynamicFields [required]').forEach(el=>{if(!el.value.trim()) errs.push('请填写服务扩展必填字段');});
+  return errs;
+}
+function act(type){
+  const box=document.getElementById('errorBox');
+  if(type==='submit'){
+    const errs=validate();
+    if(errs.length){box.style.display='block'; box.innerHTML=`提交失败：<ul>${errs.map(e=>`<li>${e}</li>`).join('')}</ul>`; return;}
+  }
+  box.style.display='none';
+  document.getElementById('entStatus').textContent=type==='draft'?'草稿已保存':'已提交审核';
+  alert(type==='draft'?'草稿已保存（示意）':'已提交审核（示意）');
+}
+document.getElementById('saveDraftBtn').addEventListener('click',()=>act('draft'));
+document.getElementById('submitBtn').addEventListener('click',()=>act('submit'));
+</script>
+</body>
+</html>
