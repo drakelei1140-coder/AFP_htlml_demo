@@ -377,4 +377,20 @@ renderParentEnterpriseSelector();document.getElementById('closeParentEnterpriseM
   document.getElementById('shopCards').addEventListener('input',(e)=>{const box=e.target.closest('[data-shop]');if(!box)return;const sid=box.dataset.shop;const s=state.shops.find(x=>x.id===sid);if(!s)return;const k=e.target.dataset.bind;if(k)s[k]=e.target.value;});
   document.getElementById('cancelAllBtn').onclick=()=>alert('已取消（演示）');document.getElementById('saveAllDraftBtn').onclick=()=>alert('保存全部草稿成功（无需校验，演示）');document.getElementById('submitBtn').onclick=()=>{const err=validateForSubmit();if(err){alert(err);return;}alert('提交审核成功（演示）');};switchStep('enterprise');
 })();
-</script></body></html>
+</script>
+<script>
+// plan2: 直接在页面展示单商铺表单（非抽屉）
+(function(){
+  function renderShopsDirect(){
+    const host=document.getElementById('shopCards');
+    if(!host) return;
+    host.innerHTML=state.shops.map((s,idx)=>`<div class='shop-card' data-shop='${s.id}'><div class='shop-h'><h4>商铺 ${idx+1}（${s.id}）</h4><span class='pill'>${s.saved?'已保存草稿':'未保存'}</span></div><div><div class='form-grid'><div class='field'><label class='req'>所属企业</label><input value='${state.enterpriseDraftId}' readonly></div><div class='field'><label class='req'>商铺名称</label><input data-bind='name' value='${s.name||''}'></div><div class='field'><label class='req'>门店类型</label><select><option>线下门店</option><option>线上店</option><option>混合</option></select></div><div class='field'><label class='req'>商铺营业状态</label><select><option>营业中</option><option>停业</option></select></div><div class='field'><label class='req'>营业国家</label><input value='${document.getElementById('f_region')?.value||''}'></div><div class='field'><label class='req'>营业地区</label><input></div><div class='field'><label class='req'>门店地址-城市</label><input></div><div class='field'><label class='req'>门店地址-地址行1</label><input data-bind='addr' value='${s.addr||''}'></div><div class='field'><label>门店地址-地址行2</label><input></div><div class='field'><label>门店地址-地址行3</label><input></div><div class='field'><label>邮政编码</label><input></div><div class='field'><label class='req'>商铺固定电话</label><div class='phone-split'><input class='area' readonly value='${getSelectedRegionDialCode()}'><input data-bind='phone' value='${s.phone||''}'></div></div><div class='field'><label class='req'>商铺手提电话</label><div class='phone-split'><input class='area' readonly value='${getSelectedRegionDialCode()}'><input></div></div><div class='field'><label class='req'>商铺电邮地址</label><input></div><div class='field'><label class='req'>销售人员</label><select><option>请选择销售人员</option><option>张伟（S001）</option><option>李敏（S002）</option><option>王强（S003）</option></select></div></div><div class='sub'><label class='req'>开通KPay服务</label><div class='svc-row'><label><input type='checkbox' data-svc='SaaS' ${s.services.includes('SaaS')?'checked':''}/> SaaS</label><label><input type='checkbox' data-svc='payment' ${s.services.includes('payment')?'checked':''}/> payment</label><label><input type='checkbox' data-svc='KBA' ${s.services.includes('KBA')?'checked':''}/> KBA</label></div></div>${renderShopDynamic(s)}<div class='shop-actions'><button class='btn' data-act='save'>保存商铺草稿</button></div></div></div>`).join('');
+    updateSummary();
+  }
+  createShop=function(){const id='SHOP-TMP-'+(state.shops.length+1);state.shops=[{id,services:[],saved:false,collapsed:false,devices:[],mids:[]}];renderShopsDirect();};
+  renderShops=renderShopsDirect;
+  document.getElementById('shopCards').addEventListener('input',(e)=>{const box=e.target.closest('[data-shop]');if(!box)return;const s=state.shops.find(x=>x.id===box.dataset.shop);if(!s)return;const k=e.target.dataset.bind;if(k)s[k]=e.target.value;});
+  setTimeout(()=>{document.getElementById('shopGate').classList.remove('hidden'); if(!state.shops.length) createShop(); else renderShopsDirect();},0);
+})();
+</script>
+</body></html>
