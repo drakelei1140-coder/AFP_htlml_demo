@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>商铺管理-新增（方案2）</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .sub{border:1px solid var(--border);border-radius:8px;background:#fff;padding:12px;margin:12px 0}
+    .shop-page{display:grid;gap:12px}
+    .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .svc-row{display:flex;gap:16px;flex-wrap:wrap}
+    .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .help{font-size:12px;color:var(--muted)}
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:1400}
+    .modal{width:min(980px,calc(100vw - 40px));background:#fff;border:1px solid var(--border);border-radius:10px}
+    .modal-hd,.modal-ft{padding:12px 16px;border-bottom:1px solid var(--border)}
+    .modal-ft{border-top:1px solid var(--border);border-bottom:0;display:flex;justify-content:flex-end;gap:8px}
+    .modal-bd{padding:12px 16px;max-height:65vh;overflow:auto}
+    .table-wrap table{min-width:860px}
+  </style>
+</head>
+<body>
+<header class="shell-top">
+  <div class="logo-area"><div class="logo">K</div><a href="shop-list.html">Kpay CRM</a></div>
+  <div class="top-controls"><select><option>地区：香港</option></select><select><option>语言：简体中文</option></select><button>⚙️</button><button>🔔</button><div class="user-pill"><div class="avatar">OP</div> Olivia</div></div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="appSidebar"></aside>
+  <main class="main">
+    <section class="card shop-page" id="shopFormRoot">
+      <h3 class="section-title">新增商铺</h3>
+      <div class="form-grid">
+        <div class="field"><label class="req">所属企业</label><input value="CID-2026-0004" readonly></div>
+        <div class="field"><label class="req">商铺名称</label><input id="shopName"></div>
+        <div class="field"><label class="req">门店类型</label><select><option>线下门店</option><option>线上店</option><option>混合</option></select></div>
+        <div class="field"><label class="req">商铺营业状态</label><select><option>营业中</option><option>停业</option></select></div>
+        <div class="field"><label class="req">营业国家</label><input value="HK"></div>
+        <div class="field"><label class="req">营业地区</label><input></div>
+        <div class="field"><label class="req">门店地址-城市</label><input></div>
+        <div class="field"><label class="req">门店地址-地址行1</label><input></div>
+        <div class="field"><label>门店地址-地址行2</label><input></div>
+        <div class="field"><label>门店地址-地址行3</label><input></div>
+        <div class="field"><label>邮政编码</label><input></div>
+        <div class="field"><label class="req">商铺固定电话</label><input></div>
+        <div class="field"><label class="req">商铺手提电话</label><input></div>
+        <div class="field"><label class="req">商铺电邮地址</label><input></div>
+        <div class="field"><label class="req">销售人员</label><select><option>请选择销售人员</option><option>张伟（S001）</option></select></div>
+      </div>
+
+      <section class="sub">
+        <label class="req">开通KPay服务</label>
+        <div class="svc-row"><label><input type="checkbox" class="svc" value="SaaS"> SaaS</label><label><input type="checkbox" class="svc" value="payment"> payment</label><label><input type="checkbox" class="svc" value="KBA"> KBA</label></div>
+      </section>
+
+      <section class="sub" id="deviceSection">
+        <h4>终端设备</h4>
+        <div class="inline-actions"><button class="btn" id="openDeviceModalBtn">新增设备</button></div>
+        <div class="table-wrap" style="margin-top:10px;"><table><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>数量</th><th>支付金额</th><th>操作</th></tr></thead><tbody id="selectedDeviceRows"><tr><td colspan="7">暂无已选设备</td></tr></tbody></table></div>
+      </section>
+
+      <section class="sub" id="peopleSection">
+        <h4>相关人员</h4>
+        <div class="inline-actions"><button class="btn" id="addPersonBtn">新增人员</button><button class="btn" id="choosePersonBtn">选择已有人员</button></div>
+        <div class="table-wrap" style="margin-top:10px;"><table><thead><tr><th>姓名</th><th>角色身份类型</th><th>是否主联系人</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="peopleRows"><tr><td colspan="6">暂无人员</td></tr></tbody></table></div>
+      </section>
+
+      <section class="sub" id="midSection">
+        <h4>MID 管理</h4>
+        <div class="inline-actions"><button class="btn" id="addMidBtn">新增 MID</button></div>
+        <div id="midCards" class="help" style="margin-top:10px;">暂无 MID，请点击“新增 MID”。</div>
+      </section>
+
+      <div class="btns"><button class="btn" id="saveDraftBtn">暂存</button><button class="btn primary" id="confirmBtn">确认</button><a class="btn" href="shop-list.html">取消</a></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-mask" id="deviceModal"><div class="modal"><div class="modal-hd"><strong>选择设备</strong></div><div class="modal-bd"><div class="table-wrap"><table><thead><tr><th>设备型号</th><th>设备分类</th><th>设备序列号</th><th>状态</th><th>操作</th></tr></thead><tbody id="devicePoolRows"></tbody></table></div></div><div class="modal-ft"><button class="btn" data-close="deviceModal">关闭</button></div></div></div>
+<div class="modal-mask" id="peopleModal"><div class="modal" style="max-width:760px;"><div class="modal-hd"><strong>新增相关人员</strong></div><div class="modal-bd"><div class="form-grid"><div class="field"><label class="req">中文姓</label><input id="pLast"></div><div class="field"><label class="req">中文名</label><input id="pFirst"></div><div class="field"><label class="req">角色身份类型</label><select id="pRole"><option>董事</option><option>股东</option><option>联络人</option></select></div><div class="field"><label>电话</label><input id="pPhone"></div><div class="field"><label>邮箱</label><input id="pEmail"></div><div class="field"><label class="req">是否主联系人</label><select id="pPrimary"><option>是</option><option>否</option></select></div></div></div><div class="modal-ft"><button class="btn" data-close="peopleModal">取消</button><button class="btn primary" id="savePeopleBtn">保存</button></div></div></div>
+<div class="modal-mask" id="personPickModal"><div class="modal"><div class="modal-hd"><strong>选择已有人员</strong></div><div class="modal-bd"><div class="table-wrap"><table><thead><tr><th>姓名</th><th>角色</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody id="personPoolRows"></tbody></table></div></div><div class="modal-ft"><button class="btn" data-close="personPickModal">关闭</button></div></div></div>
+<div class="modal-mask" id="midModal"><div class="modal" style="max-width:760px;"><div class="modal-hd"><strong>选择服务与通道</strong></div><div class="modal-bd"><label><input type="checkbox" class="mid-service" value="SaaS"> SaaS</label><br><label><input type="checkbox" class="mid-service" value="payment"> payment</label><hr><label><input type="checkbox" class="mid-channel" value="Adyen_payfac"> Adyen_payfac</label><br><label><input type="checkbox" class="mid-channel" value="Adyen_AFP"> Adyen_AFP</label><br><label><input type="checkbox" class="mid-channel" value="VISA"> VISA</label></div><div class="modal-ft"><button class="btn" data-close="midModal">取消</button><button class="btn primary" id="saveMidBtn">确认</button></div></div></div>
+
+<script src="assets/app.js"></script>
+<script>
+renderGlobalSidebar('appSidebar','shop-list.html');
+const state={devices:[],people:[],mids:[]};
+const devicePool=[{model:'V400m',category:'POS',serial:'SN-900001',status:'库存可分配'},{model:'A920',category:'POS',serial:'SN-900002',status:'库存可分配'}];
+const peoplePool=[{name:'陈一鸣',role:'负责人',phone:'+852-6666-8899',email:'owner@everpeak.hk'},{name:'林嘉敏',role:'财务联系人',phone:'+852-6555-2211',email:'finance@everpeak.hk'}];
+const open=(id)=>document.getElementById(id).style.display='flex';
+const close=(id)=>document.getElementById(id).style.display='none';
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));
+
+function renderDevices(){const body=document.getElementById('selectedDeviceRows');if(!state.devices.length){body.innerHTML="<tr><td colspan='7'>暂无已选设备</td></tr>";return;}body.innerHTML=state.devices.map((d,i)=>`<tr><td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td><td><input type='number' value='${d.qty}' min='1' data-didx='${i}' data-k='qty'></td><td><input type='number' value='${d.amount}' min='0' step='0.01' data-didx='${i}' data-k='amount'></td><td><button class='btn' data-drm='${i}'>移除</button></td></tr>`).join('');}
+function renderDevicePool(){document.getElementById('devicePoolRows').innerHTML=devicePool.map(d=>`<tr><td>${d.model}</td><td>${d.category}</td><td>${d.serial}</td><td>${d.status}</td><td><button class='btn' data-dpick='${d.serial}'>选择</button></td></tr>`).join('');}
+function renderPeople(){const body=document.getElementById('peopleRows');if(!state.people.length){body.innerHTML="<tr><td colspan='6'>暂无人员</td></tr>";return;}body.innerHTML=state.people.map((p,i)=>`<tr><td>${p.name}</td><td>${p.role}</td><td>${p.primary}</td><td>${p.phone||''}</td><td>${p.email||''}</td><td><button class='btn' data-prm='${i}'>删除</button></td></tr>`).join('');}
+function renderPersonPool(){document.getElementById('personPoolRows').innerHTML=peoplePool.map((p,i)=>`<tr><td>${p.name}</td><td>${p.role}</td><td>${p.phone}</td><td>${p.email}</td><td><button class='btn' data-ppick='${i}'>选择</button></td></tr>`).join('');}
+function renderMids(){const host=document.getElementById('midCards');if(!state.mids.length){host.className='help';host.textContent='暂无 MID，请点击“新增 MID”。';return;}host.className='';host.innerHTML=state.mids.map((m,i)=>`<div class='sub'><strong>${m.id}</strong><div>服务：${m.services.join(', ')||'无'}</div><div>通道：${m.channels.join(', ')||'无'}</div><div class='inline-actions' style='margin-top:8px;'><button class='btn' data-mrm='${i}'>删除 MID</button></div></div>`).join('');}
+
+document.getElementById('openDeviceModalBtn').onclick=()=>{renderDevicePool();open('deviceModal')};
+document.getElementById('addPersonBtn').onclick=()=>open('peopleModal');
+document.getElementById('choosePersonBtn').onclick=()=>{renderPersonPool();open('personPickModal')};
+document.getElementById('addMidBtn').onclick=()=>open('midModal');
+document.getElementById('saveDraftBtn').onclick=()=>alert('商铺草稿暂存成功（演示）');
+document.getElementById('confirmBtn').onclick=()=>alert('商铺确认成功（演示）');
+document.getElementById('savePeopleBtn').onclick=()=>{const ln=pLast.value.trim(),fn=pFirst.value.trim();if(!ln||!fn){alert('请填写中文姓和中文名');return;}state.people.push({name:ln+fn,role:pRole.value,primary:pPrimary.value,phone:pPhone.value.trim(),email:pEmail.value.trim()});close('peopleModal');renderPeople();};
+document.getElementById('saveMidBtn').onclick=()=>{const services=[...document.querySelectorAll('.mid-service:checked')].map(x=>x.value);if(!services.length){alert('请至少选择一个服务');return;}const channels=[...document.querySelectorAll('.mid-channel:checked')].map(x=>x.value);if(services.includes('payment')&&!channels.length){alert('payment 服务需至少一个通道');return;}state.mids.push({id:'MID-TMP-'+(state.mids.length+1),services,channels});close('midModal');document.querySelectorAll('.mid-service,.mid-channel').forEach(x=>x.checked=false);renderMids();};
+
+document.body.addEventListener('click',(e)=>{if(e.target.dataset.dpick){const d=devicePool.find(x=>x.serial===e.target.dataset.dpick);if(d && !state.devices.some(x=>x.serial===d.serial))state.devices.push({...d,qty:1,amount:0});renderDevices();return;}if(e.target.dataset.drm!==undefined){state.devices.splice(Number(e.target.dataset.drm),1);renderDevices();return;}if(e.target.dataset.prm!==undefined){state.people.splice(Number(e.target.dataset.prm),1);renderPeople();return;}if(e.target.dataset.ppick!==undefined){const p=peoplePool[Number(e.target.dataset.ppick)];state.people.push({...p,primary:'否'});close('personPickModal');renderPeople();return;}if(e.target.dataset.mrm!==undefined){state.mids.splice(Number(e.target.dataset.mrm),1);renderMids();return;}});
+document.body.addEventListener('input',(e)=>{if(e.target.dataset.didx!==undefined){const i=Number(e.target.dataset.didx);const k=e.target.dataset.k;state.devices[i][k]=e.target.value;}});
+
+renderDevices();renderPeople();renderMids();
+</script>
+</body>
+</html>
