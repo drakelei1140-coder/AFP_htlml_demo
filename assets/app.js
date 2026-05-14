@@ -233,6 +233,30 @@ const GLOBAL_SIDEBAR_MENU = [
       { text: '取消签约商户', href: 'cancelled-merchants.html' },
       { text: '拒绝签约商户', href: 'rejected-merchants.html' },
       {
+        text: '企业签约管理',
+        children: [
+          { text: '已签约企业', href: 'signed-enterprises.html' },
+          { text: '取消签约企业', href: 'cancelled-enterprises.html' },
+          { text: '拒绝签约企业', href: 'rejected-enterprises.html' }
+        ]
+      },
+      {
+        text: '商铺签约管理',
+        children: [
+          { text: '已签约商铺', href: 'signed-shops.html' },
+          { text: '取消签约商铺', href: 'cancelled-shops.html' },
+          { text: '拒绝签约商铺', href: 'rejected-shops.html' }
+        ]
+      },
+      {
+        text: '签约数据总览',
+        children: [
+          { text: '已签约数据', href: 'signed-data.html' },
+          { text: '取消签约数据', href: 'cancelled-data.html' },
+          { text: '拒绝签约数据', href: 'rejected-data.html' }
+        ]
+      },
+      {
         text: '资料修改待审核',
         children: [
           { text: '企业资料修改待审核', href: 'enterprise-change-review.html' },
